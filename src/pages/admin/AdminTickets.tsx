@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import StatusBadge from "@/components/StatusBadge";
 import { Clock, User, AlertTriangle, Search, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";

@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import { Users, Handshake, ChevronRight, Settings, LogOut, Shield, UserPlus, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";

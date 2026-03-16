@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import { FileText, BarChart, ChevronRight, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";

@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import StatusBadge from "@/components/StatusBadge";
 import {
   ShoppingBag, Wrench, BarChart3, TrendingUp, Users, Bath,
