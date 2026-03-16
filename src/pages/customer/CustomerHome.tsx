@@ -2,7 +2,8 @@ import MobileHeader from "@/components/MobileHeader";
 import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
   ChevronRight, Briefcase, BarChart3, Bath, FileText,
-  Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles
+  Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles,
+  CalendarDays, CheckCircle2, Clock, Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
