@@ -211,11 +211,12 @@ const CustomerHome = () => {
             <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
           </div>
           <div className="space-y-2.5">
-            {myServices.filter(s => s.status !== "inactive").map((svc) => (
+            {myServices.filter(s => s.status === "completed").map((svc) => (
               <motion.button
                 key={svc.name}
                 className="w-full rounded-2xl p-3.5 flex items-center gap-3 bg-card shadow-card border border-border/30 card-hover relative overflow-hidden text-left"
                 whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedService(svc)}
               >
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${svc.gradient} text-primary-foreground shadow-sm`}>
                   <svc.icon size={20} />
@@ -227,17 +228,9 @@ const CustomerHome = () => {
                     <span className="text-[10px] text-muted-foreground">{svc.date}</span>
                   </div>
                 </div>
-                <div className="shrink-0">
-                  {svc.status === "active" ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                      <Clock size={10} /> {svc.statusLabel}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent text-primary text-[10px] font-bold">
-                      <CheckCircle2 size={10} /> {svc.statusLabel}
-                    </span>
-                  )}
-                </div>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent text-primary text-[10px] font-bold shrink-0">
+                  <CheckCircle2 size={10} /> Hoàn thành
+                </span>
               </motion.button>
             ))}
             {/* Inactive services */}
@@ -258,6 +251,76 @@ const CustomerHome = () => {
             </div>
           </div>
         </motion.section>
+
+        {/* Service detail sheet */}
+        <Sheet open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
+          <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+            {selectedService && (
+              <>
+                <SheetHeader className="pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedService.gradient} text-primary-foreground shadow-sm`}>
+                      <selectedService.icon size={22} />
+                    </div>
+                    <div>
+                      <SheetTitle className="text-base text-left">{selectedService.name}</SheetTitle>
+                      <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-accent text-primary text-[10px] font-bold">
+                        <CheckCircle2 size={10} /> Hoàn thành
+                      </span>
+                    </div>
+                  </div>
+                </SheetHeader>
+
+                <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
+                  {selectedService.description}
+                </p>
+
+                <div className="space-y-3 mb-5">
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <FileText size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Mã hợp đồng</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.contractCode}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <CalendarDays size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Ngày đăng ký → Hoàn thành</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.date} → {selectedService.completedDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <MapPin size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Địa điểm</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <User size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Nhân viên phụ trách</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.staff}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[12px] font-bold text-foreground mb-2">Hạng mục công việc</p>
+                  <div className="space-y-2">
+                    {selectedService.tasks?.map((task, i) => (
+                      <div key={i} className="flex items-center gap-2.5 bg-card border border-border/30 rounded-xl p-3">
+                        <CheckCircle2 size={16} className="text-primary shrink-0" />
+                        <span className="text-[12px] text-foreground">{task}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
 
         {/* Tin tức */}
         <motion.section variants={stagger.item}>
