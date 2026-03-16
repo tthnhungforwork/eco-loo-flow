@@ -187,89 +187,8 @@ const CustomerOrders = () => {
         </AnimatePresence>
       </div>
 
-      {/* FAB - Create Order */}
-      {mainTab === 0 && (
-        <motion.button
-          className="fixed bottom-24 right-4 w-14 h-14 rounded-2xl gradient-primary text-primary-foreground shadow-glow flex items-center justify-center z-40"
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setShowCreate(true)}
-        >
-          <Plus size={24} />
-        </motion.button>
-      )}
 
-      {/* Create Service Order Sheet */}
-      <Sheet open={showCreate} onOpenChange={setShowCreate}>
-        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto px-5 pb-8">
-          <SheetHeader className="pb-4">
-            <SheetTitle className="text-base text-left">Tạo đơn hàng dịch vụ</SheetTitle>
-          </SheetHeader>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại dịch vụ</label>
-              <div className="grid grid-cols-2 gap-2">
-                {serviceTypes.map((t) => (
-                  <motion.button
-                    key={t}
-                    onClick={() => setNewOrder({ ...newOrder, type: t })}
-                    className={`rounded-xl p-3 text-left border transition-all ${
-                      newOrder.type === t
-                        ? "border-primary bg-primary/5 shadow-sm"
-                        : "border-border/40 bg-card"
-                    }`}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    <div className="flex items-center gap-2">
-                      {t === "Tư vấn" && <FileText size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
-                      {t === "VSLD" && <Sparkles size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
-                      {t === "SCBD" && <Wrench size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
-                      {t === "Netzero" && <ArrowRight size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
-                      <span className={`text-[13px] font-semibold ${newOrder.type === t ? "text-primary" : "text-foreground"}`}>{t}</span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nội dung yêu cầu</label>
-              <Textarea
-                placeholder="Mô tả nhu cầu dịch vụ..."
-                className="rounded-xl min-h-[80px]"
-                value={newOrder.content}
-                onChange={(e) => setNewOrder({ ...newOrder, content: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block flex items-center gap-1.5">
-                <MapPin size={14} /> Địa điểm
-              </label>
-              <Input
-                placeholder="Nhập địa điểm thực hiện..."
-                className="rounded-xl"
-                value={newOrder.address}
-                onChange={(e) => setNewOrder({ ...newOrder, address: e.target.value })}
-              />
-            </div>
-
-            <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
-              <ImageIcon size={16} /> Đính kèm file
-            </Button>
-
-            <Button
-              className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-              onClick={handleCreateOrder}
-              disabled={!newOrder.content}
-            >
-              <Send size={18} /> Tạo đơn hàng
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Rate Order Sheet */}
       <Sheet open={!!showRate} onOpenChange={() => setShowRate(null)}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
           <SheetHeader className="pb-4">
