@@ -88,18 +88,6 @@ const PartnerHome = () => (
         </div>
       </motion.section>
 
-      {/* Agent Banner */}
-      <motion.section variants={stagger.item} className="gradient-warm rounded-3xl p-6 text-primary-foreground relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/4 blur-2xl" />
-        <div className="relative z-10 flex items-start gap-3">
-          <Megaphone size={24} className="mt-0.5 shrink-0" />
-          <div>
-            <h3 className="font-extrabold text-lg mb-1">Trở thành Đại lý</h3>
-            <p className="text-sm opacity-85 mb-4">Bán hàng dropshipping, nhận hoa hồng hấp dẫn</p>
-            <Button size="sm" className="font-bold bg-card/90 text-foreground hover:bg-card rounded-xl border-0 px-6">Đăng ký</Button>
-          </div>
-        </div>
-      </motion.section>
 
       {/* Products */}
       <motion.section variants={stagger.item}>
