@@ -55,6 +55,12 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
           whileTap={{ scale: 0.85 }}
           className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
         >
+          <ScanLine size={18} />
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
+        >
           <ShoppingCart size={18} />
         </motion.button>
         <motion.button
@@ -63,13 +69,6 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
         >
           <Bell size={18} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full border-[1.5px] border-primary animate-pulse-soft" />
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.85 }}
-          onClick={showSwitcher ? openSheet : undefined}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
-        >
-          <Menu size={18} />
         </motion.button>
       </div>
     </header>
