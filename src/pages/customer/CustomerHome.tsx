@@ -1,14 +1,16 @@
 import CustomerHeader from "./components/CustomerHeader";
 import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
-  ChevronRight, Briefcase, BarChart3, Bath, FileText,
-  Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles,
-  CalendarDays, CheckCircle2, Plus, MapPin, User, X
+  ChevronRight, FileText, Wrench, ClipboardCheck, Hammer,
+  Recycle, HardHat, Sparkles, CalendarDays, CheckCircle2,
+  MapPin, User, Bath, Handshake, Shield, Zap, Gift, Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+
+// ── Data ──────────────────────────────────────────────
 
 const quickActions = [
   { label: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue", path: "/customer/surveys" },
@@ -19,10 +21,9 @@ const quickActions = [
   { label: "Netzero", icon: Recycle, gradient: "gradient-warm", path: "/customer/orders" },
 ];
 
-
-const myServices = [
+const completedServices = [
   {
-    name: "Vệ sinh lau dọn", icon: Sparkles, status: "completed", gradient: "gradient-primary",
+    name: "Vệ sinh lau dọn", icon: Sparkles, gradient: "gradient-primary",
     date: "01/01/2026", completedDate: "28/02/2026",
     location: "Tòa nhà Landmark 81, Q. Bình Thạnh",
     staff: "Nguyễn Văn A", contractCode: "HD-2026-001",
@@ -30,7 +31,7 @@ const myServices = [
     tasks: ["Lau sàn nhà vệ sinh", "Vệ sinh bồn cầu & lavabo", "Bổ sung vật tư tiêu hao", "Khử mùi & diệt khuẩn"],
   },
   {
-    name: "Liên hệ tư vấn", icon: FileText, status: "completed", gradient: "gradient-blue",
+    name: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue",
     date: "15/02/2026", completedDate: "10/03/2026",
     location: "Trung tâm thương mại Vincom, Q.1",
     staff: "Trần Thị B", contractCode: "HD-2026-015",
@@ -38,16 +39,41 @@ const myServices = [
     tasks: ["Khảo sát hiện trạng", "Đề xuất giải pháp", "Tư vấn lắp đặt", "Bàn giao báo cáo"],
   },
   {
-    name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", gradient: "gradient-warm",
+    name: "Sửa chữa bảo dưỡng", icon: Wrench, gradient: "gradient-warm",
     date: "10/12/2025", completedDate: "25/12/2025",
     location: "Bệnh viện Đa khoa Q.7",
     staff: "Lê Văn C", contractCode: "HD-2025-089",
     description: "Sửa chữa và bảo dưỡng toàn bộ hệ thống ống nước, thiết bị vệ sinh tại tầng 1-3.",
     tasks: ["Kiểm tra hệ thống ống nước", "Thay thế van vòi hỏng", "Bảo dưỡng bồn cầu", "Kiểm tra rò rỉ"],
   },
-  { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
-  { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
-  { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
+];
+
+const toiletTasks = [
+  { id: 1, toilet: "NVS Tầng 1 - Landmark 81", task: "Vệ sinh định kỳ", status: "pending", date: "16/03/2026", staff: "Nguyễn Văn A" },
+  { id: 2, toilet: "NVS Tầng 2 - Vincom Q.1", task: "Kiểm tra thiết bị", status: "in_progress", date: "16/03/2026", staff: "Trần Thị B" },
+  { id: 3, toilet: "NVS Khu A - Bệnh viện Q.7", task: "Bổ sung vật tư", status: "completed", date: "15/03/2026", staff: "Lê Văn C" },
+  { id: 4, toilet: "NVS Sảnh chính - AEON Mall", task: "Khử mùi & diệt khuẩn", status: "pending", date: "17/03/2026", staff: "Phạm Văn D" },
+];
+
+const taskStatusMap: Record<string, { label: string; color: string }> = {
+  pending: { label: "Chờ xử lý", color: "bg-amber-100 text-amber-700" },
+  in_progress: { label: "Đang thực hiện", color: "bg-blue-100 text-blue-700" },
+  completed: { label: "Hoàn thành", color: "bg-accent text-primary" },
+};
+
+const servicePlans = [
+  {
+    name: "Cơ bản", price: "2.500.000đ", period: "/tháng", popular: false,
+    features: ["Vệ sinh 2 lần/tuần", "Báo cáo hàng tháng", "Hỗ trợ giờ hành chính", "1 NVS"],
+  },
+  {
+    name: "Nâng cao", price: "5.000.000đ", period: "/tháng", popular: true,
+    features: ["Vệ sinh hàng ngày", "Báo cáo real-time", "Hỗ trợ 24/7", "Tối đa 5 NVS", "Bảo dưỡng thiết bị", "Ưu tiên xử lý ticket"],
+  },
+  {
+    name: "Doanh nghiệp", price: "Liên hệ", period: "", popular: false,
+    features: ["Tất cả gói Nâng cao", "Không giới hạn NVS", "Quản lý chuyên trách", "Tùy chỉnh theo yêu cầu", "SLA cam kết", "Đào tạo nhân viên"],
+  },
 ];
 
 const news = [
@@ -68,27 +94,25 @@ const stagger = {
   item: { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } },
 };
 
+// ── Component ─────────────────────────────────────────
+
 const CustomerHome = () => {
   const [visibleProducts, setVisibleProducts] = useState(4);
-  const [selectedService, setSelectedService] = useState<typeof myServices[0] | null>(null);
+  const [selectedService, setSelectedService] = useState<typeof completedServices[0] | null>(null);
 
   return (
     <div className="min-h-screen">
       <CustomerHeader showSwitcher />
 
-      {/* Hero area with gradient continuation from header */}
+      {/* Hero */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="orb w-32 h-32 bg-primary-foreground/20 -top-10 -right-10" />
           <div className="orb w-24 h-24 bg-primary-foreground/10 bottom-0 left-10" style={{ animationDelay: "2s" }} />
         </div>
-
-        {/* Account summary card */}
         <motion.div
           className="relative z-10 bg-primary-foreground/12 backdrop-blur-lg rounded-2xl p-4 border border-primary-foreground/10"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         >
           <div className="flex items-center justify-between mb-2">
             <p className="text-primary-foreground/70 text-xs font-medium">Tổng quan</p>
@@ -111,22 +135,16 @@ const CustomerHome = () => {
         </motion.div>
       </div>
 
-      {/* Quick actions grid - overlapping the hero */}
+      {/* 1. Dịch vụ (Quick Actions) */}
       <div className="px-4 -mt-4 relative z-10">
-        <motion.div
-          className="bg-card rounded-2xl shadow-elevated p-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-        >
+        <motion.div className="bg-card rounded-2xl shadow-elevated p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
           <div className="grid grid-cols-3 gap-y-4 gap-x-2">
             {quickActions.map((action, i) => (
               <motion.button
                 key={action.label}
                 className="flex flex-col items-center gap-1.5 relative"
                 whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 + i * 0.04 }}
               >
                 <div className={`w-12 h-12 rounded-2xl ${action.gradient} flex items-center justify-center shadow-sm`}>
@@ -141,7 +159,7 @@ const CustomerHome = () => {
 
       <motion.div className="px-4 py-5 space-y-6" variants={stagger.container} initial="hidden" animate="show">
 
-        {/* Gửi ticket - Banner CTA */}
+        {/* 2. Gửi ticket */}
         <motion.section variants={stagger.item}>
           <motion.div
             className="relative rounded-2xl overflow-hidden cursor-pointer"
@@ -168,16 +186,54 @@ const CustomerHome = () => {
           </motion.div>
         </motion.section>
 
-        {/* Gói dịch vụ */}
+        {/* 3. Danh sách công việc NVS (lướt ngang) */}
         <motion.section variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="section-title flex items-center gap-2">
-              <Crown size={16} className="text-primary" /> Gói dịch vụ
+              <Bath size={16} className="text-primary" /> Công việc NVS
+            </h2>
+            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x scrollbar-hide pb-1">
+            {toiletTasks.map((t, i) => (
+              <motion.div
+                key={t.id}
+                className="min-w-[260px] bg-card rounded-2xl p-3.5 shrink-0 snap-start shadow-card border border-border/30"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + i * 0.05 }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+                      <Bath size={14} className="text-primary-foreground" />
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${taskStatusMap[t.status].color}`}>
+                      {taskStatusMap[t.status].label}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">{t.date}</span>
+                </div>
+                <p className="text-[12px] font-semibold text-foreground leading-tight mb-1 line-clamp-1">{t.toilet}</p>
+                <p className="text-[11px] text-muted-foreground mb-2">{t.task}</p>
+                <div className="flex items-center gap-1.5">
+                  <User size={10} className="text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">{t.staff}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* 4. Dịch vụ bạn đã thực hiện */}
+        <motion.section variants={stagger.item}>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="section-title flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-primary" /> Dịch vụ đã thực hiện
             </h2>
             <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
           </div>
           <div className="space-y-2.5">
-            {myServices.filter(s => s.status === "completed").map((svc) => (
+            {completedServices.map((svc) => (
               <motion.button
                 key={svc.name}
                 className="w-full rounded-2xl p-3.5 flex items-center gap-3 bg-card shadow-card border border-border/30 card-hover relative overflow-hidden text-left"
@@ -202,77 +258,99 @@ const CustomerHome = () => {
           </div>
         </motion.section>
 
-        {/* Service detail sheet */}
-        <Sheet open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
-          <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
-            {selectedService && (
-              <>
-                <SheetHeader className="pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedService.gradient} text-primary-foreground shadow-sm`}>
-                      <selectedService.icon size={22} />
-                    </div>
-                    <div>
-                      <SheetTitle className="text-base text-left">{selectedService.name}</SheetTitle>
-                      <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-accent text-primary text-[10px] font-bold">
-                        <CheckCircle2 size={10} /> Hoàn thành
-                      </span>
-                    </div>
-                  </div>
-                </SheetHeader>
-
-                <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
-                  {selectedService.description}
-                </p>
-
-                <div className="space-y-3 mb-5">
-                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
-                    <FileText size={16} className="text-primary shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Mã hợp đồng</p>
-                      <p className="text-[13px] font-semibold text-foreground">{selectedService.contractCode}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
-                    <CalendarDays size={16} className="text-primary shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Ngày đăng ký → Hoàn thành</p>
-                      <p className="text-[13px] font-semibold text-foreground">{selectedService.date} → {selectedService.completedDate}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
-                    <MapPin size={16} className="text-primary shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Địa điểm</p>
-                      <p className="text-[13px] font-semibold text-foreground">{selectedService.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
-                    <User size={16} className="text-primary shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Nhân viên phụ trách</p>
-                      <p className="text-[13px] font-semibold text-foreground">{selectedService.staff}</p>
-                    </div>
-                  </div>
+        {/* 5. Đăng ký trở thành Đối tác */}
+        <motion.section variants={stagger.item}>
+          <motion.div
+            className="relative rounded-2xl overflow-hidden cursor-pointer"
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
+            <div className="absolute inset-0 opacity-10">
+              <div className="orb w-28 h-28 bg-white/20 -top-8 -right-8" />
+            </div>
+            <div className="relative z-10 p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/10">
+                  <Handshake size={24} className="text-white" />
                 </div>
-
                 <div>
-                  <p className="text-[12px] font-bold text-foreground mb-2">Hạng mục công việc</p>
-                  <div className="space-y-2">
-                    {selectedService.tasks?.map((task, i) => (
-                      <div key={i} className="flex items-center gap-2.5 bg-card border border-border/30 rounded-xl p-3">
-                        <CheckCircle2 size={16} className="text-primary shrink-0" />
-                        <span className="text-[12px] text-foreground">{task}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-[15px] font-bold text-white">Trở thành Đối tác</p>
+                  <p className="text-[11px] text-white/70">Mở rộng cơ hội kinh doanh cùng chúng tôi</p>
                 </div>
-              </>
-            )}
-          </SheetContent>
-        </Sheet>
+              </div>
+              <div className="flex gap-4 mb-4">
+                <div className="flex items-center gap-1.5">
+                  <Zap size={12} className="text-white/80" />
+                  <span className="text-[10px] text-white/80">Thu nhập hấp dẫn</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Shield size={12} className="text-white/80" />
+                  <span className="text-[10px] text-white/80">Đào tạo miễn phí</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Gift size={12} className="text-white/80" />
+                  <span className="text-[10px] text-white/80">Hoa hồng cao</span>
+                </div>
+              </div>
+              <button className="w-full py-2.5 rounded-xl bg-white/20 backdrop-blur-md text-white text-[13px] font-bold border border-white/20 hover:bg-white/30 transition-colors">
+                Đăng ký ngay →
+              </button>
+            </div>
+          </motion.div>
+        </motion.section>
 
-        {/* Tin tức */}
+        {/* 6. Gói dịch vụ (Pricing matrix) */}
+        <motion.section variants={stagger.item}>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="section-title flex items-center gap-2">
+              <Crown size={16} className="text-primary" /> Gói dịch vụ
+            </h2>
+          </div>
+          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x scrollbar-hide pb-1">
+            {servicePlans.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                className={`min-w-[220px] rounded-2xl p-4 shrink-0 snap-start border relative overflow-hidden ${
+                  plan.popular
+                    ? "bg-primary text-primary-foreground border-primary shadow-elevated"
+                    : "bg-card border-border/30 shadow-card"
+                }`}
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + i * 0.06 }}
+              >
+                {plan.popular && (
+                  <div className="absolute top-0 right-0 bg-primary-foreground/20 text-primary-foreground text-[9px] font-bold px-2.5 py-1 rounded-bl-xl">
+                    PHỔ BIẾN
+                  </div>
+                )}
+                <p className={`text-[13px] font-bold mb-1 ${plan.popular ? "text-primary-foreground" : "text-foreground"}`}>{plan.name}</p>
+                <div className="flex items-baseline gap-0.5 mb-3">
+                  <span className={`text-xl font-black ${plan.popular ? "text-primary-foreground" : "text-primary"}`}>{plan.price}</span>
+                  {plan.period && (
+                    <span className={`text-[10px] ${plan.popular ? "text-primary-foreground/60" : "text-muted-foreground"}`}>{plan.period}</span>
+                  )}
+                </div>
+                <div className="space-y-2 mb-4">
+                  {plan.features.map((f) => (
+                    <div key={f} className="flex items-center gap-2">
+                      <Check size={12} className={plan.popular ? "text-primary-foreground/80" : "text-primary"} />
+                      <span className={`text-[11px] ${plan.popular ? "text-primary-foreground/90" : "text-foreground"}`}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button className={`w-full py-2 rounded-xl text-[12px] font-bold transition-colors ${
+                  plan.popular
+                    ? "bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground/30"
+                    : "bg-accent text-primary hover:bg-accent/80"
+                }`}>
+                  Chọn gói
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* 7. Tin tức (lướt ngang) */}
         <motion.section variants={stagger.item}>
           <div className="flex justify-between items-center mb-3">
             <h2 className="section-title flex items-center gap-2">
@@ -286,8 +364,7 @@ const CustomerHome = () => {
                 key={n.id}
                 className="min-w-[160px] bg-card rounded-2xl overflow-hidden shrink-0 snap-start shadow-card border border-border/30 card-hover"
                 whileTap={{ scale: 0.97 }}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.05 }}
               >
                 <div className="h-20 gradient-mesh-hero flex items-center justify-center text-2xl noise-overlay relative">
@@ -302,7 +379,7 @@ const CustomerHome = () => {
           </div>
         </motion.section>
 
-        {/* Sản phẩm Xanh */}
+        {/* 8. Sản phẩm Xanh (load more) */}
         <motion.section variants={stagger.item}>
           <div className="flex justify-between items-center mb-3">
             <h2 className="section-title flex items-center gap-1.5">🌱 Sản phẩm Xanh</h2>
@@ -314,8 +391,7 @@ const CustomerHome = () => {
                 key={p.id}
                 className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/30 card-hover"
                 whileTap={{ scale: 0.97 }}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.04 }}
               >
                 <div className="h-24 gradient-mesh flex items-center justify-center noise-overlay relative">
@@ -356,6 +432,71 @@ const CustomerHome = () => {
 
         <div className="h-6" />
       </motion.div>
+
+      {/* Service detail sheet */}
+      <Sheet open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+          {selectedService && (
+            <>
+              <SheetHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedService.gradient} text-primary-foreground shadow-sm`}>
+                    <selectedService.icon size={22} />
+                  </div>
+                  <div>
+                    <SheetTitle className="text-base text-left">{selectedService.name}</SheetTitle>
+                    <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-accent text-primary text-[10px] font-bold">
+                      <CheckCircle2 size={10} /> Hoàn thành
+                    </span>
+                  </div>
+                </div>
+              </SheetHeader>
+              <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">{selectedService.description}</p>
+              <div className="space-y-3 mb-5">
+                <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                  <FileText size={16} className="text-primary shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Mã hợp đồng</p>
+                    <p className="text-[13px] font-semibold text-foreground">{selectedService.contractCode}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                  <CalendarDays size={16} className="text-primary shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Ngày đăng ký → Hoàn thành</p>
+                    <p className="text-[13px] font-semibold text-foreground">{selectedService.date} → {selectedService.completedDate}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                  <MapPin size={16} className="text-primary shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Địa điểm</p>
+                    <p className="text-[13px] font-semibold text-foreground">{selectedService.location}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                  <User size={16} className="text-primary shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Nhân viên phụ trách</p>
+                    <p className="text-[13px] font-semibold text-foreground">{selectedService.staff}</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-foreground mb-2">Hạng mục công việc</p>
+                <div className="space-y-2">
+                  {selectedService.tasks?.map((task, i) => (
+                    <div key={i} className="flex items-center gap-2.5 bg-card border border-border/30 rounded-xl p-3">
+                      <CheckCircle2 size={16} className="text-primary shrink-0" />
+                      <span className="text-[12px] text-foreground">{task}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
