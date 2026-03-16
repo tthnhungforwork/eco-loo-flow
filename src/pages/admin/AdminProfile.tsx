@@ -1,9 +1,9 @@
 import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
-import StatusBadge from "@/components/StatusBadge";
-import { Handshake, Users, ChevronRight, LogOut, CheckCircle2, Clock } from "lucide-react";
+import { Handshake, Users, ChevronRight, LogOut, CheckCircle2, Clock, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const approvedPartners = [
   { id: 1, name: "Công ty Eco Clean", contact: "0901234567", status: "done" },
@@ -16,9 +16,9 @@ const pendingPartners = [
 ];
 
 const staff = [
-  { id: 1, name: "Nguyễn Thị A", role: "Điều phối viên", status: "active" },
-  { id: 2, name: "Trần Văn B", role: "Quản lý NVS", status: "active" },
-  { id: 3, name: "Lê Thị C", role: "Nhân viên kỹ thuật", status: "active" },
+  { id: 1, name: "Nguyễn Thị A", role: "Điều phối viên", initial: "A" },
+  { id: 2, name: "Trần Văn B", role: "Quản lý NVS", initial: "B" },
+  { id: 3, name: "Lê Thị C", role: "Nhân viên kỹ thuật", initial: "C" },
 ];
 
 const AdminProfile = () => {
@@ -29,65 +29,78 @@ const AdminProfile = () => {
   return (
     <div>
       <MobileHeader title="Chung" />
-      <div className="px-4 py-4 space-y-5 animate-fade-in">
+      <div className="px-4 py-5 space-y-5">
         {/* Avatar */}
-        <div className="bg-card rounded-xl border border-border p-5 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
+        <motion.div className="glass-card rounded-2xl p-5 flex items-center gap-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center text-primary-foreground font-extrabold text-xl shadow-glow">
             AD
           </div>
-          <div>
-            <p className="font-bold text-foreground">Admin KTX</p>
+          <div className="flex-1">
+            <p className="font-bold text-foreground text-lg">Admin KTX</p>
             <p className="text-xs text-muted-foreground">admin@ktx.vn</p>
+            <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full gradient-warm text-primary-foreground text-[10px] font-bold">Admin</span>
           </div>
-        </div>
+          <button className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center">
+            <Settings size={18} className="text-muted-foreground" />
+          </button>
+        </motion.div>
 
         {/* Partner Management */}
-        <section>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1 flex items-center gap-2">
-            <Handshake size={14} />Quản lý đối tác
+        <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
+            <Handshake size={12} /> Quản lý đối tác
           </h3>
           <SegmentedControl tabs={["Đã duyệt", "Chưa duyệt"]} active={partnerTab} onChange={setPartnerTab} />
           <div className="space-y-2">
-            {partners.map((p) => (
-              <div key={p.id} className="bg-card rounded-xl border border-border p-4 flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${p.status === "done" ? "bg-eco-green-light" : "bg-muted"}`}>
-                  {p.status === "done" ? <CheckCircle2 size={18} className="text-primary" /> : <Clock size={18} className="text-muted-foreground" />}
+            {partners.map((p, i) => (
+              <motion.div key={p.id} className="glass-card rounded-2xl p-4 flex items-center gap-3 card-hover" initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                <div className={`icon-container-sm ${p.status === "done" ? "gradient-primary" : "bg-muted"} ${p.status === "done" ? "text-primary-foreground" : "text-muted-foreground"}`}>
+                  {p.status === "done" ? <CheckCircle2 size={18} /> : <Clock size={18} />}
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-sm text-foreground">{p.name}</p>
+                  <p className="font-semibold text-sm text-foreground">{p.name}</p>
                   <p className="text-xs text-muted-foreground">{p.contact}</p>
                 </div>
                 <ChevronRight size={18} className="text-muted-foreground" />
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* Staff Management */}
-        <section>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1 flex items-center gap-2">
-            <Users size={14} />Quản lý nhân viên KTX
+        {/* Staff */}
+        <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
+            <Users size={12} /> Quản lý nhân viên KTX
           </h3>
-          <div className="bg-card rounded-xl border border-border overflow-hidden">
-            {staff.map((s, i) => (
-              <button key={s.id} className="w-full flex items-center gap-3 px-4 py-3.5 touch-target border-b border-border last:border-0 text-left">
-                <div className="w-9 h-9 rounded-full bg-eco-blue-light flex items-center justify-center text-secondary font-semibold text-xs">
-                  {s.name.charAt(s.name.lastIndexOf(" ") + 1)}
+          <div className="glass-card rounded-2xl overflow-hidden">
+            {staff.map((s) => (
+              <button key={s.id} className="w-full flex items-center gap-3 px-4 py-4 touch-target border-b border-border/30 last:border-0 text-left active:bg-muted/50 transition-colors">
+                <div className="w-10 h-10 rounded-xl gradient-blue flex items-center justify-center text-secondary-foreground font-bold text-sm">
+                  {s.initial}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.role}</p>
+                  <p className="text-sm font-semibold text-foreground">{s.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{s.role}</p>
                 </div>
                 <ChevronRight size={18} className="text-muted-foreground" />
               </button>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <button onClick={() => navigate("/login")} className="w-full flex items-center gap-3 px-4 py-3.5 bg-card rounded-xl border border-destructive/20 touch-target">
-          <LogOut size={20} className="text-destructive" />
-          <span className="text-sm font-medium text-destructive">Đăng xuất</span>
-        </button>
+        <motion.button
+          onClick={() => navigate("/login")}
+          className="w-full flex items-center gap-3 px-4 py-4 glass-card rounded-2xl border-destructive/20 touch-target"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <div className="icon-container-sm bg-destructive/10">
+            <LogOut size={18} className="text-destructive" />
+          </div>
+          <span className="text-sm font-semibold text-destructive">Đăng xuất</span>
+        </motion.button>
       </div>
     </div>
   );
