@@ -43,7 +43,7 @@ const CustomerBusinessInfo = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Quản lý doanh nghiệp" />
+      <CustomerHeader title="Quản lý doanh nghiệp" />
       <div className="py-4">
         <SegmentedControl tabs={["Thông tin DN", "Nhân sự"]} active={tab} onChange={setTab} />
 

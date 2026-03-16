@@ -71,7 +71,7 @@ const CustomerSurveys = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Khảo sát" />
+      <CustomerHeader title="Khảo sát" />
       <div className="py-4">
         <SegmentedControl
           tabs={["Tư vấn Số hóa NVS", "Sạch - Xanh - Tuần hoàn"]}

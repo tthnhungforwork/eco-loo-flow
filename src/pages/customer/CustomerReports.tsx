@@ -52,7 +52,7 @@ const monthlyData = [
 const CustomerReports = () => {
   return (
     <div>
-      <MobileHeader title="Báo cáo" />
+      <CustomerHeader title="Báo cáo" />
       <div className="px-4 py-5 space-y-6">
         {/* Report sections */}
         {reportSections.map((section, si) => (

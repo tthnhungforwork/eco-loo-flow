@@ -100,7 +100,7 @@ const CustomerTasks = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Công việc" />
+      <CustomerHeader title="Công việc" />
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 

@@ -47,7 +47,7 @@ const CustomerToilets = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Nhà vệ sinh" />
+      <CustomerHeader title="Nhà vệ sinh" />
 
       <AnimatePresence mode="wait">
         {selectedId && selected ? (

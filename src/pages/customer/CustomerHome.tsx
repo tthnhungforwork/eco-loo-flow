@@ -74,7 +74,7 @@ const CustomerHome = () => {
 
   return (
     <div className="min-h-screen">
-      <MobileHeader showSwitcher />
+      <CustomerHeader showSwitcher />
 
       {/* Hero area with gradient continuation from header */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">

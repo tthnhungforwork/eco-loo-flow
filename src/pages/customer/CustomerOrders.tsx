@@ -53,7 +53,7 @@ const CustomerOrders = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Đơn hàng" />
+      <CustomerHeader title="Đơn hàng" />
       <div className="py-4">
         <SegmentedControl tabs={mainTabs} active={mainTab} onChange={setMainTab} />
 
