@@ -313,8 +313,6 @@ const CustomerCreateOrder = () => {
             </motion.div>
           )}
 
-          {/* Step 3 non-netzero: Xác nhận + summary, then show inline below */}
-          {step === 2 && type !== "netzero" && step === 2 ? null : null}
 
           {/* Step 3 (non-netzero) OR Step 4 (netzero): OTP Verification */}
           {isOtpStep && (
