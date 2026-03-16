@@ -21,11 +21,6 @@ const quickActions = [
   { label: "Sản phẩm", icon: Package, gradient: "gradient-blue" },
 ];
 
-const banners = [
-  { id: 1, title: "Gói vệ sinh NVS tháng 3", subtitle: "Giảm 20% cho đơn hàng đầu tiên", gradient: "gradient-hero", emoji: "🧹" },
-  { id: 2, title: "Tư vấn Số hóa NVS", subtitle: "Miễn phí khảo sát lần đầu", gradient: "gradient-blue", emoji: "💡" },
-  { id: 3, title: "Sản phẩm Xanh mới", subtitle: "Bộ sưu tập Eco Pro 2026", gradient: "gradient-warm", emoji: "🌿" },
-];
 
 const myServices = [
   {
