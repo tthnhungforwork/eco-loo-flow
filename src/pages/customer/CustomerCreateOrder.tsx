@@ -63,6 +63,15 @@ const CustomerCreateOrder = () => {
 
   const updateForm = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
 
+  const toggleToilet = (id: number) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedToilets: prev.selectedToilets.includes(id)
+        ? prev.selectedToilets.filter((t) => t !== id)
+        : [...prev.selectedToilets, id],
+    }));
+  };
+
   return (
     <div className="gradient-surface min-h-screen">
       <CustomerHeader title={service.label} />
