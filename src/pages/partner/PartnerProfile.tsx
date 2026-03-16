@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import { useRole } from "@/contexts/RoleContext";
 import { Building2, Users, Wrench, ChevronRight, Settings, LogOut, Shield, Plus } from "lucide-react";
 import { motion } from "framer-motion";

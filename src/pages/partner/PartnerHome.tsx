@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import {
   ArrowRight, Leaf, ShoppingCart, Star, Newspaper, Crown,
   ChevronRight, ChevronDown, Briefcase, Bath, ClipboardCheck,
