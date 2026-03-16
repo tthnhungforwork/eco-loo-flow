@@ -322,11 +322,6 @@ const PartnerHome = () => {
               Xem thêm sản phẩm
             </Button>
           )}
-          <div className="mt-3">
-            <Button className="w-full h-11 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-2">
-              <ExternalLink size={16} /> Mua hàng trên TMĐT
-            </Button>
-          </div>
         </motion.section>
       </motion.div>
     </div>
