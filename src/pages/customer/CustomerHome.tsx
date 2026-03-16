@@ -172,22 +172,6 @@ const CustomerHome = () => {
                 </span>
               </motion.button>
             ))}
-            {/* Inactive services */}
-            <div className="grid grid-cols-3 gap-2 mt-1">
-              {myServices.filter(s => s.status === "inactive").map((svc) => (
-                <motion.button
-                  key={svc.name}
-                  className="rounded-2xl p-3 flex flex-col items-center gap-2 text-center bg-muted/30 border border-dashed border-border/40 opacity-70"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted text-muted-foreground">
-                    <svc.icon size={16} />
-                  </div>
-                  <span className="text-[10px] font-medium text-muted-foreground leading-tight">{svc.name}</span>
-                  <Plus size={12} className="text-muted-foreground/60" />
-                </motion.button>
-              ))}
-            </div>
           </div>
         </motion.section>
 
