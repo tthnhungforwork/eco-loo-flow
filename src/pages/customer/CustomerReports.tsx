@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import { BarChart3, TrendingUp, AlertTriangle, ShoppingBag, Wrench } from "lucide-react";
 import { motion } from "framer-motion";

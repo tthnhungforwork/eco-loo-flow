@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import { useRole } from "@/contexts/RoleContext";
 import { Building2, Users, ShoppingBag, Heart, MessageSquareWarning, FileText, ChevronRight, Settings, LogOut, Shield } from "lucide-react";
 import { motion } from "framer-motion";
