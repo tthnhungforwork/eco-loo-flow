@@ -119,8 +119,8 @@ const CustomerHome = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <div className="grid grid-cols-4 gap-y-4 gap-x-2">
-            {displayActions.map((action, i) => (
+          <div className="grid grid-cols-3 gap-y-4 gap-x-2">
+            {quickActions.map((action, i) => (
               <motion.button
                 key={action.label}
                 className="flex flex-col items-center gap-1.5 relative"
@@ -129,11 +129,6 @@ const CustomerHome = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 + i * 0.04 }}
               >
-                {action.badge && (
-                  <span className="absolute -top-1 right-1 text-[7px] font-bold bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full z-10">
-                    {action.badge}
-                  </span>
-                )}
                 <div className={`w-12 h-12 rounded-2xl ${action.gradient} flex items-center justify-center shadow-sm`}>
                   <action.icon size={20} className="text-primary-foreground" />
                 </div>
@@ -141,20 +136,6 @@ const CustomerHome = () => {
               </motion.button>
             ))}
           </div>
-          {quickActions.length > 4 && (
-            <motion.button
-              onClick={() => setShowAllActions(!showAllActions)}
-              className="w-full flex items-center justify-center mt-3 pt-2 border-t border-border/30"
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={{ rotate: showAllActions ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown size={20} className="text-primary" />
-              </motion.div>
-            </motion.button>
-          )}
         </motion.div>
       </div>
 
