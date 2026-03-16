@@ -161,27 +161,28 @@ const CustomerCreateOrder = () => {
                 ))}
               </div>
 
-              <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS đăng ký</p>
+               <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS đăng ký (có thể chọn nhiều)</p>
               <div className="space-y-2">
-                {existingToilets.map((t) => (
-                  <motion.button
-                    key={t.id}
-                    className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
-                      form.selectedToilet === t.id
-                        ? "bg-primary/5 border-primary/30"
-                        : "bg-card border-border/30"
-                    }`}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => updateForm("selectedToilet", t.id)}
-                  >
-                    <Bath size={16} className={form.selectedToilet === t.id ? "text-primary" : "text-muted-foreground"} />
-                    <div className="flex-1">
-                      <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{t.address}</p>
-                    </div>
-                    {form.selectedToilet === t.id && <CheckCircle2 size={16} className="text-primary" />}
-                  </motion.button>
-                ))}
+                {existingToilets.map((t) => {
+                  const selected = form.selectedToilets.includes(t.id);
+                  return (
+                    <motion.button
+                      key={t.id}
+                      className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
+                        selected ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"
+                      }`}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => toggleToilet(t.id)}
+                    >
+                      <Bath size={16} className={selected ? "text-primary" : "text-muted-foreground"} />
+                      <div className="flex-1">
+                        <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{t.address}</p>
+                      </div>
+                      {selected && <CheckCircle2 size={16} className="text-primary" />}
+                    </motion.button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
