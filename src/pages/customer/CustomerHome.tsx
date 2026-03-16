@@ -70,9 +70,7 @@ const stagger = {
 
 const CustomerHome = () => {
   const [visibleProducts, setVisibleProducts] = useState(4);
-  const [showAllActions, setShowAllActions] = useState(false);
   const [selectedService, setSelectedService] = useState<typeof myServices[0] | null>(null);
-  const displayActions = showAllActions ? quickActions : quickActions.slice(0, 4);
 
   return (
     <div className="min-h-screen">
