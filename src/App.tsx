@@ -42,6 +42,8 @@ import AdminTickets from "./pages/admin/AdminTickets";
 import AdminToilets from "./pages/admin/AdminToilets";
 import AdminSurveys from "./pages/admin/AdminSurveys";
 import AdminProfile from "./pages/admin/AdminProfile";
+import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
+import AdminPartners from "./pages/admin/AdminPartners";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,8 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminHome />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="orders/:orderId" element={<AdminOrderDetail />} />
+              <Route path="partners" element={<AdminPartners />} />
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="toilets" element={<AdminToilets />} />
               <Route path="surveys" element={<AdminSurveys />} />

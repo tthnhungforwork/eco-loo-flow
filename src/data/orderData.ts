@@ -268,3 +268,87 @@ export const MOCK_PARTNER_ORDERS: OrderData[] = [
     assignedStaff: [MOCK_PARTNER_STAFF[2]],
   },
 ];
+
+// Partner directory for admin dispatch
+export interface PartnerInfo {
+  id: string;
+  name: string;
+  type: "individual" | "business";
+  services: ServiceType[];
+  phone: string;
+  email: string;
+  address: string;
+  rating: number;
+  completedOrders: number;
+  status: "active" | "pending" | "rejected" | "suspended";
+  registeredAt: string;
+  taxCode?: string;
+  staffCount?: number;
+}
+
+export const MOCK_PARTNERS: PartnerInfo[] = [
+  { id: "DT-001", name: "Eco Clean Co.", type: "business", services: ["vsld", "scbd"], phone: "0281234567", email: "info@ecoclean.vn", address: "100 Nguyễn Thị Minh Khai, Q.3", rating: 4.8, completedOrders: 156, status: "active", registeredAt: "15/01/2025", taxCode: "0123456789", staffCount: 25 },
+  { id: "DT-002", name: "Green Tech Solutions", type: "business", services: ["scbd", "xaymoi", "caitao"], phone: "0287654321", email: "contact@greentech.vn", address: "200 Lê Văn Sỹ, Q.Tân Bình", rating: 4.6, completedOrders: 89, status: "active", registeredAt: "20/03/2025", taxCode: "9876543210", staffCount: 18 },
+  { id: "DT-003", name: "Nguyễn Văn Tùng", type: "individual", services: ["vsld"], phone: "0934567890", email: "tung@email.com", address: "50 Trần Quốc Thảo, Q.3", rating: 4.5, completedOrders: 34, status: "active", registeredAt: "01/06/2025" },
+  { id: "DT-004", name: "Smart Toilet JSC", type: "business", services: ["tuvan", "netzero", "vsld", "scbd"], phone: "0289998877", email: "info@smarttoilet.vn", address: "300 Điện Biên Phủ, Q.Bình Thạnh", rating: 4.9, completedOrders: 210, status: "active", registeredAt: "10/11/2024", taxCode: "1122334455", staffCount: 42 },
+  { id: "DT-005", name: "Phạm Minh Tuấn", type: "individual", services: ["scbd"], phone: "0945678901", email: "tuan.pham@email.com", address: "15 Nguyễn Đình Chiểu, Q.1", rating: 0, completedOrders: 0, status: "pending", registeredAt: "14/03/2026" },
+  { id: "DT-006", name: "CleanPro Vietnam", type: "business", services: ["vsld", "tuvan"], phone: "0286665544", email: "info@cleanpro.vn", address: "88 Võ Văn Tần, Q.3", rating: 0, completedOrders: 0, status: "pending", registeredAt: "15/03/2026", taxCode: "5566778899", staffCount: 8 },
+  { id: "DT-007", name: "Lê Hoàng Anh", type: "individual", services: ["vsld"], phone: "0912223344", email: "anh.le@email.com", address: "22 Pasteur, Q.1", rating: 3.2, completedOrders: 5, status: "suspended", registeredAt: "01/12/2025" },
+];
+
+// Admin sees ALL orders across the system
+export const MOCK_ADMIN_ORDERS: OrderData[] = [
+  ...MOCK_CUSTOMER_ORDERS,
+  {
+    id: "DH-005",
+    type: "vsld",
+    typeLabel: "Vệ sinh lau dọn",
+    name: "Vệ sinh NVS KTX Block A",
+    customerName: "KTX Đại học X",
+    customerPhone: "0289876543",
+    customerEmail: "ktx@email.com",
+    address: "456 Lê Lợi, Q.3, TP.HCM",
+    content: "Vệ sinh lau dọn định kỳ tất cả NVS trong KTX",
+    toilets: ["NVS Tầng 1 - KTX", "NVS Tầng 2 - KTX", "NVS Tầng 3 - KTX"],
+    createdAt: "16/03/2026",
+    status: "cho_dieu_phoi",
+    timeline: [
+      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "16/03/2026 08:00", actor: "KTX Đại học X" },
+    ],
+  },
+  {
+    id: "DH-006",
+    type: "scbd",
+    typeLabel: "Sửa chữa bảo dưỡng",
+    name: "Bảo trì thiết bị Tầng 3",
+    customerName: "Công ty ABC",
+    customerPhone: "0281112233",
+    customerEmail: "abc@company.vn",
+    address: "789 Điện Biên Phủ, Q.Bình Thạnh",
+    content: "Sửa chữa hệ thống xả nước tầng 3, thay thế van nước bị hỏng",
+    toilets: ["NVS Tầng 3 - ABC Tower"],
+    createdAt: "15/03/2026",
+    status: "cho_dieu_phoi",
+    timeline: [
+      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "15/03/2026 14:00", actor: "Công ty ABC" },
+    ],
+  },
+  {
+    id: "DH-007",
+    type: "netzero",
+    typeLabel: "Netzero",
+    name: "Đăng ký Netzero - Xanh",
+    customerName: "Trường THPT Y",
+    customerPhone: "0287654321",
+    customerEmail: "thpt@email.com",
+    address: "789 Nguyễn Trãi, Q.5",
+    content: "Đăng ký chứng nhận Xanh cho NVS trường học",
+    toilets: ["NVS Block A - THPT Y", "NVS Block B - THPT Y"],
+    netzeroLevel: "xanh",
+    createdAt: "16/03/2026",
+    status: "cho_dieu_phoi",
+    timeline: [
+      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "16/03/2026 09:30", actor: "Trường THPT Y" },
+    ],
+  },
+];
