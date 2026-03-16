@@ -4,12 +4,12 @@ import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Calendar, Star, Heart, ShoppingCart, Package, ArrowRight,
-  Plus, Send, MapPin, FileText, Image as ImageIcon, Sparkles, Wrench
+  Calendar, Star, Heart, ShoppingCart, Package,
+  Send, Image as ImageIcon
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { motion, AnimatePresence } from "framer-motion";
 
 const serviceOrders = [
