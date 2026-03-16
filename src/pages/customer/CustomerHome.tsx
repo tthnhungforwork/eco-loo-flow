@@ -34,7 +34,7 @@ const quickStats = [
 
 const stagger = {
   container: { hidden: {}, show: { transition: { staggerChildren: 0.07 } } },
-  item: { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } },
+  item: { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } } },
 };
 
 const CustomerHome = () => {
