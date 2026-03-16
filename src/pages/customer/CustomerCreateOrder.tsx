@@ -299,8 +299,8 @@ const CustomerCreateOrder = () => {
                   <p>👤 {form.name} · {form.phone}</p>
                   <p>📍 {form.address}</p>
                   <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>
-                  {form.selectedToilet && (
-                    <p>🚻 {existingToilets.find(t => t.id === form.selectedToilet)?.name}</p>
+                  {form.selectedToilets.length > 0 && (
+                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
                   )}
                   {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
                 </div>
