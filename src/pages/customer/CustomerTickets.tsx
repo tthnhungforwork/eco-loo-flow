@@ -1,13 +1,14 @@
 import { useState } from "react";
 import CustomerHeader from "./components/CustomerHeader";
 import StatusBadge from "@/components/StatusBadge";
+import SegmentedControl from "@/components/SegmentedControl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MessageSquareWarning, Plus, Calendar, MapPin, Bath, Search,
-  ChevronRight, Send, Image as ImageIcon, Clock, CheckCircle2, AlertTriangle, X
+  ChevronRight, Send, Image as ImageIcon, Clock, CheckCircle2, AlertTriangle, ShoppingCart, Wrench, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,7 +16,7 @@ interface Ticket {
   id: string;
   title: string;
   nvs: string;
-  category: string;
+  type: "order" | "service" | "accident";
   status: string;
   createdAt: string;
   description: string;
@@ -23,28 +24,56 @@ interface Ticket {
   responseAt?: string;
 }
 
+const typeLabel: Record<string, string> = {
+  order: "Phản ánh đơn hàng",
+  service: "Phản ánh dịch vụ",
+  accident: "Phản ánh tai nạn sự cố NVS",
+};
+
+const typeIcon: Record<string, React.ReactNode> = {
+  order: <ShoppingCart size={14} />,
+  service: <Wrench size={14} />,
+  accident: <AlertTriangle size={14} />,
+};
+
+const typeColor: Record<string, string> = {
+  order: "bg-secondary/10 text-secondary",
+  service: "bg-primary/10 text-primary",
+  accident: "bg-destructive/10 text-destructive",
+};
+
 const tickets: Ticket[] = [
   {
-    id: "TK-001", title: "Bồn cầu tầng 3 bị tắc", nvs: "NVS Tầng 3 - Tòa A",
-    category: "Sự cố thiết bị", status: "processing", createdAt: "15/03/2026",
-    description: "Bồn cầu phòng vệ sinh nam tầng 3 bị tắc nghẽn, nước không thoát được.",
+    id: "TK-001", title: "Đơn DV-101 chưa được xử lý đúng hạn", nvs: "NVS Tầng 3 - Tòa A",
+    type: "order", status: "processing", createdAt: "15/03/2026",
+    description: "Đơn hàng DV-101 đã quá hạn xử lý 2 ngày nhưng chưa có phản hồi từ đối tác.",
   },
   {
-    id: "TK-002", title: "Thiếu giấy vệ sinh Block B", nvs: "NVS Sảnh B - KTX",
-    category: "Vật tư tiêu hao", status: "done", createdAt: "10/03/2026",
-    description: "Giấy vệ sinh khu Block B đã hết từ sáng, cần bổ sung gấp.",
-    response: "Đã bổ sung giấy vệ sinh cho toàn bộ khu Block B.", responseAt: "10/03/2026",
+    id: "TK-002", title: "Sai thông tin đơn hàng BH-201", nvs: "NVS Sảnh B - KTX",
+    type: "order", status: "done", createdAt: "10/03/2026",
+    description: "Thông tin địa chỉ giao hàng trên đơn BH-201 bị sai so với yêu cầu ban đầu.",
+    response: "Đã cập nhật lại thông tin đơn hàng và thông báo đối tác.", responseAt: "11/03/2026",
   },
   {
-    id: "TK-003", title: "Mùi hôi khu vực lavabo", nvs: "NVS Tầng 1 - Tòa C",
-    category: "Vệ sinh", status: "pending", createdAt: "12/03/2026",
-    description: "Khu vực lavabo có mùi hôi khó chịu, nghi do hệ thống thoát nước bị nghẹt.",
+    id: "TK-003", title: "Nhân viên vệ sinh không đến đúng giờ", nvs: "NVS Tầng 1 - Tòa C",
+    type: "service", status: "pending", createdAt: "14/03/2026",
+    description: "Nhân viên vệ sinh ca sáng không đến đúng giờ quy định, khu vực NVS chưa được dọn.",
   },
   {
-    id: "TK-004", title: "Đèn nhà vệ sinh bị hỏng", nvs: "NVS Công viên Eco Park",
-    category: "Sự cố thiết bị", status: "done", createdAt: "05/03/2026",
-    description: "Đèn LED phòng vệ sinh nữ không sáng.",
-    response: "Đã thay bóng đèn LED mới và kiểm tra hệ thống điện.", responseAt: "07/03/2026",
+    id: "TK-004", title: "Chất lượng vệ sinh kém", nvs: "NVS Công viên Eco Park",
+    type: "service", status: "processing", createdAt: "13/03/2026",
+    description: "Sau khi vệ sinh xong, sàn nhà vệ sinh vẫn còn ẩm ướt và có mùi hôi.",
+  },
+  {
+    id: "TK-005", title: "Rò rỉ nước NVS Tầng 5", nvs: "NVS Tầng 5 - Tòa A",
+    type: "accident", status: "pending", createdAt: "16/03/2026",
+    description: "Đường ống nước bị vỡ gây ngập sàn nhà vệ sinh tầng 5, cần xử lý khẩn cấp.",
+  },
+  {
+    id: "TK-006", title: "Hư hỏng thiết bị bồn cầu", nvs: "NVS Sảnh A - VP",
+    type: "accident", status: "done", createdAt: "05/03/2026",
+    description: "Bồn cầu tự động bị hỏng nút xả, nước chảy liên tục.",
+    response: "Đã thay thế van xả mới và kiểm tra hoạt động bình thường.", responseAt: "07/03/2026",
   },
 ];
 
@@ -52,30 +81,36 @@ const statusLabel: Record<string, string> = {
   pending: "Chờ xử lý", processing: "Đang xử lý", done: "Đã xử lý",
 };
 
-const categories = ["Sự cố thiết bị", "Vệ sinh", "Vật tư tiêu hao", "Khác"];
+const tabLabels = ["Đơn hàng", "Dịch vụ", "Sự cố NVS"];
+const tabKeys = ["order", "service", "accident"];
 
 const CustomerTickets = () => {
+  const [activeTab, setActiveTab] = useState(0);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [newTicket, setNewTicket] = useState({ title: "", category: categories[0], nvs: "", description: "" });
+  const [newTicket, setNewTicket] = useState({ title: "", type: tabKeys[0], nvs: "", description: "" });
 
   const filtered = tickets
+    .filter((t) => t.type === tabKeys[activeTab])
     .filter((t) => !filterStatus || t.status === filterStatus)
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 
   const handleCreate = () => {
-    // Mock create - in real app would POST to API
     setShowCreate(false);
-    setNewTicket({ title: "", category: categories[0], nvs: "", description: "" });
+    setNewTicket({ title: "", type: tabKeys[activeTab], nvs: "", description: "" });
   };
 
   return (
     <div className="gradient-surface min-h-screen">
       <CustomerHeader title="Ticket hỗ trợ" />
 
-      <div className="px-4 pt-5 pb-3">
+      <div className="pt-4">
+        <SegmentedControl tabs={tabLabels} active={activeTab} onChange={setActiveTab} />
+      </div>
+
+      <div className="px-4 pb-3">
         <div className="relative">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -122,7 +157,12 @@ const CustomerTickets = () => {
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 mr-2">
                   <p className="font-semibold text-sm text-foreground leading-snug">{t.title}</p>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{t.id}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-mono text-muted-foreground">#{t.id}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${typeColor[t.type]}`}>
+                      {typeIcon[t.type]} {typeLabel[t.type]}
+                    </span>
+                  </div>
                 </div>
                 <StatusBadge status={t.status} label={statusLabel[t.status] || t.status} />
               </div>
@@ -147,7 +187,10 @@ const CustomerTickets = () => {
       <motion.button
         className="fixed bottom-24 right-4 w-14 h-14 rounded-2xl gradient-primary text-primary-foreground shadow-glow flex items-center justify-center z-40"
         whileTap={{ scale: 0.9 }}
-        onClick={() => setShowCreate(true)}
+        onClick={() => {
+          setNewTicket({ title: "", type: tabKeys[activeTab], nvs: "", description: "" });
+          setShowCreate(true);
+        }}
       >
         <Plus size={24} />
       </motion.button>
@@ -183,8 +226,8 @@ const CustomerTickets = () => {
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
                   <AlertTriangle size={16} className="text-primary shrink-0" />
                   <div>
-                    <p className="text-[10px] text-muted-foreground">Phân loại</p>
-                    <p className="text-[13px] font-semibold text-foreground">{selectedTicket.category}</p>
+                    <p className="text-[10px] text-muted-foreground">Loại phản ánh</p>
+                    <p className="text-[13px] font-semibold text-foreground">{typeLabel[selectedTicket.type]}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
@@ -230,6 +273,22 @@ const CustomerTickets = () => {
 
           <div className="space-y-4">
             <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại phản ánh</label>
+              <div className="flex gap-2 flex-wrap">
+                {tabKeys.map((key, i) => (
+                  <motion.button
+                    key={key}
+                    onClick={() => setNewTicket({ ...newTicket, type: key })}
+                    className={`chip ${newTicket.type === key ? "chip-active" : "chip-inactive"}`}
+                    whileTap={{ scale: 0.93 }}
+                  >
+                    {tabLabels[i]}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Tiêu đề</label>
               <Input
                 placeholder="Mô tả ngắn gọn vấn đề..."
@@ -237,22 +296,6 @@ const CustomerTickets = () => {
                 value={newTicket.title}
                 onChange={(e) => setNewTicket({ ...newTicket, title: e.target.value })}
               />
-            </div>
-
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Phân loại</label>
-              <div className="flex gap-2 flex-wrap">
-                {categories.map((c) => (
-                  <motion.button
-                    key={c}
-                    onClick={() => setNewTicket({ ...newTicket, category: c })}
-                    className={`chip ${newTicket.category === c ? "chip-active" : "chip-inactive"}`}
-                    whileTap={{ scale: 0.93 }}
-                  >
-                    {c}
-                  </motion.button>
-                ))}
-              </div>
             </div>
 
             <div>
