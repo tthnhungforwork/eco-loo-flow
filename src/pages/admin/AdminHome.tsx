@@ -32,7 +32,7 @@ const stagger = {
 
 const AdminHome = () => (
   <div>
-    <MobileHeader title="Dashboard" />
+    <MobileHeader title="Dashboard" showSwitcher />
     <motion.div className="px-4 py-5 space-y-6" variants={stagger.container} initial="hidden" animate="show">
       {/* Welcome */}
       <motion.section variants={stagger.item} className="gradient-hero rounded-3xl p-5 text-primary-foreground relative overflow-hidden">

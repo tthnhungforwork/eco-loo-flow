@@ -39,7 +39,7 @@ const stagger = {
 
 const CustomerHome = () => (
   <div>
-    <MobileHeader />
+    <MobileHeader showSwitcher />
     <motion.div
       className="px-4 py-5 space-y-7"
       variants={stagger.container}

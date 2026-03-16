@@ -7,7 +7,7 @@ const PartnerProfile = () => {
   const navigate = useNavigate();
   return (
     <div>
-      <MobileHeader title="Chung" />
+      <MobileHeader title="Chung" showSwitcher />
       <div className="px-4 py-5 space-y-5">
         <motion.div className="glass-card rounded-2xl p-5 flex items-center gap-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="w-16 h-16 rounded-2xl gradient-blue flex items-center justify-center text-secondary-foreground font-extrabold text-xl shadow-glow-blue">

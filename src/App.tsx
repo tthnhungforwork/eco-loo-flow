@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { RoleProvider } from "@/contexts/RoleContext";
+import RoleSwitcherSheet from "@/components/RoleSwitcherSheet";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -41,44 +43,44 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/role-select" element={<RoleSelect />} />
+        <RoleProvider>
+          <RoleSwitcherSheet />
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/role-select" element={<RoleSelect />} />
 
-          {/* Customer */}
-          <Route path="/customer" element={<CustomerLayout />}>
-            <Route index element={<CustomerHome />} />
-            <Route path="tasks" element={<CustomerTasks />} />
-            <Route path="reports" element={<CustomerReports />} />
-            <Route path="toilets" element={<CustomerToilets />} />
-            <Route path="orders" element={<CustomerOrders />} />
-            <Route path="profile" element={<CustomerProfile />} />
-          </Route>
+            <Route path="/customer" element={<CustomerLayout />}>
+              <Route index element={<CustomerHome />} />
+              <Route path="tasks" element={<CustomerTasks />} />
+              <Route path="reports" element={<CustomerReports />} />
+              <Route path="toilets" element={<CustomerToilets />} />
+              <Route path="orders" element={<CustomerOrders />} />
+              <Route path="profile" element={<CustomerProfile />} />
+            </Route>
 
-          {/* Partner */}
-          <Route path="/partner" element={<PartnerLayout />}>
-            <Route index element={<PartnerHome />} />
-            <Route path="orders" element={<PartnerOrders />} />
-            <Route path="tasks" element={<PartnerTasks />} />
-            <Route path="toilets" element={<PartnerToilets />} />
-            <Route path="surveys" element={<PartnerSurveys />} />
-            <Route path="profile" element={<PartnerProfile />} />
-          </Route>
+            <Route path="/partner" element={<PartnerLayout />}>
+              <Route index element={<PartnerHome />} />
+              <Route path="orders" element={<PartnerOrders />} />
+              <Route path="tasks" element={<PartnerTasks />} />
+              <Route path="toilets" element={<PartnerToilets />} />
+              <Route path="surveys" element={<PartnerSurveys />} />
+              <Route path="profile" element={<PartnerProfile />} />
+            </Route>
 
-          {/* Admin */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminHome />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="tickets" element={<AdminTickets />} />
-            <Route path="toilets" element={<AdminToilets />} />
-            <Route path="surveys" element={<AdminSurveys />} />
-            <Route path="profile" element={<AdminProfile />} />
-          </Route>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminHome />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="tickets" element={<AdminTickets />} />
+              <Route path="toilets" element={<AdminToilets />} />
+              <Route path="surveys" element={<AdminSurveys />} />
+              <Route path="profile" element={<AdminProfile />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </RoleProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
