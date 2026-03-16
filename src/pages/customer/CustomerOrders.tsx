@@ -30,7 +30,7 @@ const favorites = [
 
 const statusLabel: Record<string, string> = { new: "Mới", processing: "Đang xử lý", done: "Hoàn thành", cancelled: "Đã hủy" };
 const mainTabs = ["Đơn dịch vụ", "Đơn mua hàng", "Yêu thích"];
-const serviceTypes = ["Tư vấn", "VSLD", "SCBD", "Netzero"];
+
 
 const CustomerOrders = () => {
   const [mainTab, setMainTab] = useState(0);
