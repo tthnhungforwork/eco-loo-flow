@@ -72,6 +72,7 @@ const App = () => (
               <Route path="create-order" element={<CustomerCreateOrder />} />
               <Route path="register-partner" element={<CustomerRegisterPartner />} />
               <Route path="cart" element={<CustomerCart />} />
+              <Route path="orders/:orderId" element={<CustomerOrderDetail />} />
             </Route>
 
             <Route path="/partner" element={<PartnerLayout />}>
