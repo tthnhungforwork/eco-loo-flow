@@ -35,8 +35,8 @@ const statusMap: Record<string, { label: string; dot: string }> = {
 
 const certColor: Record<string, string> = {
   "Sạch": "bg-primary/10 text-primary",
-  "Xanh": "bg-emerald-500/10 text-emerald-600",
-  "Tuần hoàn": "bg-blue-500/10 text-blue-600",
+  "Xanh": "bg-eco-teal/10 text-eco-teal",
+  "Tuần hoàn": "bg-secondary/10 text-secondary",
 };
 
 const CustomerToilets = () => {
@@ -46,64 +46,66 @@ const CustomerToilets = () => {
   const filtered = toilets.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()) || t.address.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div>
+    <div className="gradient-surface min-h-screen">
       <MobileHeader title="Nhà vệ sinh" />
 
       <AnimatePresence mode="wait">
         {selectedId && selected ? (
           <motion.div key="detail" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="px-4 py-5 space-y-4">
-            <button onClick={() => setSelectedId(null)} className="text-sm text-primary font-semibold flex items-center gap-1 mb-2">← Quay lại danh sách</button>
+            <motion.button
+              onClick={() => setSelectedId(null)}
+              className="text-sm text-primary font-semibold flex items-center gap-1 mb-2"
+              whileTap={{ x: -4 }}
+            >
+              ← Quay lại danh sách
+            </motion.button>
 
             {/* Header card */}
-            <div className="glass-card rounded-2xl p-5">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="glass-card-elevated rounded-2xl p-5 relative overflow-hidden">
+              <div className="orb orb-green w-20 h-20 -top-6 -right-6 opacity-10" />
+              <div className="flex items-center gap-3 mb-4 relative z-10">
                 <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-glow">
                   <QrCode size={24} className="text-primary-foreground" />
                 </div>
                 <div className="flex-1">
                   <h2 className="font-bold text-base text-foreground">{selected.name}</h2>
-                  <span className="flex items-center gap-1 mt-0.5">
+                  <span className="flex items-center gap-1.5 mt-0.5">
                     <span className={`w-2 h-2 rounded-full ${statusMap[selected.status].dot}`} />
                     <span className="text-xs text-muted-foreground">{statusMap[selected.status].label}</span>
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-3 text-sm">
-                <div className="flex items-start gap-2"><MapPin size={14} className="text-muted-foreground mt-0.5 shrink-0" /><span className="text-foreground">{selected.address}</span></div>
-                <div className="flex items-center gap-2"><User size={14} className="text-muted-foreground shrink-0" /><span className="text-foreground">{selected.owner}</span></div>
-                <div className="flex items-center gap-2"><Phone size={14} className="text-muted-foreground shrink-0" /><span className="text-foreground">{selected.phone}</span></div>
-                <div className="flex items-start gap-2"><FileText size={14} className="text-muted-foreground mt-0.5 shrink-0" /><span className="text-muted-foreground">{selected.description}</span></div>
+              <div className="space-y-3 text-sm relative z-10">
+                <div className="flex items-start gap-2.5"><MapPin size={14} className="text-muted-foreground mt-0.5 shrink-0" /><span className="text-foreground">{selected.address}</span></div>
+                <div className="flex items-center gap-2.5"><User size={14} className="text-muted-foreground shrink-0" /><span className="text-foreground">{selected.owner}</span></div>
+                <div className="flex items-center gap-2.5"><Phone size={14} className="text-muted-foreground shrink-0" /><span className="text-foreground">{selected.phone}</span></div>
+                <div className="flex items-start gap-2.5"><FileText size={14} className="text-muted-foreground mt-0.5 shrink-0" /><span className="text-muted-foreground text-[13px]">{selected.description}</span></div>
               </div>
             </div>
 
             {/* Info grid */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="glass-card rounded-2xl p-4">
-                <p className="text-xs text-muted-foreground mb-1">Phân loại</p>
-                <p className="font-bold text-sm text-foreground">{selected.category}</p>
-              </div>
-              <div className="glass-card rounded-2xl p-4">
-                <p className="text-xs text-muted-foreground mb-1">Ngày tạo</p>
-                <p className="font-bold text-sm text-foreground">{selected.createdAt}</p>
-              </div>
-              <div className="glass-card rounded-2xl p-4">
-                <p className="text-xs text-muted-foreground mb-1">Khu vực</p>
-                <p className="font-bold text-sm text-foreground">{selected.area}</p>
-              </div>
-              <div className="glass-card rounded-2xl p-4">
-                <p className="text-xs text-muted-foreground mb-1">Mã QR</p>
-                <p className="font-bold text-sm text-foreground font-mono">{selected.qr}</p>
-              </div>
+              {[
+                { label: "Phân loại", value: selected.category },
+                { label: "Ngày tạo", value: selected.createdAt },
+                { label: "Khu vực", value: selected.area },
+                { label: "Mã QR", value: selected.qr, mono: true },
+              ].map((item) => (
+                <motion.div key={item.label} className="glass-card rounded-2xl p-4" whileTap={{ scale: 0.97 }}>
+                  <p className="text-[11px] text-muted-foreground mb-1">{item.label}</p>
+                  <p className={`font-bold text-sm text-foreground ${item.mono ? "font-mono" : ""}`}>{item.value}</p>
+                </motion.div>
+              ))}
             </div>
 
             {/* Certificates */}
             {selected.certificates.length > 0 && (
               <div className="glass-card rounded-2xl p-4">
-                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1"><Award size={14} /> Chứng chỉ</p>
+                <p className="text-[11px] text-muted-foreground mb-3 flex items-center gap-1.5"><Award size={14} /> Chứng chỉ</p>
                 <div className="flex gap-2">
                   {selected.certificates.map((c) => (
-                    <span key={c} className={`px-3 py-1 rounded-full text-xs font-bold ${certColor[c] || "bg-muted text-muted-foreground"}`}>{c}</span>
+                    <span key={c} className={`px-3 py-1.5 rounded-full text-xs font-bold ${certColor[c] || "bg-muted text-muted-foreground"}`}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -112,36 +114,42 @@ const CustomerToilets = () => {
             {/* Tasks */}
             <div className="glass-card rounded-2xl p-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground flex items-center gap-1"><Briefcase size={14} /> Công việc</p>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1.5"><Briefcase size={14} /> Công việc</p>
                 <span className="text-sm font-bold text-primary">{selected.taskCount} công việc</span>
               </div>
             </div>
 
-            <Button className="w-full touch-target font-bold gap-2 rounded-2xl gradient-primary border-0 shadow-glow h-14">
+            <Button className="w-full touch-target font-bold gap-2 rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground">
               <ScanLine size={18} /> Quét QR
             </Button>
           </motion.div>
         ) : (
           <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <div className="px-4 pt-5 pb-2">
+            <div className="px-4 pt-5 pb-3">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Tìm nhà vệ sinh..." className="pl-9 rounded-xl bg-card/80 border-border/50" value={search} onChange={(e) => setSearch(e.target.value)} />
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Tìm nhà vệ sinh..."
+                  className="pl-10 rounded-xl bg-card/60 backdrop-blur-sm border-border/40 h-11 text-sm"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
             </div>
-            <div className="px-4 py-3 space-y-3">
+            <div className="px-4 pb-3 space-y-3">
               {filtered.map((t, i) => (
                 <motion.div
                   key={t.id}
                   className="glass-card rounded-2xl p-4 card-hover cursor-pointer"
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
                   onClick={() => setSelectedId(t.id)}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex gap-3">
-                    <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shrink-0 shadow-glow">
-                      <QrCode size={24} className="text-primary-foreground" />
+                    <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shrink-0 shadow-sm">
+                      <QrCode size={22} className="text-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -151,16 +159,17 @@ const CustomerToilets = () => {
                           <span className="text-[10px] font-medium text-muted-foreground">{statusMap[t.status].label}</span>
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
-                        <MapPin size={12} className="shrink-0" />{t.address}
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1 mb-1.5">
+                        <MapPin size={11} className="shrink-0" />{t.address}
                       </p>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-muted-foreground">{t.category}</span>
-                        <span className="text-[10px] text-muted-foreground">·</span>
-                        <span className="text-[10px] text-muted-foreground font-mono">QR: {t.qr}</span>
+                        {t.certificates.slice(0, 2).map((c) => (
+                          <span key={c} className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${certColor[c]}`}>{c}</span>
+                        ))}
+                        <span className="text-[10px] text-muted-foreground font-mono ml-auto">{t.qr}</span>
                       </div>
                     </div>
-                    <ChevronRight size={16} className="text-muted-foreground/40 self-center shrink-0" />
+                    <ChevronRight size={16} className="text-muted-foreground/30 self-center shrink-0" />
                   </div>
                 </motion.div>
               ))}

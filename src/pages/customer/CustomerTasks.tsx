@@ -2,7 +2,7 @@ import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
-import { Clock, User, Play, Search, Filter, MapPin, FileText } from "lucide-react";
+import { Clock, User, Play, Search, MapPin, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,64 +47,88 @@ const CustomerTasks = () => {
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div>
+    <div className="gradient-surface min-h-screen">
       <MobileHeader title="Công việc" />
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 
-        {/* Search & Filter */}
-        <div className="px-4 mb-4 flex gap-2">
-          <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Tìm công việc..." className="pl-9 rounded-xl bg-card/80 border-border/50" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <div className="px-4 mb-4">
+          <div className="relative">
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Tìm công việc..."
+              className="pl-10 rounded-xl bg-card/60 backdrop-blur-sm border-border/40 h-11 text-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
         </div>
 
-        {/* Type filter chips */}
         <div className="px-4 mb-4 flex gap-2">
-          <button onClick={() => setFilterType(null)} className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${!filterType ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>Tất cả</button>
-          <button onClick={() => setFilterType("VSLD")} className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterType === "VSLD" ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>VSLD</button>
-          <button onClick={() => setFilterType("SCBD")} className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterType === "SCBD" ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>SCBD</button>
+          {[
+            { key: null, label: "Tất cả" },
+            { key: "VSLD", label: "VSLD" },
+            { key: "SCBD", label: "SCBD" },
+          ].map((f) => (
+            <motion.button
+              key={f.label}
+              onClick={() => setFilterType(f.key)}
+              className={`chip ${filterType === f.key ? "chip-active" : "chip-inactive"}`}
+              whileTap={{ scale: 0.93 }}
+            >
+              {f.label}
+            </motion.button>
+          ))}
         </div>
 
         <div className="px-4 space-y-3">
           <AnimatePresence mode="popLayout">
             {filtered.length === 0 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-muted flex items-center justify-center">
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-20">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/60 flex items-center justify-center">
                   <FileText size={28} className="text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground text-sm font-medium">Không tìm thấy công việc</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">Thử tìm kiếm với từ khóa khác</p>
               </motion.div>
             )}
             {filtered.map((t, i) => (
               <motion.div
                 key={t.id}
                 className="glass-card rounded-2xl p-4 card-hover"
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
+                exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: i * 0.04 }}
                 layout
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1 mr-2">
-                    <p className="font-semibold text-sm text-foreground">{t.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${typeColor[t.type]}`}>{typeLabel[t.type]}</span>
-                      {t.orderId && <span className="text-[10px] font-mono text-muted-foreground">#{t.orderId}</span>}
+                    <p className="font-semibold text-sm text-foreground leading-snug">{t.title}</p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${typeColor[t.type]}`}>
+                        {typeLabel[t.type]}
+                      </span>
+                      {t.orderId && (
+                        <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-md">
+                          #{t.orderId}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <StatusBadge status={t.status} label={statusLabel[t.status]} />
                 </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
+                <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-3 pt-3 border-t border-border/30">
                   <span className="flex items-center gap-1"><User size={12} />{t.assignee}</span>
                   <span className="flex items-center gap-1"><Clock size={12} />{t.deadline}</span>
                   <span className="flex items-center gap-1"><MapPin size={12} />{t.nvs}</span>
                 </div>
                 {t.status !== "done" && (
-                  <Button size="sm" className="w-full mt-3 touch-target font-bold rounded-xl gradient-primary border-0 text-xs gap-1 shadow-glow">
-                    <Play size={12} /> Thực hiện
+                  <Button
+                    size="sm"
+                    className="w-full mt-3 touch-target font-bold rounded-xl gradient-primary border-0 text-primary-foreground text-xs gap-1.5 shadow-sm h-10"
+                  >
+                    <Play size={13} /> Thực hiện
                   </Button>
                 )}
               </motion.div>

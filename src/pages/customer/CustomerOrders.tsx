@@ -2,9 +2,9 @@ import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
-import { Calendar, Building2, Star, Heart, ShoppingCart, Package } from "lucide-react";
+import { Calendar, Star, Heart, ShoppingCart, Package, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const serviceOrders = [
   { id: "DH-001", name: "Gói vệ sinh tháng 3", date: "16/03/2026", amount: "2.500.000đ", status: "processing", partner: "Eco Clean" },
@@ -36,7 +36,7 @@ const CustomerOrders = () => {
   const filteredProduct = statusKeys[statusFilter] === "all" ? productOrders : productOrders.filter((o) => o.status === statusKeys[statusFilter]);
 
   return (
-    <div>
+    <div className="gradient-surface min-h-screen">
       <MobileHeader title="Đơn hàng" />
       <div className="py-4">
         <SegmentedControl tabs={mainTabs} active={mainTab} onChange={setMainTab} />
@@ -44,75 +44,122 @@ const CustomerOrders = () => {
         {mainTab < 2 && (
           <div className="px-4 mb-4 flex gap-2 overflow-x-auto scrollbar-hide">
             {statusFilters.map((s, i) => (
-              <button key={s} onClick={() => setStatusFilter(i)} className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === i ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{s}</button>
+              <motion.button
+                key={s}
+                onClick={() => setStatusFilter(i)}
+                className={`chip ${statusFilter === i ? "chip-active" : "chip-inactive"}`}
+                whileTap={{ scale: 0.93 }}
+              >
+                {s}
+              </motion.button>
             ))}
           </div>
         )}
 
-        <div className="px-4 space-y-3">
-          {mainTab === 0 && filteredService.map((o, i) => (
-            <motion.div key={o.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1 mr-2">
-                  <p className="font-bold text-sm text-foreground">{o.name}</p>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{o.id} · {o.partner}</p>
-                </div>
-                <StatusBadge status={o.status} label={statusLabel[o.status]} />
-              </div>
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
-                <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} />{o.date}</span>
-                <span className="font-extrabold text-sm text-primary">{o.amount}</span>
-              </div>
-              {o.status === "done" && (
-                <Button size="sm" variant="outline" className="w-full mt-3 rounded-xl font-semibold gap-1 border-primary/20 text-primary">
-                  <Star size={14} /> Đánh giá dịch vụ
-                </Button>
-              )}
-            </motion.div>
-          ))}
-
-          {mainTab === 1 && filteredProduct.map((o, i) => (
-            <motion.div key={o.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1 mr-2">
-                  <p className="font-bold text-sm text-foreground">{o.name}</p>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{o.id}</p>
-                </div>
-                <StatusBadge status={o.status} label={statusLabel[o.status]} />
-              </div>
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
-                <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} />{o.date}</span>
-                <span className="font-extrabold text-sm text-primary">{o.amount}</span>
-              </div>
-            </motion.div>
-          ))}
-
-          {mainTab === 2 && favorites.map((f, i) => (
-            <motion.div key={f.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl gradient-mesh flex items-center justify-center">
-                  <Package size={20} className="text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-sm text-foreground">{f.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Star size={12} className="text-eco-orange fill-eco-orange" />
-                    <span className="text-xs text-foreground font-bold">{f.rating}</span>
-                    <span className="text-sm font-extrabold text-primary ml-auto">{f.price}</span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${mainTab}-${statusFilter}`}
+            className="px-4 space-y-3"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            {mainTab === 0 && filteredService.map((o, i) => (
+              <motion.div
+                key={o.id}
+                className="glass-card rounded-2xl p-4 card-hover"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1 mr-2">
+                    <p className="font-bold text-sm text-foreground">{o.name}</p>
+                    <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{o.id} · {o.partner}</p>
                   </div>
+                  <StatusBadge status={o.status} label={statusLabel[o.status]} />
                 </div>
-                <Heart size={18} className="text-destructive fill-destructive shrink-0" />
-              </div>
-            </motion.div>
-          ))}
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/30">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Calendar size={12} />{o.date}
+                  </span>
+                  <span className="font-extrabold text-sm text-primary">{o.amount}</span>
+                </div>
+                {o.status === "done" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-3 rounded-xl font-semibold gap-1.5 border-primary/15 text-primary hover:bg-accent/50"
+                  >
+                    <Star size={14} /> Đánh giá dịch vụ
+                  </Button>
+                )}
+              </motion.div>
+            ))}
 
-          {((mainTab === 0 && filteredService.length === 0) || (mainTab === 1 && filteredProduct.length === 0)) && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-muted flex items-center justify-center"><ShoppingCart size={28} className="text-muted-foreground" /></div>
-              <p className="text-muted-foreground text-sm font-medium">Không có đơn hàng nào</p>
-            </div>
-          )}
-        </div>
+            {mainTab === 1 && filteredProduct.map((o, i) => (
+              <motion.div
+                key={o.id}
+                className="glass-card rounded-2xl p-4 card-hover"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1 mr-2">
+                    <p className="font-bold text-sm text-foreground">{o.name}</p>
+                    <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{o.id}</p>
+                  </div>
+                  <StatusBadge status={o.status} label={statusLabel[o.status]} />
+                </div>
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/30">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Calendar size={12} />{o.date}
+                  </span>
+                  <span className="font-extrabold text-sm text-primary">{o.amount}</span>
+                </div>
+              </motion.div>
+            ))}
+
+            {mainTab === 2 && favorites.map((f, i) => (
+              <motion.div
+                key={f.id}
+                className="glass-card rounded-2xl p-4 card-hover"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-2xl gradient-mesh flex items-center justify-center relative noise-overlay">
+                    <Package size={22} className="text-primary relative z-10" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-sm text-foreground">{f.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Star size={12} className="text-eco-orange fill-eco-orange" />
+                      <span className="text-xs text-foreground font-bold">{f.rating}</span>
+                      <span className="text-sm font-extrabold text-primary ml-auto">{f.price}</span>
+                    </div>
+                  </div>
+                  <motion.button whileTap={{ scale: 0.8 }}>
+                    <Heart size={20} className="text-destructive fill-destructive shrink-0" />
+                  </motion.button>
+                </div>
+              </motion.div>
+            ))}
+
+            {((mainTab === 0 && filteredService.length === 0) || (mainTab === 1 && filteredProduct.length === 0)) && (
+              <motion.div className="text-center py-20" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/60 flex items-center justify-center">
+                  <ShoppingCart size={28} className="text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground text-sm font-medium">Không có đơn hàng nào</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">Thử thay đổi bộ lọc</p>
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

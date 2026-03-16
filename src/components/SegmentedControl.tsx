@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 interface SegmentedControlProps {
   tabs: string[];
   active: number;
@@ -5,18 +7,25 @@ interface SegmentedControlProps {
 }
 
 const SegmentedControl = ({ tabs, active, onChange }: SegmentedControlProps) => (
-  <div className="flex bg-muted/60 backdrop-blur-sm rounded-2xl p-1 mx-4 mb-4">
+  <div className="flex bg-muted/50 backdrop-blur-xl rounded-2xl p-1 mx-4 mb-4 relative">
     {tabs.map((tab, i) => (
       <button
         key={tab}
         onClick={() => onChange(i)}
-        className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 ${
+        className={`relative flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 z-10 ${
           active === i
-            ? "bg-card text-foreground shadow-card"
+            ? "text-foreground"
             : "text-muted-foreground active:scale-95"
         }`}
       >
-        {tab}
+        {active === i && (
+          <motion.div
+            layoutId="segment-active"
+            className="absolute inset-0 bg-card rounded-xl shadow-card"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          />
+        )}
+        <span className="relative z-10">{tab}</span>
       </button>
     ))}
   </div>
