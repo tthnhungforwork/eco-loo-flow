@@ -36,11 +36,9 @@ const serviceTypes = ["Tư vấn", "VSLD", "SCBD", "Netzero"];
 const CustomerOrders = () => {
   const [mainTab, setMainTab] = useState(0);
   const [statusFilter, setStatusFilter] = useState(0);
-  const [showCreate, setShowCreate] = useState(false);
   const [showRate, setShowRate] = useState<string | null>(null);
   const [rating, setRating] = useState(5);
   const [rateContent, setRateContent] = useState("");
-  const [newOrder, setNewOrder] = useState({ type: "Tư vấn", content: "", address: "" });
 
   const statusFilters = ["Tất cả", "Mới", "Đang xử lý", "Hoàn thành", "Hủy/Hoàn"];
   const statusKeys = ["all", "new", "processing", "done", "cancelled"];
