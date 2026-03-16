@@ -1,7 +1,8 @@
 import MobileHeader from "@/components/MobileHeader";
-import { User, Ticket, ClipboardList, ChevronRight, LogOut, Settings, Shield } from "lucide-react";
+import { User, Ticket, ClipboardList, ChevronRight, LogOut, Settings, Shield, ArrowRightLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useRole } from "@/contexts/RoleContext";
 
 const menuSections = [
   {
