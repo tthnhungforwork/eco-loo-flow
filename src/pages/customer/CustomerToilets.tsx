@@ -116,6 +116,33 @@ const CustomerToilets = () => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [taskSearch, setTaskSearch] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] as string[],
+  });
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleCertificate = (cert: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      certificates: prev.certificates.includes(cert)
+        ? prev.certificates.filter((c) => c !== cert)
+        : [...prev.certificates, cert],
+    }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.name.trim() || !formData.address.trim() || !formData.phone.trim()) {
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
+      return;
+    }
+    toast.success("Thêm nhà vệ sinh thành công!");
+    setShowAddForm(false);
+    setFormData({ name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] });
+  };
   const selected = toilets.find((t) => t.id === selectedId);
   const filtered = toilets.filter((t) =>
     t.name.toLowerCase().includes(search.toLowerCase()) ||
