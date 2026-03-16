@@ -433,8 +433,8 @@ const CustomerToilets = () => {
 
             {/* Add button */}
             <div className="px-4 pb-6">
-              <Button className="w-full touch-target font-bold gap-2 rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground">
-                Thêm nhà vệ sinh
+              <Button onClick={() => setShowAddForm(true)} className="w-full touch-target font-bold gap-2 rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground">
+                <Plus size={18} /> Thêm nhà vệ sinh
               </Button>
             </div>
           </motion.div>
