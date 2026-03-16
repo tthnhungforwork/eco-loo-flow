@@ -22,6 +22,7 @@ const menuSections = [
 
 const CustomerProfile = () => {
   const navigate = useNavigate();
+  const { currentRole, openSheet } = useRole();
 
   return (
     <div>
@@ -33,13 +34,18 @@ const CustomerProfile = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-primary-foreground font-extrabold text-xl shadow-glow">
-            KH
+          <div className={`w-16 h-16 rounded-2xl ${currentRole.gradient} flex items-center justify-center text-primary-foreground font-extrabold text-xl shadow-glow`}>
+            {currentRole.initials}
           </div>
           <div className="flex-1">
-            <p className="font-bold text-foreground text-lg">Nguyễn Văn Khách</p>
-            <p className="text-xs text-muted-foreground">khach@email.com</p>
-            <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold">Khách hàng</span>
+            <p className="font-bold text-foreground text-lg">{currentRole.label}</p>
+            <p className="text-xs text-muted-foreground">{currentRole.subtitle}</p>
+            <button
+              onClick={openSheet}
+              className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-1 rounded-full bg-accent text-accent-foreground text-[10px] font-bold active:scale-95 transition-transform"
+            >
+              <ArrowRightLeft size={10} /> Chuyển tài khoản
+            </button>
           </div>
           <button className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center">
             <Settings size={18} className="text-muted-foreground" />
