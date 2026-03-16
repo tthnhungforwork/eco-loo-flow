@@ -283,7 +283,7 @@ const CustomerCreateOrder = () => {
                 <ImageIcon size={16} /> Đính kèm hình ảnh / tài liệu
               </Button>
 
-              {(type === "vsld" || type === "scbd" || type === "xaymoi" || type === "caitao") && (
+              {(type === "vsld" || type === "scbd" || type === "caitao") && (
                 <>
                   <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS liên quan (có thể chọn nhiều)</p>
                   <div className="space-y-2">
