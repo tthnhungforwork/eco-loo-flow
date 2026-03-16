@@ -3,11 +3,12 @@ import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
   ChevronRight, Briefcase, BarChart3, Bath, FileText,
   Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles,
-  CalendarDays, CheckCircle2, Clock, Plus
+  CalendarDays, CheckCircle2, Plus, MapPin, User, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const quickActions = [
   { label: "Đơn hàng", icon: ShoppingCart, gradient: "gradient-primary", path: "/customer/orders" },
