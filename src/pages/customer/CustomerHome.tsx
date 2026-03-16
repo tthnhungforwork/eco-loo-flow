@@ -274,7 +274,7 @@ const CustomerHome = () => {
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/customer/register-partner")}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/85 to-emerald-600" />
             <div className="absolute inset-0 opacity-10">
               <div className="orb w-28 h-28 bg-white/20 -top-8 -right-8" />
             </div>
