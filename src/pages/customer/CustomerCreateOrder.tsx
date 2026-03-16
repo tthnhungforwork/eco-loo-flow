@@ -56,7 +56,12 @@ const CustomerCreateOrder = () => {
 
   const totalSteps = type === "netzero" ? 4 : 3;
 
-  const handleSubmit = () => {
+  const handleRequestSubmit = () => {
+    setShowOtp(true);
+  };
+
+  const handleOtpVerified = () => {
+    setShowOtp(false);
     toast.success("Đơn hàng đã được tạo thành công!", {
       description: `Đơn hàng ${service.label} đang chờ điều phối.`,
     });
