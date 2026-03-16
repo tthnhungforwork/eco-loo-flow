@@ -141,6 +141,33 @@ const CustomerHome = () => {
 
       <motion.div className="px-4 py-5 space-y-6" variants={stagger.container} initial="hidden" animate="show">
 
+        {/* Gửi ticket - Banner CTA */}
+        <motion.section variants={stagger.item}>
+          <motion.div
+            className="relative rounded-2xl overflow-hidden cursor-pointer"
+            whileTap={{ scale: 0.98 }}
+            onClick={() => window.location.href = "/customer/tickets"}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
+            <div className="absolute inset-0 opacity-10">
+              <div className="orb w-24 h-24 bg-primary-foreground/30 -top-6 -right-6" />
+              <div className="orb w-16 h-16 bg-primary-foreground/20 bottom-0 left-8" style={{ animationDelay: "1.5s" }} />
+            </div>
+            <div className="relative z-10 p-4 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-primary-foreground/15 backdrop-blur-md flex items-center justify-center border border-primary-foreground/10 shrink-0">
+                <ClipboardCheck size={22} className="text-primary-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-bold text-primary-foreground">Gửi yêu cầu hỗ trợ</p>
+                <p className="text-[11px] text-primary-foreground/70 mt-0.5">Tạo ticket để được hỗ trợ nhanh chóng</p>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
+                <ArrowRight size={16} className="text-primary-foreground" />
+              </div>
+            </div>
+          </motion.div>
+        </motion.section>
+
         {/* Gói dịch vụ */}
         <motion.section variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
@@ -172,23 +199,6 @@ const CustomerHome = () => {
                 </span>
               </motion.button>
             ))}
-          </div>
-        </motion.section>
-
-        {/* Gửi ticket */}
-        <motion.section variants={stagger.item}>
-          <div
-            className="bg-card rounded-2xl shadow-card border border-border/30 p-4 flex items-center gap-3 cursor-pointer card-hover"
-            onClick={() => window.location.href = "/customer/tickets"}
-          >
-            <div className="w-11 h-11 rounded-xl gradient-warm flex items-center justify-center text-primary-foreground shadow-sm shrink-0">
-              <ClipboardCheck size={20} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-foreground">Gửi yêu cầu hỗ trợ</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Tạo ticket để được hỗ trợ nhanh chóng</p>
-            </div>
-            <ChevronRight size={16} className="text-muted-foreground shrink-0" />
           </div>
         </motion.section>
 
