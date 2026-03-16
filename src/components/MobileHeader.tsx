@@ -1,4 +1,4 @@
-import { Bell, ShoppingCart, Menu } from "lucide-react";
+import { Bell, ShoppingCart, Menu, ScanLine } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useRole } from "@/contexts/RoleContext";
 import { motion } from "framer-motion";
