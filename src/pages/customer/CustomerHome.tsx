@@ -32,12 +32,12 @@ const myServices = [
     tasks: ["Lau sàn nhà vệ sinh", "Vệ sinh bồn cầu & lavabo", "Bổ sung vật tư tiêu hao", "Khử mùi & diệt khuẩn"],
   },
   {
-    name: "Tư vấn số hóa", icon: FileText, status: "completed", gradient: "gradient-blue",
+    name: "Liên hệ tư vấn", icon: FileText, status: "completed", gradient: "gradient-blue",
     date: "15/02/2026", completedDate: "10/03/2026",
     location: "Trung tâm thương mại Vincom, Q.1",
     staff: "Trần Thị B", contractCode: "HD-2026-015",
-    description: "Tư vấn giải pháp số hóa quản lý nhà vệ sinh thông minh, bao gồm IoT sensor và dashboard.",
-    tasks: ["Khảo sát hiện trạng", "Đề xuất giải pháp IoT", "Lắp đặt sensor thử nghiệm", "Bàn giao báo cáo"],
+    description: "Liên hệ tư vấn giải pháp số hóa quản lý nhà vệ sinh thông minh.",
+    tasks: ["Khảo sát hiện trạng", "Đề xuất giải pháp", "Tư vấn lắp đặt", "Bàn giao báo cáo"],
   },
   {
     name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", gradient: "gradient-warm",
