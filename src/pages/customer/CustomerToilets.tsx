@@ -440,6 +440,83 @@ const CustomerToilets = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Add Toilet Sheet */}
+      <Sheet open={showAddForm} onOpenChange={setShowAddForm}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto pb-8">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-base font-bold text-foreground">Thêm nhà vệ sinh mới</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Tên nhà vệ sinh <span className="text-destructive">*</span></Label>
+              <Input placeholder="VD: NVS Tầng 3 - Tòa A" className="rounded-xl h-11 text-sm" value={formData.name} onChange={(e) => handleFormChange("name", e.target.value)} maxLength={200} />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Địa chỉ <span className="text-destructive">*</span></Label>
+              <Input placeholder="VD: 123 Nguyễn Huệ, Q.1, TP.HCM" className="rounded-xl h-11 text-sm" value={formData.address} onChange={(e) => handleFormChange("address", e.target.value)} maxLength={500} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Khu vực</Label>
+                <Input placeholder="VD: Quận 1" className="rounded-xl h-11 text-sm" value={formData.area} onChange={(e) => handleFormChange("area", e.target.value)} maxLength={100} />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Phân loại</Label>
+                <Input placeholder="VD: Công cộng" className="rounded-xl h-11 text-sm" value={formData.category} onChange={(e) => handleFormChange("category", e.target.value)} maxLength={100} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Người sở hữu</Label>
+                <Input placeholder="VD: Nguyễn Văn A" className="rounded-xl h-11 text-sm" value={formData.owner} onChange={(e) => handleFormChange("owner", e.target.value)} maxLength={100} />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Số điện thoại <span className="text-destructive">*</span></Label>
+                <Input placeholder="VD: 0901234567" className="rounded-xl h-11 text-sm" value={formData.phone} onChange={(e) => handleFormChange("phone", e.target.value.replace(/[^0-9]/g, ""))} maxLength={15} />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Mô tả</Label>
+              <Textarea placeholder="Mô tả chi tiết về nhà vệ sinh..." className="rounded-xl text-sm min-h-[80px] resize-none" value={formData.description} onChange={(e) => handleFormChange("description", e.target.value)} maxLength={1000} />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Chứng chỉ</Label>
+              <div className="flex gap-2">
+                {["Sạch", "Xanh", "Tuần hoàn"].map((cert) => (
+                  <button
+                    key={cert}
+                    type="button"
+                    onClick={() => toggleCertificate(cert)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                      formData.certificates.includes(cert)
+                        ? `${certColor[cert]} border-current`
+                        : "bg-muted text-muted-foreground border-border/40"
+                    }`}
+                  >
+                    {cert}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={() => setShowAddForm(false)}>
+                Hủy
+              </Button>
+              <Button className="flex-1 rounded-2xl h-12 font-bold gradient-primary border-0 shadow-glow text-primary-foreground" onClick={handleSubmit}>
+                Thêm mới
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
