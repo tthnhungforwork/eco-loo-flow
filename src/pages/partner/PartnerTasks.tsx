@@ -48,7 +48,7 @@ const PartnerTasks = () => {
 
   return (
     <div>
-      <MobileHeader title="QL Công việc" />
+      <PartnerHeader title="QL Công việc" />
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 

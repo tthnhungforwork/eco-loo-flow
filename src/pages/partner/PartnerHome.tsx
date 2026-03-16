@@ -51,7 +51,7 @@ const PartnerHome = () => {
 
   return (
     <div className="min-h-screen">
-      <MobileHeader showSwitcher />
+      <PartnerHeader showSwitcher />
 
       {/* Hero */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">
