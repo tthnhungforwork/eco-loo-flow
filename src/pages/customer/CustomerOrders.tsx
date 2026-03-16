@@ -10,7 +10,6 @@ import {
   Send, Image as ImageIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { motion, AnimatePresence } from "framer-motion";
 
 const serviceOrders = [
   { id: "DH-001", name: "Gói vệ sinh tháng 3", date: "16/03/2026", amount: "2.500.000đ", status: "processing", partner: "Eco Clean", type: "VSLD" },
