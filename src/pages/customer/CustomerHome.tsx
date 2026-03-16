@@ -8,17 +8,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 // ── Data ──────────────────────────────────────────────
 
 const quickActions = [
-  { label: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue", path: "/customer/surveys" },
-  { label: "Vệ sinh lau dọn", icon: Sparkles, gradient: "gradient-primary", path: "/customer/orders" },
-  { label: "Sửa chữa bảo dưỡng", icon: Wrench, gradient: "gradient-warm", path: "/customer/orders" },
-  { label: "Xây mới", icon: HardHat, gradient: "gradient-primary", path: "/customer/orders" },
-  { label: "Cải tạo", icon: Hammer, gradient: "gradient-blue", path: "/customer/orders" },
-  { label: "Netzero", icon: Recycle, gradient: "gradient-warm", path: "/customer/orders" },
+  { label: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue", path: "/customer/create-order?type=tuvan" },
+  { label: "Vệ sinh lau dọn", icon: Sparkles, gradient: "gradient-primary", path: "/customer/create-order?type=vsld" },
+  { label: "Sửa chữa bảo dưỡng", icon: Wrench, gradient: "gradient-warm", path: "/customer/create-order?type=scbd" },
+  { label: "Xây mới", icon: HardHat, gradient: "gradient-primary", path: "/customer/create-order?type=xaymoi" },
+  { label: "Cải tạo", icon: Hammer, gradient: "gradient-blue", path: "/customer/create-order?type=caitao" },
+  { label: "Netzero", icon: Recycle, gradient: "gradient-warm", path: "/customer/create-order?type=netzero" },
 ];
 
 const completedServices = [
@@ -97,6 +98,7 @@ const stagger = {
 // ── Component ─────────────────────────────────────────
 
 const CustomerHome = () => {
+  const navigate = useNavigate();
   const [visibleProducts, setVisibleProducts] = useState(4);
   const [selectedService, setSelectedService] = useState<typeof completedServices[0] | null>(null);
 
@@ -111,8 +113,9 @@ const CustomerHome = () => {
           <div className="orb w-24 h-24 bg-primary-foreground/10 bottom-0 left-10" style={{ animationDelay: "2s" }} />
         </div>
         <motion.div
-          className="relative z-10 bg-primary-foreground/12 backdrop-blur-lg rounded-2xl p-4 border border-primary-foreground/10"
+          className="relative z-10 bg-primary-foreground/12 backdrop-blur-lg rounded-2xl p-4 border border-primary-foreground/10 cursor-pointer"
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          onClick={() => navigate("/customer/reports")}
         >
           <div className="flex items-center justify-between mb-2">
             <p className="text-primary-foreground/70 text-xs font-medium">Tổng quan</p>
@@ -146,6 +149,7 @@ const CustomerHome = () => {
                 whileTap={{ scale: 0.9 }}
                 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 + i * 0.04 }}
+                onClick={() => navigate(action.path)}
               >
                 <div className={`w-12 h-12 rounded-2xl ${action.gradient} flex items-center justify-center shadow-sm`}>
                   <action.icon size={20} className="text-primary-foreground" />
@@ -164,7 +168,7 @@ const CustomerHome = () => {
           <motion.div
             className="relative rounded-2xl overflow-hidden cursor-pointer"
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = "/customer/tickets"}
+            onClick={() => navigate("/customer/tickets")}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
             <div className="absolute inset-0 opacity-10">
@@ -192,15 +196,18 @@ const CustomerHome = () => {
             <h2 className="section-title flex items-center gap-2">
               <Bath size={16} className="text-primary" /> Công việc NVS
             </h2>
-            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
+            <button className="text-xs text-primary font-semibold flex items-center gap-0.5" onClick={() => navigate("/customer/tasks")}>
+              Tất cả <ChevronRight size={14} />
+            </button>
           </div>
           <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x scrollbar-hide pb-1">
             {toiletTasks.map((t, i) => (
               <motion.div
                 key={t.id}
-                className="min-w-[260px] bg-card rounded-2xl p-3.5 shrink-0 snap-start shadow-card border border-border/30"
+                className="min-w-[260px] bg-card rounded-2xl p-3.5 shrink-0 snap-start shadow-card border border-border/30 cursor-pointer"
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 + i * 0.05 }}
+                onClick={() => navigate("/customer/tasks")}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -230,7 +237,9 @@ const CustomerHome = () => {
             <h2 className="section-title flex items-center gap-2">
               <CheckCircle2 size={16} className="text-primary" /> Dịch vụ đã thực hiện
             </h2>
-            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
+            <button className="text-xs text-primary font-semibold flex items-center gap-0.5" onClick={() => navigate("/customer/orders")}>
+              Tất cả <ChevronRight size={14} />
+            </button>
           </div>
           <div className="space-y-2.5">
             {completedServices.map((svc) => (
@@ -263,6 +272,7 @@ const CustomerHome = () => {
           <motion.div
             className="relative rounded-2xl overflow-hidden cursor-pointer"
             whileTap={{ scale: 0.98 }}
+            onClick={() => navigate("/customer/register-partner")}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
             <div className="absolute inset-0 opacity-10">
@@ -338,11 +348,14 @@ const CustomerHome = () => {
                     </div>
                   ))}
                 </div>
-                <button className={`w-full py-2 rounded-xl text-[12px] font-bold transition-colors ${
-                  plan.popular
-                    ? "bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground/30"
-                    : "bg-accent text-primary hover:bg-accent/80"
-                }`}>
+                <button
+                  className={`w-full py-2 rounded-xl text-[12px] font-bold transition-colors ${
+                    plan.popular
+                      ? "bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground/30"
+                      : "bg-accent text-primary hover:bg-accent/80"
+                  }`}
+                  onClick={() => navigate("/customer/create-order?type=vsld")}
+                >
                   Chọn gói
                 </button>
               </motion.div>
@@ -362,7 +375,7 @@ const CustomerHome = () => {
             {news.map((n, i) => (
               <motion.div
                 key={n.id}
-                className="min-w-[160px] bg-card rounded-2xl overflow-hidden shrink-0 snap-start shadow-card border border-border/30 card-hover"
+                className="min-w-[160px] bg-card rounded-2xl overflow-hidden shrink-0 snap-start shadow-card border border-border/30 card-hover cursor-pointer"
                 whileTap={{ scale: 0.97 }}
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.05 }}
@@ -383,13 +396,15 @@ const CustomerHome = () => {
         <motion.section variants={stagger.item}>
           <div className="flex justify-between items-center mb-3">
             <h2 className="section-title flex items-center gap-1.5">🌱 Sản phẩm Xanh</h2>
-            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ArrowRight size={14} /></button>
+            <button className="text-xs text-primary font-semibold flex items-center gap-0.5" onClick={() => navigate("/customer/orders")}>
+              Tất cả <ArrowRight size={14} />
+            </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {products.slice(0, visibleProducts).map((p, i) => (
               <motion.div
                 key={p.id}
-                className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/30 card-hover"
+                className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/30 card-hover cursor-pointer"
                 whileTap={{ scale: 0.97 }}
                 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.04 }}
@@ -411,6 +426,7 @@ const CustomerHome = () => {
                     <motion.button
                       whileTap={{ scale: 0.8, rotate: -10 }}
                       className="w-7 h-7 rounded-lg gradient-primary text-primary-foreground flex items-center justify-center shadow-sm"
+                      onClick={(e) => { e.stopPropagation(); navigate("/customer/cart"); }}
                     >
                       <ShoppingCart size={13} />
                     </motion.button>
