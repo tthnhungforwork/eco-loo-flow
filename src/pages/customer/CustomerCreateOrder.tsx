@@ -4,6 +4,7 @@ import CustomerHeader from "./components/CustomerHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import OtpVerifySheet from "@/components/OtpVerifySheet";
 import {
   FileText, Sparkles, Wrench, HardHat, Hammer, Recycle,
   MapPin, User, Phone, Mail, Building2, Bath, ChevronRight,
@@ -41,6 +42,7 @@ const CustomerCreateOrder = () => {
   const ServiceIcon = service.icon;
 
   const [step, setStep] = useState(1);
+  const [showOtp, setShowOtp] = useState(false);
   const [form, setForm] = useState({
     name: "Nguyễn Văn Khách",
     phone: "0901234567",
@@ -54,7 +56,12 @@ const CustomerCreateOrder = () => {
 
   const totalSteps = type === "netzero" ? 4 : 3;
 
-  const handleSubmit = () => {
+  const handleRequestSubmit = () => {
+    setShowOtp(true);
+  };
+
+  const handleOtpVerified = () => {
+    setShowOtp(false);
     toast.success("Đơn hàng đã được tạo thành công!", {
       description: `Đơn hàng ${service.label} đang chờ điều phối.`,
     });
@@ -331,12 +338,20 @@ const CustomerCreateOrder = () => {
           ) : (
             <Button
               className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-              onClick={handleSubmit}
+              onClick={handleRequestSubmit}
             >
               <Send size={18} /> Gửi đơn hàng
             </Button>
           )}
         </div>
+
+        {/* OTP Verification */}
+        <OtpVerifySheet
+          open={showOtp}
+          phone={form.phone}
+          onVerified={handleOtpVerified}
+          onCancel={() => setShowOtp(false)}
+        />
       </div>
     </div>
   );
