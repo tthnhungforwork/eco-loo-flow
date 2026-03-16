@@ -424,66 +424,39 @@ const CustomerCreateOrder = () => {
             </motion.div>
           )}
 
-          {/* Netzero step 4: Confirm */}
-          {step === 4 && type === "netzero" && (
-            <motion.div key="step4-netzero" className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <div className="bg-muted/40 rounded-2xl p-4 space-y-3">
-                <p className="text-[12px] font-bold text-foreground">Tóm tắt đơn hàng Netzero</p>
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-lg ${service.gradient} flex items-center justify-center text-primary-foreground`}>
-                    <ServiceIcon size={14} />
-                  </div>
-                  <span className="text-[13px] font-semibold text-foreground">{service.label}</span>
-                </div>
-                <div className="text-[11px] text-muted-foreground space-y-1.5 pt-2 border-t border-border/30">
-                  <p>👤 {form.name} · {form.phone}</p>
-                  <p>📍 {form.address}</p>
-                  <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>
-                  {form.selectedToilets.length > 0 && (
-                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
-                  )}
-                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
 
-        {/* Navigation buttons */}
-        <div className="flex gap-3 mt-8">
-          {step > 1 && (
-            <Button
-              variant="outline"
-              className="flex-1 rounded-2xl h-14 font-semibold gap-2"
-              onClick={() => setStep((s) => s - 1)}
-            >
-              <ArrowLeft size={16} /> Quay lại
-            </Button>
-          )}
-          {step < totalSteps ? (
+        {/* Navigation buttons - only show if NOT on OTP step */}
+        {!isOtpStep && (
+          <div className="flex gap-3 mt-8">
+            {step > 1 && (
+              <Button
+                variant="outline"
+                className="flex-1 rounded-2xl h-14 font-semibold gap-2"
+                onClick={() => setStep((s) => s - 1)}
+              >
+                <ArrowLeft size={16} /> Quay lại
+              </Button>
+            )}
             <Button
               className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
               onClick={() => setStep((s) => s + 1)}
             >
               Tiếp theo <ChevronRight size={16} />
             </Button>
-          ) : (
+          </div>
+        )}
+        {isOtpStep && (
+          <div className="mt-6">
             <Button
-              className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-              onClick={handleRequestSubmit}
+              variant="outline"
+              className="w-full rounded-2xl h-12 font-semibold gap-2"
+              onClick={() => setStep((s) => s - 1)}
             >
-              <Send size={18} /> Gửi đơn hàng
+              <ArrowLeft size={16} /> Quay lại
             </Button>
-          )}
-        </div>
-
-        {/* OTP Verification */}
-        <OtpVerifySheet
-          open={showOtp}
-          phone={form.phone}
-          onVerified={handleOtpVerified}
-          onCancel={() => setShowOtp(false)}
-        />
+          </div>
+        )}
       </div>
     </div>
   );
