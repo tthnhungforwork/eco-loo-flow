@@ -179,40 +179,60 @@ const CustomerHome = () => {
           </div>
         </motion.section>
 
-        {/* Dịch vụ đã đăng ký */}
+        {/* Gói dịch vụ */}
         <motion.section variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="section-title flex items-center gap-2">
-              <Crown size={16} className="text-primary" /> Dịch vụ của tôi
+              <Crown size={16} className="text-primary" /> Gói dịch vụ
             </h2>
             <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
           </div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {myServices.map((svc) => (
+          <div className="space-y-2.5">
+            {myServices.filter(s => s.status !== "inactive").map((svc) => (
               <motion.button
                 key={svc.name}
-                className={`rounded-2xl p-3 flex flex-col items-center gap-2 text-center card-hover relative overflow-hidden ${
-                  svc.status === "active"
-                    ? "bg-card shadow-card border border-border/30"
-                    : "bg-muted/40 border border-border/20 opacity-60"
-                }`}
-                whileTap={{ scale: 0.95 }}
+                className="w-full rounded-2xl p-3.5 flex items-center gap-3 bg-card shadow-card border border-border/30 card-hover relative overflow-hidden text-left"
+                whileTap={{ scale: 0.98 }}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  svc.status === "active" ? svc.gradient + " text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground"
-                }`}>
-                  <svc.icon size={18} />
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${svc.gradient} text-primary-foreground shadow-sm`}>
+                  <svc.icon size={20} />
                 </div>
-                <span className={`text-[11px] font-medium leading-tight ${
-                  svc.status === "active" ? "text-foreground" : "text-muted-foreground"
-                }`}>
-                  {svc.name}
-                </span>
-                {svc.status === "active" && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
-                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-foreground leading-tight">{svc.name}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <CalendarDays size={10} className="text-muted-foreground shrink-0" />
+                    <span className="text-[10px] text-muted-foreground">{svc.date}</span>
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  {svc.status === "active" ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                      <Clock size={10} /> {svc.statusLabel}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent text-primary text-[10px] font-bold">
+                      <CheckCircle2 size={10} /> {svc.statusLabel}
+                    </span>
+                  )}
+                </div>
               </motion.button>
             ))}
+            {/* Inactive services */}
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              {myServices.filter(s => s.status === "inactive").map((svc) => (
+                <motion.button
+                  key={svc.name}
+                  className="rounded-2xl p-3 flex flex-col items-center gap-2 text-center bg-muted/30 border border-dashed border-border/40 opacity-70"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted text-muted-foreground">
+                    <svc.icon size={16} />
+                  </div>
+                  <span className="text-[10px] font-medium text-muted-foreground leading-tight">{svc.name}</span>
+                  <Plus size={12} className="text-muted-foreground/60" />
+                </motion.button>
+              ))}
+            </div>
           </div>
         </motion.section>
 
