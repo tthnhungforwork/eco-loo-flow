@@ -1,6 +1,6 @@
 import MobileHeader from "@/components/MobileHeader";
 import StatusBadge from "@/components/StatusBadge";
-import { ShoppingBag, Wrench, BarChart3, TrendingUp, Users, Bath, Sparkles, AlertTriangle, ArrowRight, Briefcase } from "lucide-react";
+import { ShoppingBag, Wrench, BarChart3, TrendingUp, Users, Bath, Sparkles, AlertTriangle, ArrowRight, Briefcase, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -36,153 +36,200 @@ const completedServices = [
 ];
 
 const dashStats = [
-  { label: "Tổng NVS", value: "1,245", icon: Bath, gradient: "gradient-primary" },
-  { label: "Đối tác", value: "89", icon: Users, gradient: "gradient-blue" },
-  { label: "Đơn tháng", value: "342", icon: ShoppingBag, gradient: "gradient-warm" },
-  { label: "Doanh thu", value: "1.2 tỷ", icon: TrendingUp, gradient: "gradient-primary" },
+  { label: "Tổng NVS", value: "1,245", icon: Bath, gradient: "gradient-primary", glow: "shadow-glow" },
+  { label: "Đối tác", value: "89", icon: Users, gradient: "gradient-blue", glow: "shadow-glow-blue" },
+  { label: "Đơn tháng", value: "342", icon: ShoppingBag, gradient: "gradient-warm", glow: "" },
+  { label: "Doanh thu", value: "1.2 tỷ", icon: TrendingUp, gradient: "gradient-primary", glow: "shadow-glow" },
 ];
 
 const statusLabel: Record<string, string> = { new: "Mới", processing: "Đang xử lý", done: "Hoàn thành" };
 
 const stagger = {
-  container: { hidden: {}, show: { transition: { staggerChildren: 0.06 } } },
-  item: { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } },
+  container: { hidden: {}, show: { transition: { staggerChildren: 0.07 } } },
+  item: { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } },
 };
 
 const AdminHome = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="gradient-surface min-h-screen">
       <MobileHeader title="Dashboard" showSwitcher />
       <motion.div className="px-4 py-5 space-y-6" variants={stagger.container} initial="hidden" animate="show">
-        {/* Welcome */}
-        <motion.section variants={stagger.item} className="gradient-hero rounded-3xl p-5 text-primary-foreground relative overflow-hidden">
-          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative z-10">
+        {/* Hero */}
+        <motion.section variants={stagger.item} className="relative rounded-3xl p-5 overflow-hidden noise-overlay">
+          <div className="absolute inset-0 gradient-hero" />
+          <div className="orb orb-blue w-28 h-28 -top-10 -right-10" />
+          <div className="orb orb-green w-20 h-20 bottom-0 left-0" style={{ animationDelay: "2s" }} />
+          <div className="relative z-10 text-primary-foreground">
             <p className="text-sm opacity-80 mb-1">Dashboard Admin 🛡️</p>
-            <h2 className="text-xl font-bold mb-1">Hệ thống KTX</h2>
-            <p className="text-sm opacity-80 flex items-center gap-1"><Sparkles size={14} /> Tổng quan hoạt động</p>
+            <h2 className="text-xl font-extrabold mb-1 tracking-tight">Hệ thống KTX</h2>
+            <p className="text-sm opacity-75 flex items-center gap-1.5"><Sparkles size={14} /> Tổng quan hoạt động</p>
           </div>
         </motion.section>
 
-        {/* Stats */}
+        {/* Stats Grid */}
         <motion.div variants={stagger.item} className="grid grid-cols-2 gap-3">
           {dashStats.map((s, i) => (
-            <motion.div key={s.label} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 + i * 0.06 }}>
-              <div className={`icon-container-sm ${s.gradient} text-primary-foreground mb-3 shadow-sm`}>
-                <s.icon size={18} />
+            <motion.div
+              key={s.label}
+              className="glass-card-elevated rounded-2xl p-4 card-hover relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.15 + i * 0.06, type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div className={`icon-container-xs ${s.gradient} text-primary-foreground mb-3 ${s.glow}`}>
+                <s.icon size={16} />
               </div>
-              <p className="text-xl font-extrabold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground font-medium">{s.label}</p>
+              <p className="text-2xl font-black text-foreground tracking-tight">{s.value}</p>
+              <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{s.label}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Đơn dịch vụ cần điều phối */}
+        {/* Đơn dịch vụ */}
         {serviceOrders.length > 0 && (
           <motion.section variants={stagger.item}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="section-title flex items-center gap-2"><Wrench size={18} className="text-primary" /> Đơn DV cần điều phối</h2>
-              <button onClick={() => navigate("/admin/orders")} className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ArrowRight size={14} /></button>
+              <h2 className="section-title flex items-center gap-2">
+                <div className="icon-container-xs bg-primary/10 text-primary"><Wrench size={14} /></div>
+                Đơn DV cần điều phối
+              </h2>
+              <button onClick={() => navigate("/admin/orders")} className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ChevronRight size={14} /></button>
             </div>
-            {serviceOrders.map((o) => (
-              <div key={o.id} className="glass-card rounded-2xl p-4 mb-3 card-hover">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="font-semibold text-sm text-foreground">{o.name}</p>
-                  <StatusBadge status={o.status} label="Mới" />
-                </div>
-                <p className="text-xs text-muted-foreground font-mono mb-3">{o.client} · #{o.id}</p>
-                <Button size="sm" className="w-full touch-target font-bold rounded-xl gradient-primary border-0 shadow-glow">Điều phối</Button>
-              </div>
-            ))}
+            <div className="space-y-3">
+              {serviceOrders.map((o, i) => (
+                <motion.div key={o.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.05 }}>
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="font-semibold text-sm text-foreground">{o.name}</p>
+                    <StatusBadge status={o.status} label="Mới" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-mono mb-3">{o.client} · #{o.id}</p>
+                  <Button size="sm" className="w-full touch-target font-bold rounded-xl gradient-primary border-0 text-primary-foreground shadow-sm h-10">
+                    Điều phối
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
           </motion.section>
         )}
 
-        {/* Ticket cần xử lý */}
+        {/* Tickets */}
         {tickets.length > 0 && (
           <motion.section variants={stagger.item}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="section-title flex items-center gap-2"><AlertTriangle size={18} className="text-destructive" /> Ticket cần xử lý</h2>
-              <button onClick={() => navigate("/admin/tickets")} className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ArrowRight size={14} /></button>
+              <h2 className="section-title flex items-center gap-2">
+                <div className="icon-container-xs bg-destructive/10 text-destructive"><AlertTriangle size={14} /></div>
+                Ticket cần xử lý
+              </h2>
+              <button onClick={() => navigate("/admin/tickets")} className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ChevronRight size={14} /></button>
             </div>
-            {tickets.map((t) => (
-              <div key={t.id} className="glass-card rounded-2xl p-4 mb-3 card-hover">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle size={16} className={`mt-0.5 shrink-0 ${t.priority === "high" ? "text-destructive" : "text-eco-orange"}`} />
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm text-foreground">{t.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Báo cáo: {t.reporter} · #{t.id}</p>
+            <div className="space-y-3">
+              {tickets.map((t, i) => (
+                <motion.div key={t.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.05 }}>
+                  <div className="flex items-start gap-3">
+                    <div className={`icon-container-xs shrink-0 ${t.priority === "high" ? "bg-destructive/10" : "bg-eco-orange/10"}`}>
+                      <AlertTriangle size={14} className={t.priority === "high" ? "text-destructive" : "text-eco-orange"} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-foreground">{t.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">Báo cáo: {t.reporter} · #{t.id}</p>
+                    </div>
+                    <span className={`text-[9px] font-bold uppercase px-2 py-1 rounded-full tracking-wider ${t.priority === "high" ? "bg-destructive/10 text-destructive" : "bg-eco-orange/10 text-eco-orange"}`}>
+                      {t.priority === "high" ? "Cao" : "TB"}
+                    </span>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${t.priority === "high" ? "bg-destructive/10 text-destructive" : "bg-eco-orange/10 text-eco-orange"}`}>
-                    {t.priority === "high" ? "Cao" : "TB"}
-                  </span>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </motion.section>
         )}
 
-        {/* Đơn bán hàng cần điều phối */}
+        {/* Đơn bán hàng */}
         {salesOrders.length > 0 && (
           <motion.section variants={stagger.item}>
-            <h2 className="section-title mb-4 flex items-center gap-2"><ShoppingBag size={18} className="text-secondary" /> Đơn bán hàng cần điều phối</h2>
-            {salesOrders.map((o) => (
-              <div key={o.id} className="glass-card rounded-2xl p-4 mb-3 card-hover">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="font-semibold text-sm text-foreground">{o.name}</p>
-                  <StatusBadge status={o.status} label="Mới" />
+            <h2 className="section-title mb-4 flex items-center gap-2">
+              <div className="icon-container-xs bg-secondary/10 text-secondary"><ShoppingBag size={14} /></div>
+              Đơn bán hàng cần điều phối
+            </h2>
+            <div className="space-y-3">
+              {salesOrders.map((o) => (
+                <div key={o.id} className="glass-card rounded-2xl p-4 card-hover">
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="font-semibold text-sm text-foreground">{o.name}</p>
+                    <StatusBadge status={o.status} label="Mới" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-mono mb-3">{o.client} · #{o.id}</p>
+                  <Button size="sm" className="w-full touch-target font-bold rounded-xl gradient-blue border-0 text-secondary-foreground h-10">Điều phối</Button>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono mb-3">{o.client} · #{o.id}</p>
-                <Button size="sm" className="w-full touch-target font-bold rounded-xl gradient-blue border-0">Điều phối</Button>
-              </div>
-            ))}
+              ))}
+            </div>
           </motion.section>
         )}
 
         {/* Đơn hàng cần xử lý */}
         {pendingOrders.length > 0 && (
           <motion.section variants={stagger.item}>
-            <h2 className="section-title mb-4 flex items-center gap-2"><Briefcase size={18} className="text-primary" /> Đơn hàng cần xử lý</h2>
+            <h2 className="section-title mb-4 flex items-center gap-2">
+              <div className="icon-container-xs bg-primary/10 text-primary"><Briefcase size={14} /></div>
+              Đơn hàng cần xử lý
+            </h2>
             {pendingOrders.map((o) => (
-              <div key={o.id} className="glass-card rounded-2xl p-4 mb-3 card-hover">
+              <div key={o.id} className="glass-card rounded-2xl p-4 card-hover">
                 <div className="flex justify-between items-start mb-1">
                   <p className="font-semibold text-sm text-foreground">{o.name}</p>
                   <StatusBadge status={o.status} label="Đang xử lý" />
                 </div>
-                <p className="text-xs text-muted-foreground font-mono">{o.client} · #{o.id}</p>
+                <p className="text-[11px] text-muted-foreground font-mono">{o.client} · #{o.id}</p>
               </div>
             ))}
           </motion.section>
         )}
 
-        {/* Công việc NVS - Lướt ngang */}
+        {/* Công việc NVS */}
         <motion.section variants={stagger.item}>
           <div className="flex justify-between items-center mb-4">
             <h2 className="section-title">Công việc NVS</h2>
-            <button className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ArrowRight size={14} /></button>
+            <button className="text-xs text-primary font-semibold flex items-center gap-1">Tất cả <ChevronRight size={14} /></button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
-            {nvsJobs.map((j) => (
-              <motion.div key={j.id} className="min-w-[240px] glass-card rounded-2xl p-4 shrink-0 snap-start card-hover" whileTap={{ scale: 0.97 }}>
+            {nvsJobs.map((j, i) => (
+              <motion.div
+                key={j.id}
+                className="min-w-[220px] glass-card rounded-2xl p-4 shrink-0 snap-start card-hover"
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + i * 0.05 }}
+              >
                 <div className="flex justify-between items-start mb-2">
-                  <p className="font-semibold text-sm text-foreground flex-1 mr-2 leading-tight">{j.title}</p>
+                  <p className="font-semibold text-[13px] text-foreground flex-1 mr-2 leading-tight">{j.title}</p>
                   <StatusBadge status={j.status} label={statusLabel[j.status]} />
                 </div>
-                <p className="text-xs text-muted-foreground">{j.nvs} · {j.time}</p>
+                <p className="text-[11px] text-muted-foreground">{j.nvs} · {j.time}</p>
               </motion.div>
             ))}
           </div>
         </motion.section>
 
-        {/* Dịch vụ đã thực hiện - Chart */}
-        <motion.section variants={stagger.item} className="glass-card rounded-2xl p-5">
-          <h3 className="section-title text-sm mb-5 flex items-center gap-2"><BarChart3 size={16} className="text-primary" /> Dịch vụ đã thực hiện</h3>
+        {/* Chart */}
+        <motion.section variants={stagger.item} className="glass-card-elevated rounded-2xl p-5">
+          <h3 className="section-title text-sm mb-5 flex items-center gap-2">
+            <div className="icon-container-xs bg-primary/10 text-primary"><BarChart3 size={14} /></div>
+            Dịch vụ đã thực hiện
+          </h3>
           <div className="flex items-end justify-between gap-2 h-32">
             {completedServices.map((d, i) => (
               <div key={d.month} className="flex-1 flex flex-col items-center gap-1.5">
                 <span className="text-[10px] font-bold text-foreground">{d.count}</span>
-                <motion.div className="w-full gradient-primary rounded-lg" initial={{ height: 0 }} animate={{ height: `${d.count}%` }} transition={{ delay: 0.5 + i * 0.08, duration: 0.5 }} />
+                <motion.div
+                  className="w-full rounded-lg overflow-hidden"
+                  initial={{ height: 0 }}
+                  animate={{ height: `${d.count}%` }}
+                  transition={{ delay: 0.5 + i * 0.08, duration: 0.6, ease: "easeOut" }}
+                >
+                  <div className="w-full h-full gradient-primary" />
+                </motion.div>
                 <span className="text-[10px] font-medium text-muted-foreground">{d.month}</span>
               </div>
             ))}
