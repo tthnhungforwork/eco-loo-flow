@@ -317,25 +317,7 @@ const CustomerCreateOrder = () => {
           {/* Step 3 (non-netzero) OR Step 4 (netzero): OTP Verification */}
           {isOtpStep && (
             <motion.div key="step-otp" className="space-y-5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              {/* Summary */}
-              <div className="bg-muted/40 rounded-2xl p-4 space-y-3">
-                <p className="text-[12px] font-bold text-foreground">Tóm tắt đơn hàng</p>
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-lg ${service.gradient} flex items-center justify-center text-primary-foreground`}>
-                    <ServiceIcon size={14} />
-                  </div>
-                  <span className="text-[13px] font-semibold text-foreground">{service.label}</span>
-                </div>
-                <div className="text-[11px] text-muted-foreground space-y-1.5 pt-2 border-t border-border/30">
-                  <p>👤 {form.name} · {form.phone}</p>
-                  <p>📍 {form.address}</p>
-                  {type === "netzero" && <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>}
-                  {form.selectedToilets.length > 0 && (
-                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
-                  )}
-                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
-                </div>
-              </div>
+
 
               {/* OTP Section */}
               <motion.div
