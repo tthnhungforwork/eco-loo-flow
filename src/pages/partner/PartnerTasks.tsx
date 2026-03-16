@@ -129,9 +129,14 @@ const PartnerTasks = () => {
                   <span className="flex items-center gap-1"><Clock size={12} />{t.deadline}</span>
                   <span className="flex items-center gap-1"><MapPin size={12} />{t.nvs}</span>
                 </div>
-                {t.status !== "done" && (
+                {t.assignee === "Tôi" && t.status !== "done" && (
                   <Button size="sm" className="w-full mt-3 h-9 font-bold rounded-xl gradient-primary border-0 text-xs gap-1 shadow-glow">
                     <Play size={12} /> Thực hiện
+                  </Button>
+                )}
+                {t.assignee !== "Tôi" && t.creator === "Tôi" && t.status !== "done" && (
+                  <Button size="sm" variant="outline" className="w-full mt-3 h-9 font-bold rounded-xl text-xs gap-1 border-primary/30 text-primary">
+                    <Clock size={12} /> Nhắc nhở
                   </Button>
                 )}
               </motion.div>
