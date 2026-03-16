@@ -22,7 +22,7 @@ const menuSections = [
 
 const CustomerProfile = () => {
   const navigate = useNavigate();
-  const { currentRole, openSheet } = useRole();
+  const { currentAccount, openSheet } = useRole();
 
   return (
     <div>
