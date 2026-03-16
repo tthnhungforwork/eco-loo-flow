@@ -175,6 +175,23 @@ const CustomerHome = () => {
           </div>
         </motion.section>
 
+        {/* Gửi ticket */}
+        <motion.section variants={stagger.item}>
+          <div
+            className="bg-card rounded-2xl shadow-card border border-border/30 p-4 flex items-center gap-3 cursor-pointer card-hover"
+            onClick={() => window.location.href = "/customer/tickets"}
+          >
+            <div className="w-11 h-11 rounded-xl gradient-warm flex items-center justify-center text-primary-foreground shadow-sm shrink-0">
+              <ClipboardCheck size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-foreground">Gửi yêu cầu hỗ trợ</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Tạo ticket để được hỗ trợ nhanh chóng</p>
+            </div>
+            <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+          </div>
+        </motion.section>
+
         {/* Service detail sheet */}
         <Sheet open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
           <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
