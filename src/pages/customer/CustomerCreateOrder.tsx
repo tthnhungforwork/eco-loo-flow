@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   FileText, Sparkles, Wrench, HardHat, Hammer, Recycle,
   MapPin, User, Phone, Mail, Building2, Bath, ChevronRight,
-  Send, Image as ImageIcon, CheckCircle2, ArrowLeft, Leaf
+  Send, Image as ImageIcon, CheckCircle2, ArrowLeft, Leaf,
+  ShieldCheck, RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
