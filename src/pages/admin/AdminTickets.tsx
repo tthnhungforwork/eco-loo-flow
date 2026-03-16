@@ -2,7 +2,8 @@ import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
-import { Clock, User } from "lucide-react";
+import { Clock, User, AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
 
 const ticketData: Record<string, Array<{ id: string; title: string; reporter: string; date: string; status: string }>> = {
   order: [
@@ -18,7 +19,7 @@ const ticketData: Record<string, Array<{ id: string; title: string; reporter: st
   ],
 };
 
-const tabs = ["Phản ánh đơn hàng", "Phản ánh dịch vụ", "Tai nạn sự cố"];
+const tabs = ["Đơn hàng", "Dịch vụ", "Sự cố"];
 const tabKeys = ["order", "service", "accident"];
 const statusLabel: Record<string, string> = { new: "Mới", processing: "Đang xử lý", done: "Đã xử lý" };
 
@@ -29,20 +30,25 @@ const AdminTickets = () => {
   return (
     <div>
       <MobileHeader title="Ticket" />
-      <div className="py-4 animate-fade-in">
+      <div className="py-4">
         <SegmentedControl tabs={tabs} active={tab} onChange={setTab} />
         <div className="px-4 space-y-3">
-          {tickets.map((t) => (
-            <div key={t.id} className="bg-card rounded-xl border border-border p-4">
-              <div className="flex justify-between items-start mb-2">
-                <p className="font-medium text-sm text-foreground flex-1 mr-2">{t.title}</p>
+          {tickets.map((t, i) => (
+            <motion.div key={t.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-start gap-2 flex-1 mr-2">
+                  {tabKeys[tab] === "accident" && t.status === "new" && (
+                    <AlertTriangle size={16} className="text-eco-red mt-0.5 shrink-0" />
+                  )}
+                  <p className="font-semibold text-sm text-foreground">{t.title}</p>
+                </div>
                 <StatusBadge status={t.status} label={statusLabel[t.status]} />
               </div>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><User size={12} />{t.reporter}</span>
                 <span className="flex items-center gap-1"><Clock size={12} />{t.date}</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
