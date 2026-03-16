@@ -28,9 +28,30 @@ const banners = [
 ];
 
 const myServices = [
-  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", date: "01/01/2026", statusLabel: "Đang thực hiện", gradient: "gradient-primary" },
-  { name: "Tư vấn số hóa", icon: FileText, status: "active", date: "15/02/2026", statusLabel: "Đang thực hiện", gradient: "gradient-blue" },
-  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", date: "10/12/2025", statusLabel: "Hoàn thành", gradient: "gradient-warm" },
+  {
+    name: "Vệ sinh lau dọn", icon: Sparkles, status: "completed", gradient: "gradient-primary",
+    date: "01/01/2026", completedDate: "28/02/2026",
+    location: "Tòa nhà Landmark 81, Q. Bình Thạnh",
+    staff: "Nguyễn Văn A", contractCode: "HD-2026-001",
+    description: "Dịch vụ vệ sinh lau dọn định kỳ hàng tháng cho khu vực nhà vệ sinh công cộng.",
+    tasks: ["Lau sàn nhà vệ sinh", "Vệ sinh bồn cầu & lavabo", "Bổ sung vật tư tiêu hao", "Khử mùi & diệt khuẩn"],
+  },
+  {
+    name: "Tư vấn số hóa", icon: FileText, status: "completed", gradient: "gradient-blue",
+    date: "15/02/2026", completedDate: "10/03/2026",
+    location: "Trung tâm thương mại Vincom, Q.1",
+    staff: "Trần Thị B", contractCode: "HD-2026-015",
+    description: "Tư vấn giải pháp số hóa quản lý nhà vệ sinh thông minh, bao gồm IoT sensor và dashboard.",
+    tasks: ["Khảo sát hiện trạng", "Đề xuất giải pháp IoT", "Lắp đặt sensor thử nghiệm", "Bàn giao báo cáo"],
+  },
+  {
+    name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", gradient: "gradient-warm",
+    date: "10/12/2025", completedDate: "25/12/2025",
+    location: "Bệnh viện Đa khoa Q.7",
+    staff: "Lê Văn C", contractCode: "HD-2025-089",
+    description: "Sửa chữa và bảo dưỡng toàn bộ hệ thống ống nước, thiết bị vệ sinh tại tầng 1-3.",
+    tasks: ["Kiểm tra hệ thống ống nước", "Thay thế van vòi hỏng", "Bảo dưỡng bồn cầu", "Kiểm tra rò rỉ"],
+  },
   { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
   { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
   { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
