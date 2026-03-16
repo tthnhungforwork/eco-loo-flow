@@ -15,7 +15,7 @@ const quickActions = [
   { label: "Ticket", icon: MessageSquareWarning, gradient: "gradient-warm", path: "/admin/tickets" },
   { label: "QL NVS", icon: Bath, gradient: "gradient-blue", path: "/admin/toilets" },
   { label: "Khảo sát", icon: ClipboardCheck, gradient: "gradient-primary", path: "/admin/surveys" },
-  { label: "Đối tác", icon: Users, gradient: "gradient-blue" },
+  { label: "Đối tác", icon: Users, gradient: "gradient-blue", path: "/admin/partners" },
   { label: "Báo cáo", icon: FileText, gradient: "gradient-warm" },
   { label: "Bảo trì", icon: Wrench, gradient: "gradient-primary" },
   { label: "Cài đặt", icon: Settings, gradient: "gradient-blue" },

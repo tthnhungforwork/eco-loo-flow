@@ -90,6 +90,8 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminHome />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="orders/:orderId" element={<AdminOrderDetail />} />
+              <Route path="partners" element={<AdminPartners />} />
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="toilets" element={<AdminToilets />} />
               <Route path="surveys" element={<AdminSurveys />} />
