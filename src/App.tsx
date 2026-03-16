@@ -78,6 +78,7 @@ const App = () => (
             <Route path="/partner" element={<PartnerLayout />}>
               <Route index element={<PartnerHome />} />
               <Route path="orders" element={<PartnerOrders />} />
+              <Route path="orders/:orderId" element={<PartnerOrderDetail />} />
               <Route path="tasks" element={<PartnerTasks />} />
               <Route path="toilets" element={<PartnerToilets />} />
               <Route path="surveys" element={<PartnerSurveys />} />
