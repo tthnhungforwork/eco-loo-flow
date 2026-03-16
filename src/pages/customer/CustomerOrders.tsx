@@ -2,15 +2,21 @@ import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
-import { Calendar, Star, Heart, ShoppingCart, Package, ArrowRight } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Calendar, Star, Heart, ShoppingCart, Package, ArrowRight,
+  Plus, Send, MapPin, FileText, Image as ImageIcon, Sparkles, Wrench
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const serviceOrders = [
-  { id: "DH-001", name: "Gói vệ sinh tháng 3", date: "16/03/2026", amount: "2.500.000đ", status: "processing", partner: "Eco Clean" },
-  { id: "DH-002", name: "Tư vấn số hóa NVS", date: "14/03/2026", amount: "Miễn phí", status: "new", partner: "Chờ điều phối" },
-  { id: "DH-003", name: "Bảo trì thiết bị Q1", date: "10/03/2026", amount: "5.000.000đ", status: "done", partner: "Green Tech" },
-  { id: "DH-004", name: "Dịch vụ VSLD Block A", date: "05/03/2026", amount: "3.200.000đ", status: "cancelled", partner: "Eco Clean" },
+  { id: "DH-001", name: "Gói vệ sinh tháng 3", date: "16/03/2026", amount: "2.500.000đ", status: "processing", partner: "Eco Clean", type: "VSLD" },
+  { id: "DH-002", name: "Tư vấn số hóa NVS", date: "14/03/2026", amount: "Miễn phí", status: "new", partner: "Chờ điều phối", type: "Tư vấn" },
+  { id: "DH-003", name: "Bảo trì thiết bị Q1", date: "10/03/2026", amount: "5.000.000đ", status: "done", partner: "Green Tech", type: "SCBD" },
+  { id: "DH-004", name: "Dịch vụ VSLD Block A", date: "05/03/2026", amount: "3.200.000đ", status: "cancelled", partner: "Eco Clean", type: "VSLD" },
 ];
 
 const productOrders = [
@@ -25,15 +31,33 @@ const favorites = [
 
 const statusLabel: Record<string, string> = { new: "Mới", processing: "Đang xử lý", done: "Hoàn thành", cancelled: "Đã hủy" };
 const mainTabs = ["Đơn dịch vụ", "Đơn mua hàng", "Yêu thích"];
+const serviceTypes = ["Tư vấn", "VSLD", "SCBD", "Netzero"];
 
 const CustomerOrders = () => {
   const [mainTab, setMainTab] = useState(0);
   const [statusFilter, setStatusFilter] = useState(0);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showRate, setShowRate] = useState<string | null>(null);
+  const [rating, setRating] = useState(5);
+  const [rateContent, setRateContent] = useState("");
+  const [newOrder, setNewOrder] = useState({ type: "Tư vấn", content: "", address: "" });
+
   const statusFilters = ["Tất cả", "Mới", "Đang xử lý", "Hoàn thành", "Hủy/Hoàn"];
   const statusKeys = ["all", "new", "processing", "done", "cancelled"];
 
   const filteredService = statusKeys[statusFilter] === "all" ? serviceOrders : serviceOrders.filter((o) => o.status === statusKeys[statusFilter]);
   const filteredProduct = statusKeys[statusFilter] === "all" ? productOrders : productOrders.filter((o) => o.status === statusKeys[statusFilter]);
+
+  const handleCreateOrder = () => {
+    setShowCreate(false);
+    setNewOrder({ type: "Tư vấn", content: "", address: "" });
+  };
+
+  const handleRate = () => {
+    setShowRate(null);
+    setRating(5);
+    setRateContent("");
+  };
 
   return (
     <div className="gradient-surface min-h-screen">
@@ -59,7 +83,7 @@ const CustomerOrders = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={`${mainTab}-${statusFilter}`}
-            className="px-4 space-y-3"
+            className="px-4 space-y-3 pb-24"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -91,6 +115,7 @@ const CustomerOrders = () => {
                     size="sm"
                     variant="outline"
                     className="w-full mt-3 rounded-xl font-semibold gap-1.5 border-primary/15 text-primary hover:bg-accent/50"
+                    onClick={() => setShowRate(o.id)}
                   >
                     <Star size={14} /> Đánh giá dịch vụ
                   </Button>
@@ -161,6 +186,140 @@ const CustomerOrders = () => {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* FAB - Create Order */}
+      {mainTab === 0 && (
+        <motion.button
+          className="fixed bottom-24 right-4 w-14 h-14 rounded-2xl gradient-primary text-primary-foreground shadow-glow flex items-center justify-center z-40"
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setShowCreate(true)}
+        >
+          <Plus size={24} />
+        </motion.button>
+      )}
+
+      {/* Create Service Order Sheet */}
+      <Sheet open={showCreate} onOpenChange={setShowCreate}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">Tạo đơn hàng dịch vụ</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại dịch vụ</label>
+              <div className="grid grid-cols-2 gap-2">
+                {serviceTypes.map((t) => (
+                  <motion.button
+                    key={t}
+                    onClick={() => setNewOrder({ ...newOrder, type: t })}
+                    className={`rounded-xl p-3 text-left border transition-all ${
+                      newOrder.type === t
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border/40 bg-card"
+                    }`}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t === "Tư vấn" && <FileText size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
+                      {t === "VSLD" && <Sparkles size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
+                      {t === "SCBD" && <Wrench size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
+                      {t === "Netzero" && <ArrowRight size={16} className={newOrder.type === t ? "text-primary" : "text-muted-foreground"} />}
+                      <span className={`text-[13px] font-semibold ${newOrder.type === t ? "text-primary" : "text-foreground"}`}>{t}</span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nội dung yêu cầu</label>
+              <Textarea
+                placeholder="Mô tả nhu cầu dịch vụ..."
+                className="rounded-xl min-h-[80px]"
+                value={newOrder.content}
+                onChange={(e) => setNewOrder({ ...newOrder, content: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block flex items-center gap-1.5">
+                <MapPin size={14} /> Địa điểm
+              </label>
+              <Input
+                placeholder="Nhập địa điểm thực hiện..."
+                className="rounded-xl"
+                value={newOrder.address}
+                onChange={(e) => setNewOrder({ ...newOrder, address: e.target.value })}
+              />
+            </div>
+
+            <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
+              <ImageIcon size={16} /> Đính kèm file
+            </Button>
+
+            <Button
+              className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
+              onClick={handleCreateOrder}
+              disabled={!newOrder.content}
+            >
+              <Send size={18} /> Tạo đơn hàng
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Rate Order Sheet */}
+      <Sheet open={!!showRate} onOpenChange={() => setShowRate(null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">Đánh giá dịch vụ</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-4">
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground mb-3">Bạn đánh giá chất lượng dịch vụ thế nào?</p>
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <motion.button
+                    key={s}
+                    onClick={() => setRating(s)}
+                    whileTap={{ scale: 0.8, rotate: -15 }}
+                    className="p-1"
+                  >
+                    <Star
+                      size={32}
+                      className={s <= rating ? "text-eco-orange fill-eco-orange" : "text-muted-foreground/30"}
+                    />
+                  </motion.button>
+                ))}
+              </div>
+              <p className="text-lg font-bold text-foreground mt-2">{rating}/5</p>
+            </div>
+
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nhận xét</label>
+              <Textarea
+                placeholder="Chia sẻ trải nghiệm của bạn..."
+                className="rounded-xl min-h-[80px]"
+                value={rateContent}
+                onChange={(e) => setRateContent(e.target.value)}
+              />
+            </div>
+
+            <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
+              <ImageIcon size={16} /> Đính kèm hình ảnh
+            </Button>
+
+            <Button
+              className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
+              onClick={handleRate}
+            >
+              <Send size={18} /> Gửi đánh giá
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
