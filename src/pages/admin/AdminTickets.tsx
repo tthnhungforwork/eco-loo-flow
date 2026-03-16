@@ -34,7 +34,7 @@ const AdminTickets = () => {
 
   return (
     <div>
-      <MobileHeader title="Ticket" />
+      <AdminHeader title="Ticket" />
       <div className="py-4">
         <div className="px-4 mb-4 relative">
           <Search size={16} className="absolute left-7 top-1/2 -translate-y-1/2 text-muted-foreground" />

@@ -63,7 +63,7 @@ const AdminHome = () => {
 
   return (
     <div className="min-h-screen">
-      <MobileHeader title="Dashboard" showSwitcher />
+      <AdminHeader title="Dashboard" showSwitcher />
 
       {/* Hero */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">
