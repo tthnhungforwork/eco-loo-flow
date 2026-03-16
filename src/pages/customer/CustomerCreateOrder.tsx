@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CustomerHeader from "./components/CustomerHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import OtpVerifySheet from "@/components/OtpVerifySheet";
 import {
   FileText, Sparkles, Wrench, HardHat, Hammer, Recycle,
   MapPin, User, Phone, Mail, Building2, Bath, ChevronRight,
