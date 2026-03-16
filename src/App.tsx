@@ -18,6 +18,9 @@ import CustomerReports from "./pages/customer/CustomerReports";
 import CustomerToilets from "./pages/customer/CustomerToilets";
 import CustomerOrders from "./pages/customer/CustomerOrders";
 import CustomerProfile from "./pages/customer/CustomerProfile";
+import CustomerTickets from "./pages/customer/CustomerTickets";
+import CustomerSurveys from "./pages/customer/CustomerSurveys";
+import CustomerBusinessInfo from "./pages/customer/CustomerBusinessInfo";
 
 import PartnerLayout from "./layouts/PartnerLayout";
 import PartnerHome from "./pages/partner/PartnerHome";
@@ -58,6 +61,9 @@ const App = () => (
               <Route path="toilets" element={<CustomerToilets />} />
               <Route path="orders" element={<CustomerOrders />} />
               <Route path="profile" element={<CustomerProfile />} />
+              <Route path="tickets" element={<CustomerTickets />} />
+              <Route path="surveys" element={<CustomerSurveys />} />
+              <Route path="business" element={<CustomerBusinessInfo />} />
             </Route>
 
             <Route path="/partner" element={<PartnerLayout />}>
