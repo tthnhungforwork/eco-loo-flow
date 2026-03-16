@@ -11,14 +11,12 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const quickActions = [
-  { label: "Đơn hàng", icon: ShoppingCart, gradient: "gradient-primary", path: "/customer/orders" },
-  { label: "Công việc", icon: Briefcase, gradient: "gradient-blue", path: "/customer/tasks" },
-  { label: "Báo cáo", icon: BarChart3, gradient: "gradient-warm", path: "/customer/reports" },
-  { label: "NVS", icon: Bath, gradient: "gradient-primary", path: "/customer/toilets" },
-  { label: "Khảo sát", icon: ClipboardCheck, gradient: "gradient-blue", badge: "Mới" },
-  { label: "Tư vấn", icon: FileText, gradient: "gradient-warm" },
-  { label: "Bảo trì", icon: Wrench, gradient: "gradient-primary" },
-  { label: "Sản phẩm", icon: Package, gradient: "gradient-blue" },
+  { label: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue", path: "/customer/surveys" },
+  { label: "Vệ sinh lau dọn", icon: Sparkles, gradient: "gradient-primary", path: "/customer/orders" },
+  { label: "Sửa chữa bảo dưỡng", icon: Wrench, gradient: "gradient-warm", path: "/customer/orders" },
+  { label: "Xây mới", icon: HardHat, gradient: "gradient-primary", path: "/customer/orders" },
+  { label: "Cải tạo", icon: Hammer, gradient: "gradient-blue", path: "/customer/orders" },
+  { label: "Netzero", icon: Recycle, gradient: "gradient-warm", path: "/customer/orders" },
 ];
 
 
@@ -72,9 +70,7 @@ const stagger = {
 
 const CustomerHome = () => {
   const [visibleProducts, setVisibleProducts] = useState(4);
-  const [showAllActions, setShowAllActions] = useState(false);
   const [selectedService, setSelectedService] = useState<typeof myServices[0] | null>(null);
-  const displayActions = showAllActions ? quickActions : quickActions.slice(0, 4);
 
   return (
     <div className="min-h-screen">
@@ -123,8 +119,8 @@ const CustomerHome = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <div className="grid grid-cols-4 gap-y-4 gap-x-2">
-            {displayActions.map((action, i) => (
+          <div className="grid grid-cols-3 gap-y-4 gap-x-2">
+            {quickActions.map((action, i) => (
               <motion.button
                 key={action.label}
                 className="flex flex-col items-center gap-1.5 relative"
@@ -133,11 +129,6 @@ const CustomerHome = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 + i * 0.04 }}
               >
-                {action.badge && (
-                  <span className="absolute -top-1 right-1 text-[7px] font-bold bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full z-10">
-                    {action.badge}
-                  </span>
-                )}
                 <div className={`w-12 h-12 rounded-2xl ${action.gradient} flex items-center justify-center shadow-sm`}>
                   <action.icon size={20} className="text-primary-foreground" />
                 </div>
@@ -145,20 +136,6 @@ const CustomerHome = () => {
               </motion.button>
             ))}
           </div>
-          {quickActions.length > 4 && (
-            <motion.button
-              onClick={() => setShowAllActions(!showAllActions)}
-              className="w-full flex items-center justify-center mt-3 pt-2 border-t border-border/30"
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={{ rotate: showAllActions ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown size={20} className="text-primary" />
-              </motion.div>
-            </motion.button>
-          )}
         </motion.div>
       </div>
 
