@@ -313,20 +313,14 @@ const CustomerCreateOrder = () => {
             </motion.div>
           )}
 
-          {/* Step 3 (or 4 for netzero): Địa điểm + Xác nhận */}
-          {step === 3 && type !== "netzero" && (
-            <motion.div key="step3" className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <p className="text-[13px] font-bold text-foreground">Xác nhận địa điểm thực hiện</p>
-              <div>
-                <label className="text-[12px] font-medium text-muted-foreground mb-1.5 block flex items-center gap-1.5">
-                  <MapPin size={12} /> Địa điểm
-                </label>
-                <Input value={form.address} onChange={(e) => updateForm("address", e.target.value)} className="rounded-xl" />
-                <p className="text-[10px] text-muted-foreground mt-1.5">Tự động lấy từ thông tin cá nhân, bạn có thể chỉnh sửa.</p>
-              </div>
+          {/* Step 3 non-netzero: Xác nhận + summary, then show inline below */}
+          {step === 2 && type !== "netzero" && step === 2 ? null : null}
 
+          {/* Step 3 (non-netzero) OR Step 4 (netzero): OTP Verification */}
+          {isOtpStep && (
+            <motion.div key="step-otp" className="space-y-5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               {/* Summary */}
-              <div className="bg-muted/40 rounded-2xl p-4 space-y-3 mt-4">
+              <div className="bg-muted/40 rounded-2xl p-4 space-y-3">
                 <p className="text-[12px] font-bold text-foreground">Tóm tắt đơn hàng</p>
                 <div className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-lg ${service.gradient} flex items-center justify-center text-primary-foreground`}>
@@ -337,11 +331,76 @@ const CustomerCreateOrder = () => {
                 <div className="text-[11px] text-muted-foreground space-y-1.5 pt-2 border-t border-border/30">
                   <p>👤 {form.name} · {form.phone}</p>
                   <p>📍 {form.address}</p>
-                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
+                  {type === "netzero" && <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>}
                   {form.selectedToilets.length > 0 && (
                     <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
                   )}
+                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
                 </div>
+              </div>
+
+              {/* OTP Section */}
+              <motion.div
+                className="w-16 h-16 mx-auto rounded-2xl gradient-primary flex items-center justify-center shadow-glow"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                <ShieldCheck size={28} className="text-primary-foreground" />
+              </motion.div>
+
+              <div className="text-center">
+                <p className="text-[13px] text-foreground font-medium">Mã xác thực đã được gửi đến</p>
+                <p className="text-[15px] font-bold text-primary mt-1">{maskedPhone}</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Nhập mã 6 số để xác nhận đăng ký dịch vụ</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 italic">
+                  (Demo: mã OTP là <span className="font-mono font-bold text-primary">123456</span>)
+                </p>
+              </div>
+
+              {/* OTP Inputs */}
+              <div className="flex justify-center gap-2.5" onPaste={handleOtpPaste}>
+                {otp.map((digit, index) => (
+                  <motion.input
+                    key={index}
+                    ref={(el) => { inputRefs.current[index] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    className={`w-11 h-13 text-center text-lg font-bold rounded-xl border-2 transition-all outline-none ${
+                      digit ? "border-primary bg-primary/5 text-foreground" : "border-border bg-card text-foreground"
+                    } ${otpError ? "border-destructive bg-destructive/5" : ""} focus:border-primary focus:ring-2 focus:ring-primary/20`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + index * 0.04 }}
+                  />
+                ))}
+              </div>
+
+              {otpError && (
+                <motion.p className="text-center text-[12px] text-destructive font-medium" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {otpError}
+                </motion.p>
+              )}
+
+              {verifying && (
+                <div className="text-center">
+                  <motion.div className="w-6 h-6 mx-auto border-2 border-primary border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
+                  <p className="text-[11px] text-muted-foreground mt-2">Đang xác thực...</p>
+                </div>
+              )}
+
+              <div className="text-center">
+                {otpCountdown > 0 ? (
+                  <p className="text-[12px] text-muted-foreground">Gửi lại mã sau <span className="font-bold text-foreground">{otpCountdown}s</span></p>
+                ) : (
+                  <Button variant="ghost" size="sm" className="text-primary font-semibold gap-1.5" onClick={handleResendOtp}>
+                    <RotateCcw size={14} /> Gửi lại mã OTP
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}
