@@ -1,4 +1,4 @@
-import { Bell, ShoppingCart, Menu } from "lucide-react";
+import { Bell, ShoppingCart, Menu, ScanLine } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useRole } from "@/contexts/RoleContext";
 import { motion } from "framer-motion";
@@ -22,7 +22,7 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
           whileTap={{ scale: 0.96 }}
         >
           <div className="w-9 h-9 rounded-xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-            <img src={logo} alt="Logo" className="w-5 h-5 object-contain brightness-0 invert" />
+            <Menu className="w-5 h-5 text-primary-foreground" />
           </div>
           <div className="text-left min-w-0 hidden min-[340px]:block">
             <p className="text-[13px] font-bold text-primary-foreground leading-tight truncate max-w-[110px]">
@@ -33,11 +33,14 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
             </p>
           </div>
         </motion.button>
-      ) : showLogo ? (
-        <div className="w-9 h-9 rounded-xl bg-primary-foreground/15 p-1.5">
-          <img src={logo} alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
-        </div>
-      ) : null}
+      ) : (
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          className="w-9 h-9 rounded-xl bg-primary-foreground/15 flex items-center justify-center shrink-0"
+        >
+          <Menu className="w-5 h-5 text-primary-foreground" />
+        </motion.button>
+      )}
 
       {title && (
         <h1 className="flex-1 font-bold text-base text-primary-foreground tracking-tight truncate">
@@ -52,6 +55,12 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
           whileTap={{ scale: 0.85 }}
           className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
         >
+          <ScanLine size={18} />
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.85 }}
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
+        >
           <ShoppingCart size={18} />
         </motion.button>
         <motion.button
@@ -60,13 +69,6 @@ const MobileHeader = ({ title, showLogo = true, showSwitcher = false }: MobileHe
         >
           <Bell size={18} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full border-[1.5px] border-primary animate-pulse-soft" />
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.85 }}
-          onClick={showSwitcher ? openSheet : undefined}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-foreground/12 text-primary-foreground/85 hover:bg-primary-foreground/20 transition-colors shrink-0"
-        >
-          <Menu size={18} />
         </motion.button>
       </div>
     </header>
