@@ -30,20 +30,6 @@ const performedServices = [
   { label: "Netzero", count: 3, icon: "♻️" },
 ];
 
-const servicePlans = [
-  {
-    name: "Cơ bản", price: "Miễn phí", features: ["Tiếp nhận đơn hàng", "Quản lý 5 NVS", "Báo cáo cơ bản"],
-    limits: ["Không ưu tiên điều phối", "Không có đào tạo"], popular: false, current: false,
-  },
-  {
-    name: "Nâng cao", price: "1.5M/tháng", features: ["Không giới hạn đơn", "Quản lý 20 NVS", "Báo cáo chi tiết", "Ưu tiên điều phối"],
-    limits: ["Không hỗ trợ 24/7"], popular: true, current: true,
-  },
-  {
-    name: "VIP", price: "3M/tháng", features: ["Toàn bộ quyền lợi", "Ưu tiên điều phối cao nhất", "Hỗ trợ 24/7", "Đào tạo miễn phí", "Branding trên app"],
-    limits: [], popular: false, current: false,
-  },
-];
 
 const newsList = [
   { id: 1, title: "Tuyển đối tác vệ sinh khu vực Q.7", emoji: "📢", tag: "Tuyển dụng", date: "15/03" },
