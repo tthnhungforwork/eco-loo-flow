@@ -24,6 +24,7 @@ import CustomerBusinessInfo from "./pages/customer/CustomerBusinessInfo";
 import CustomerCreateOrder from "./pages/customer/CustomerCreateOrder";
 import CustomerRegisterPartner from "./pages/customer/CustomerRegisterPartner";
 import CustomerCart from "./pages/customer/CustomerCart";
+import CustomerOrderDetail from "./pages/customer/CustomerOrderDetail";
 
 import PartnerLayout from "./layouts/PartnerLayout";
 import PartnerHome from "./pages/partner/PartnerHome";
