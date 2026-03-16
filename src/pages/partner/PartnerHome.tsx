@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import PartnerHeader from "./components/PartnerHeader";
 import {
-  ArrowRight, Leaf, ShoppingCart, Star, Newspaper, Crown,
-  ChevronRight, ChevronDown, Bath, Calendar, Clock,
-  CheckCircle2, Package, ExternalLink
+  ArrowRight, Leaf, ShoppingCart, Star, Newspaper,
+  ChevronRight, Bath, Calendar, Clock,
+  CheckCircle2, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -30,20 +30,6 @@ const performedServices = [
   { label: "Netzero", count: 3, icon: "♻️" },
 ];
 
-const servicePlans = [
-  {
-    name: "Cơ bản", price: "Miễn phí", features: ["Tiếp nhận đơn hàng", "Quản lý 5 NVS", "Báo cáo cơ bản"],
-    limits: ["Không ưu tiên điều phối", "Không có đào tạo"], popular: false, current: false,
-  },
-  {
-    name: "Nâng cao", price: "1.5M/tháng", features: ["Không giới hạn đơn", "Quản lý 20 NVS", "Báo cáo chi tiết", "Ưu tiên điều phối"],
-    limits: ["Không hỗ trợ 24/7"], popular: true, current: true,
-  },
-  {
-    name: "VIP", price: "3M/tháng", features: ["Toàn bộ quyền lợi", "Ưu tiên điều phối cao nhất", "Hỗ trợ 24/7", "Đào tạo miễn phí", "Branding trên app"],
-    limits: [], popular: false, current: false,
-  },
-];
 
 const newsList = [
   { id: 1, title: "Tuyển đối tác vệ sinh khu vực Q.7", emoji: "📢", tag: "Tuyển dụng", date: "15/03" },
@@ -194,57 +180,6 @@ const PartnerHome = () => {
           </div>
         </motion.section>
 
-        {/* 4. Gói dịch vụ (ma trận quyền lợi) */}
-        <motion.section variants={stagger.item}>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-sm text-foreground flex items-center gap-2">
-              <Crown size={16} className="text-primary" /> Gói dịch vụ
-            </h2>
-          </div>
-          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x snap-mandatory scrollbar-hide pb-1">
-            {servicePlans.map((plan) => (
-              <motion.div
-                key={plan.name}
-                className={`min-w-[200px] rounded-2xl p-4 shrink-0 snap-start relative overflow-hidden ${
-                  plan.popular ? "gradient-primary text-primary-foreground shadow-glow" : "bg-card shadow-card border border-border/30"
-                }`}
-                whileTap={{ scale: 0.97 }}
-              >
-                {plan.current && (
-                  <span className="absolute top-2 right-2 text-[8px] font-bold uppercase bg-primary-foreground/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                    ✓ Đang dùng
-                  </span>
-                )}
-                {plan.popular && !plan.current && (
-                  <span className="absolute top-2 right-2 text-[8px] font-bold uppercase bg-primary-foreground/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                    ⭐ Phổ biến
-                  </span>
-                )}
-                <h3 className={`font-bold text-sm mb-0.5 ${plan.popular ? "" : "text-foreground"}`}>{plan.name}</h3>
-                <p className={`text-lg font-black mb-3 ${plan.popular ? "" : "text-primary"}`}>{plan.price}</p>
-                <ul className="space-y-1.5 mb-3">
-                  {plan.features.map((f) => (
-                    <li key={f} className={`text-[10px] flex items-center gap-1.5 ${plan.popular ? "opacity-90" : "text-muted-foreground"}`}>
-                      <CheckCircle2 size={10} className={plan.popular ? "text-primary-foreground/70" : "text-primary"} /> {f}
-                    </li>
-                  ))}
-                  {plan.limits.map((l) => (
-                    <li key={l} className={`text-[10px] flex items-center gap-1.5 line-through opacity-50`}>
-                      <span className="w-2.5 h-[1px] bg-current" /> {l}
-                    </li>
-                  ))}
-                </ul>
-                {!plan.current && (
-                  <Button size="sm" className={`w-full rounded-xl font-bold text-[11px] h-8 ${
-                    plan.popular ? "bg-primary-foreground/90 text-foreground hover:bg-primary-foreground border-0" : "gradient-primary border-0 text-primary-foreground"
-                  }`}>
-                    Nâng cấp
-                  </Button>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
 
         {/* 5. Tin tức (lướt ngang) */}
         <motion.section variants={stagger.item}>
