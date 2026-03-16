@@ -266,12 +266,21 @@ const CustomerTasks = () => {
                 </div>
               )}
 
-              {selectedTask.status !== "done" && (
+              {selectedTask.assignee === "Tôi" && selectedTask.status !== "done" && (
                 <Button
                   className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
                   onClick={() => setShowComplete(true)}
                 >
                   <CheckCircle2 size={18} /> Khai báo hoàn thành
+                </Button>
+              )}
+              {selectedTask.assignee !== "Tôi" && selectedTask.creator === "Tôi" && selectedTask.status !== "done" && (
+                <Button
+                  variant="outline"
+                  className="w-full touch-target font-bold rounded-2xl h-14 gap-2 border-primary/30 text-primary"
+                  onClick={() => {/* TODO: send reminder */}}
+                >
+                  <Clock size={18} /> Nhắc nhở
                 </Button>
               )}
             </>
