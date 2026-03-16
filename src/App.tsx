@@ -32,7 +32,7 @@ import PartnerOrders from "./pages/partner/PartnerOrders";
 import PartnerTasks from "./pages/partner/PartnerTasks";
 import PartnerToilets from "./pages/partner/PartnerToilets";
 import PartnerSurveys from "./pages/partner/PartnerSurveys";
-import PartnerProfile from "./pages/partner/PartnerProfile";
+import PartnerGeneral from "./pages/partner/PartnerGeneral";
 import PartnerOrderDetail from "./pages/partner/PartnerOrderDetail";
 
 import AdminLayout from "./layouts/AdminLayout";
