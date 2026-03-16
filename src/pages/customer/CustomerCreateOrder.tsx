@@ -47,7 +47,7 @@ const CustomerCreateOrder = () => {
     email: "khach@email.com",
     address: "123 Nguyễn Huệ, Q.1, TP.HCM",
     content: "",
-    selectedToilet: null as number | null,
+    selectedToilets: [] as number[],
     netzeroLevel: "",
     attachments: [] as string[],
   });
