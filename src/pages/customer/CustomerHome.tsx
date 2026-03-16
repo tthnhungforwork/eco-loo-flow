@@ -2,7 +2,7 @@ import MobileHeader from "@/components/MobileHeader";
 import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
   ChevronRight, Briefcase, BarChart3, Bath, FileText,
-  Wrench, ClipboardCheck, Package, ChevronDown
+  Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -25,10 +25,13 @@ const banners = [
   { id: 3, title: "Sản phẩm Xanh mới", subtitle: "Bộ sưu tập Eco Pro 2026", gradient: "gradient-warm", emoji: "🌿" },
 ];
 
-const servicePlans = [
-  { name: "Cơ bản", price: "Miễn phí", features: ["Quản lý 1 NVS", "Báo cáo cơ bản"], popular: false },
-  { name: "Nâng cao", price: "300K/tháng", features: ["Quản lý 10 NVS", "Báo cáo chi tiết", "Ưu tiên hỗ trợ"], popular: true },
-  { name: "VIP", price: "800K/tháng", features: ["Không giới hạn NVS", "Hỗ trợ 24/7", "API tích hợp"], popular: false },
+const myServices = [
+  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", gradient: "gradient-primary" },
+  { name: "Tư vấn số hóa", icon: FileText, status: "active", gradient: "gradient-blue" },
+  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "active", gradient: "gradient-warm" },
+  { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
+  { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
+  { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
 ];
 
 const news = [
@@ -175,41 +178,39 @@ const CustomerHome = () => {
           </div>
         </motion.section>
 
-        {/* Gói dịch vụ */}
+        {/* Dịch vụ đã đăng ký */}
         <motion.section variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="section-title flex items-center gap-2">
-              <Crown size={16} className="text-primary" /> Gói dịch vụ
+              <Crown size={16} className="text-primary" /> Dịch vụ của tôi
             </h2>
-            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Chi tiết <ChevronRight size={14} /></button>
+            <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
           </div>
-          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x snap-mandatory scrollbar-hide pb-1">
-            {servicePlans.map((plan) => (
-              <motion.div
-                key={plan.name}
-                className={`min-w-[180px] rounded-2xl p-4 shrink-0 snap-start relative overflow-hidden ${
-                  plan.popular ? "gradient-primary text-primary-foreground shadow-glow" : "bg-card shadow-card border border-border/30"
+          <div className="grid grid-cols-3 gap-2.5">
+            {myServices.map((svc) => (
+              <motion.button
+                key={svc.name}
+                className={`rounded-2xl p-3 flex flex-col items-center gap-2 text-center card-hover relative overflow-hidden ${
+                  svc.status === "active"
+                    ? "bg-card shadow-card border border-border/30"
+                    : "bg-muted/40 border border-border/20 opacity-60"
                 }`}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {plan.popular && (
-                  <span className="absolute top-2 right-2 text-[8px] font-bold uppercase bg-primary-foreground/20 backdrop-blur-sm px-2 py-0.5 rounded-full tracking-wider">⭐ Phổ biến</span>
-                )}
-                <h3 className={`font-bold text-sm mb-0.5 ${plan.popular ? "" : "text-foreground"}`}>{plan.name}</h3>
-                <p className={`text-lg font-black mb-2 ${plan.popular ? "" : "text-primary"}`}>{plan.price}</p>
-                <ul className="space-y-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className={`text-[10px] flex items-center gap-1.5 ${plan.popular ? "opacity-85" : "text-muted-foreground"}`}>
-                      <span className={`w-1 h-1 rounded-full ${plan.popular ? "bg-primary-foreground/60" : "bg-primary"}`} /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button size="sm" className={`w-full mt-3 rounded-xl font-bold text-[11px] h-8 ${
-                  plan.popular ? "bg-primary-foreground/90 text-foreground hover:bg-primary-foreground border-0" : "gradient-primary border-0 text-primary-foreground shadow-sm"
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  svc.status === "active" ? svc.gradient + " text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground"
                 }`}>
-                  {plan.popular ? "✓ Đang dùng" : "Chọn gói"}
-                </Button>
-              </motion.div>
+                  <svc.icon size={18} />
+                </div>
+                <span className={`text-[11px] font-medium leading-tight ${
+                  svc.status === "active" ? "text-foreground" : "text-muted-foreground"
+                }`}>
+                  {svc.name}
+                </span>
+                {svc.status === "active" && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+                )}
+              </motion.button>
             ))}
           </div>
         </motion.section>
