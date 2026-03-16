@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CustomerHeader from "./components/CustomerHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import OtpVerifySheet from "@/components/OtpVerifySheet";
 import {
   FileText, Sparkles, Wrench, HardHat, Hammer, Recycle,
   MapPin, User, Phone, Mail, Building2, Bath, ChevronRight,
-  Send, Image as ImageIcon, CheckCircle2, ArrowLeft, Leaf
+  Send, Image as ImageIcon, CheckCircle2, ArrowLeft, Leaf,
+  ShieldCheck, RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -42,7 +42,6 @@ const CustomerCreateOrder = () => {
   const ServiceIcon = service.icon;
 
   const [step, setStep] = useState(1);
-  const [showOtp, setShowOtp] = useState(false);
   const [form, setForm] = useState({
     name: "Nguyễn Văn Khách",
     phone: "0901234567",
@@ -54,18 +53,92 @@ const CustomerCreateOrder = () => {
     attachments: [] as string[],
   });
 
-  const totalSteps = type === "netzero" ? 4 : 3;
+  // OTP state
+  const MOCK_OTP = "123456";
+  const OTP_LENGTH = 6;
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [otpError, setOtpError] = useState("");
+  const [otpCountdown, setOtpCountdown] = useState(60);
+  const [verifying, setVerifying] = useState(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleRequestSubmit = () => {
-    setShowOtp(true);
+  const totalSteps = type === "netzero" ? 4 : 3;
+  const isOtpStep = step === totalSteps;
+
+  // OTP countdown
+  useEffect(() => {
+    if (!isOtpStep) return;
+    setOtp(Array(OTP_LENGTH).fill(""));
+    setOtpError("");
+    setOtpCountdown(60);
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isOtpStep]);
+
+  // Focus first OTP input
+  useEffect(() => {
+    if (isOtpStep) {
+      setTimeout(() => inputRefs.current[0]?.focus(), 200);
+    }
+  }, [isOtpStep]);
+
+  const maskedPhone = form.phone
+    ? form.phone.slice(0, 4) + "***" + form.phone.slice(-3)
+    : "****";
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    setOtpError("");
+    if (value && index < OTP_LENGTH - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+    if (newOtp.every((d) => d !== "") && newOtp.join("").length === OTP_LENGTH) {
+      verifyOtp(newOtp.join(""));
+    }
   };
 
-  const handleOtpVerified = () => {
-    setShowOtp(false);
-    toast.success("Đơn hàng đã được tạo thành công!", {
-      description: `Đơn hàng ${service.label} đang chờ điều phối.`,
-    });
-    navigate("/customer/orders");
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
+    if (pasted.length === OTP_LENGTH) {
+      setOtp(pasted.split(""));
+      verifyOtp(pasted);
+    }
+  };
+
+  const verifyOtp = (code: string) => {
+    setVerifying(true);
+    setTimeout(() => {
+      if (code === MOCK_OTP) {
+        toast.success("Đơn hàng đã được tạo thành công!", {
+          description: `Đơn hàng ${service.label} đang chờ điều phối.`,
+        });
+        navigate("/customer/orders");
+      } else {
+        setOtpError("Mã OTP không đúng. Vui lòng thử lại.");
+        setOtp(Array(OTP_LENGTH).fill(""));
+        inputRefs.current[0]?.focus();
+      }
+      setVerifying(false);
+    }, 800);
+  };
+
+  const handleResendOtp = () => {
+    setOtpCountdown(60);
+    setOtp(Array(OTP_LENGTH).fill(""));
+    setOtpError("");
+    inputRefs.current[0]?.focus();
   };
 
   const updateForm = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
@@ -240,20 +313,12 @@ const CustomerCreateOrder = () => {
             </motion.div>
           )}
 
-          {/* Step 3 (or 4 for netzero): Địa điểm + Xác nhận */}
-          {step === 3 && type !== "netzero" && (
-            <motion.div key="step3" className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <p className="text-[13px] font-bold text-foreground">Xác nhận địa điểm thực hiện</p>
-              <div>
-                <label className="text-[12px] font-medium text-muted-foreground mb-1.5 block flex items-center gap-1.5">
-                  <MapPin size={12} /> Địa điểm
-                </label>
-                <Input value={form.address} onChange={(e) => updateForm("address", e.target.value)} className="rounded-xl" />
-                <p className="text-[10px] text-muted-foreground mt-1.5">Tự động lấy từ thông tin cá nhân, bạn có thể chỉnh sửa.</p>
-              </div>
 
+          {/* Step 3 (non-netzero) OR Step 4 (netzero): OTP Verification */}
+          {isOtpStep && (
+            <motion.div key="step-otp" className="space-y-5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               {/* Summary */}
-              <div className="bg-muted/40 rounded-2xl p-4 space-y-3 mt-4">
+              <div className="bg-muted/40 rounded-2xl p-4 space-y-3">
                 <p className="text-[12px] font-bold text-foreground">Tóm tắt đơn hàng</p>
                 <div className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-lg ${service.gradient} flex items-center justify-center text-primary-foreground`}>
@@ -264,11 +329,76 @@ const CustomerCreateOrder = () => {
                 <div className="text-[11px] text-muted-foreground space-y-1.5 pt-2 border-t border-border/30">
                   <p>👤 {form.name} · {form.phone}</p>
                   <p>📍 {form.address}</p>
-                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
+                  {type === "netzero" && <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>}
                   {form.selectedToilets.length > 0 && (
                     <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
                   )}
+                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
                 </div>
+              </div>
+
+              {/* OTP Section */}
+              <motion.div
+                className="w-16 h-16 mx-auto rounded-2xl gradient-primary flex items-center justify-center shadow-glow"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                <ShieldCheck size={28} className="text-primary-foreground" />
+              </motion.div>
+
+              <div className="text-center">
+                <p className="text-[13px] text-foreground font-medium">Mã xác thực đã được gửi đến</p>
+                <p className="text-[15px] font-bold text-primary mt-1">{maskedPhone}</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Nhập mã 6 số để xác nhận đăng ký dịch vụ</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 italic">
+                  (Demo: mã OTP là <span className="font-mono font-bold text-primary">123456</span>)
+                </p>
+              </div>
+
+              {/* OTP Inputs */}
+              <div className="flex justify-center gap-2.5" onPaste={handleOtpPaste}>
+                {otp.map((digit, index) => (
+                  <motion.input
+                    key={index}
+                    ref={(el) => { inputRefs.current[index] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    className={`w-11 h-13 text-center text-lg font-bold rounded-xl border-2 transition-all outline-none ${
+                      digit ? "border-primary bg-primary/5 text-foreground" : "border-border bg-card text-foreground"
+                    } ${otpError ? "border-destructive bg-destructive/5" : ""} focus:border-primary focus:ring-2 focus:ring-primary/20`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + index * 0.04 }}
+                  />
+                ))}
+              </div>
+
+              {otpError && (
+                <motion.p className="text-center text-[12px] text-destructive font-medium" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {otpError}
+                </motion.p>
+              )}
+
+              {verifying && (
+                <div className="text-center">
+                  <motion.div className="w-6 h-6 mx-auto border-2 border-primary border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
+                  <p className="text-[11px] text-muted-foreground mt-2">Đang xác thực...</p>
+                </div>
+              )}
+
+              <div className="text-center">
+                {otpCountdown > 0 ? (
+                  <p className="text-[12px] text-muted-foreground">Gửi lại mã sau <span className="font-bold text-foreground">{otpCountdown}s</span></p>
+                ) : (
+                  <Button variant="ghost" size="sm" className="text-primary font-semibold gap-1.5" onClick={handleResendOtp}>
+                    <RotateCcw size={14} /> Gửi lại mã OTP
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}
@@ -292,66 +422,39 @@ const CustomerCreateOrder = () => {
             </motion.div>
           )}
 
-          {/* Netzero step 4: Confirm */}
-          {step === 4 && type === "netzero" && (
-            <motion.div key="step4-netzero" className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <div className="bg-muted/40 rounded-2xl p-4 space-y-3">
-                <p className="text-[12px] font-bold text-foreground">Tóm tắt đơn hàng Netzero</p>
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-lg ${service.gradient} flex items-center justify-center text-primary-foreground`}>
-                    <ServiceIcon size={14} />
-                  </div>
-                  <span className="text-[13px] font-semibold text-foreground">{service.label}</span>
-                </div>
-                <div className="text-[11px] text-muted-foreground space-y-1.5 pt-2 border-t border-border/30">
-                  <p>👤 {form.name} · {form.phone}</p>
-                  <p>📍 {form.address}</p>
-                  <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>
-                  {form.selectedToilets.length > 0 && (
-                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
-                  )}
-                  {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
 
-        {/* Navigation buttons */}
-        <div className="flex gap-3 mt-8">
-          {step > 1 && (
-            <Button
-              variant="outline"
-              className="flex-1 rounded-2xl h-14 font-semibold gap-2"
-              onClick={() => setStep((s) => s - 1)}
-            >
-              <ArrowLeft size={16} /> Quay lại
-            </Button>
-          )}
-          {step < totalSteps ? (
+        {/* Navigation buttons - only show if NOT on OTP step */}
+        {!isOtpStep && (
+          <div className="flex gap-3 mt-8">
+            {step > 1 && (
+              <Button
+                variant="outline"
+                className="flex-1 rounded-2xl h-14 font-semibold gap-2"
+                onClick={() => setStep((s) => s - 1)}
+              >
+                <ArrowLeft size={16} /> Quay lại
+              </Button>
+            )}
             <Button
               className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
               onClick={() => setStep((s) => s + 1)}
             >
               Tiếp theo <ChevronRight size={16} />
             </Button>
-          ) : (
+          </div>
+        )}
+        {isOtpStep && (
+          <div className="mt-6">
             <Button
-              className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-              onClick={handleRequestSubmit}
+              variant="outline"
+              className="w-full rounded-2xl h-12 font-semibold gap-2"
+              onClick={() => setStep((s) => s - 1)}
             >
-              <Send size={18} /> Gửi đơn hàng
+              <ArrowLeft size={16} /> Quay lại
             </Button>
-          )}
-        </div>
-
-        {/* OTP Verification */}
-        <OtpVerifySheet
-          open={showOtp}
-          phone={form.phone}
-          onVerified={handleOtpVerified}
-          onCancel={() => setShowOtp(false)}
-        />
+          </div>
+        )}
       </div>
     </div>
   );
