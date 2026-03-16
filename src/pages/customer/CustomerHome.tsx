@@ -27,9 +27,9 @@ const banners = [
 ];
 
 const myServices = [
-  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", gradient: "gradient-primary" },
-  { name: "Tư vấn số hóa", icon: FileText, status: "active", gradient: "gradient-blue" },
-  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "active", gradient: "gradient-warm" },
+  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", date: "01/01/2026", statusLabel: "Đang thực hiện", gradient: "gradient-primary" },
+  { name: "Tư vấn số hóa", icon: FileText, status: "active", date: "15/02/2026", statusLabel: "Đang thực hiện", gradient: "gradient-blue" },
+  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", date: "10/12/2025", statusLabel: "Hoàn thành", gradient: "gradient-warm" },
   { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
   { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
   { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
