@@ -42,6 +42,8 @@ import AdminTickets from "./pages/admin/AdminTickets";
 import AdminToilets from "./pages/admin/AdminToilets";
 import AdminSurveys from "./pages/admin/AdminSurveys";
 import AdminProfile from "./pages/admin/AdminProfile";
+import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
+import AdminPartners from "./pages/admin/AdminPartners";
 
 const queryClient = new QueryClient();
 
