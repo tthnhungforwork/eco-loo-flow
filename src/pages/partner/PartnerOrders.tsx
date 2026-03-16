@@ -1,29 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PartnerHeader from "./components/PartnerHeader";
-import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Building2, Search, CheckCircle, XCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
+import { MOCK_PARTNER_ORDERS, ORDER_STATUS_CONFIG } from "@/data/orderData";
 
-const allOrders = [
-  { id: "PDH-001", name: "Gói vệ sinh tháng 3", client: "Công ty ABC", date: "16/03/2026", amount: "5.000.000đ", status: "pending", type: "VSLD" },
-  { id: "PDH-002", name: "Bảo trì hệ thống Q1", client: "KTX Đại học X", date: "14/03/2026", amount: "8.500.000đ", status: "accepted", type: "SCBD" },
-  { id: "PDH-003", name: "Tư vấn số hóa NVS", client: "Trường THPT Y", date: "12/03/2026", amount: "Miễn phí", status: "dispatching", type: "Tư vấn" },
-  { id: "PDH-004", name: "Lắp đặt thiết bị mới", client: "Công ty Green", date: "10/03/2026", amount: "15.000.000đ", status: "done", type: "SCBD" },
-  { id: "PDH-005", name: "VSLD Block C tháng 3", client: "KTX ĐH Z", date: "08/03/2026", amount: "3.200.000đ", status: "done", type: "VSLD" },
-];
+const statusToFilter = (status: string) => {
+  if (["cho_tiep_nhan"].includes(status)) return "pending";
+  if (["da_tiep_nhan", "dang_khao_sat", "da_bao_gia"].includes(status)) return "accepted";
+  if (["da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu"].includes(status)) return "dispatching";
+  if (["hoan_thanh", "da_danh_gia"].includes(status)) return "done";
+  return "all";
+};
 
-const statusLabel: Record<string, string> = { pending: "Chờ tiếp nhận", accepted: "Đã tiếp nhận", dispatching: "Đang điều phối", done: "Hoàn thành" };
-const tabs = ["Tất cả", "Chờ tiếp nhận", "Đã tiếp nhận", "Đang điều phối", "Hoàn thành"];
+const tabs = ["Tất cả", "Chờ tiếp nhận", "Đã tiếp nhận", "Đang thực hiện", "Hoàn thành"];
 const tabStatus = ["all", "pending", "accepted", "dispatching", "done"];
 
 const PartnerOrders = () => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
-  const filtered = allOrders
-    .filter((o) => tabStatus[tab] === "all" || o.status === tabStatus[tab])
+
+  const filtered = MOCK_PARTNER_ORDERS
+    .filter((o) => tabStatus[tab] === "all" || statusToFilter(o.status) === tabStatus[tab])
     .filter((o) => o.name.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -41,42 +43,42 @@ const PartnerOrders = () => {
           ))}
         </div>
 
-        <div className="px-4 space-y-3">
-          {filtered.map((o, i) => (
-            <motion.div key={o.id} className="glass-card rounded-2xl p-4 card-hover" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <div className="flex justify-between items-start mb-1">
-                <div className="flex-1 mr-2">
-                  <p className="font-bold text-sm text-foreground">{o.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[10px] font-mono text-muted-foreground">#{o.id}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">{o.type}</span>
+        <div className="px-4 space-y-3 pb-24">
+          {filtered.map((o, i) => {
+            const config = ORDER_STATUS_CONFIG[o.status];
+            return (
+              <motion.button
+                key={o.id}
+                className="w-full text-left glass-card rounded-2xl p-4 card-hover"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                onClick={() => navigate(`/partner/orders/${o.id}`)}
+              >
+                <div className="flex justify-between items-start mb-1">
+                  <div className="flex-1 mr-2">
+                    <p className="font-bold text-sm text-foreground">{o.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] font-mono text-muted-foreground">#{o.id}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">{o.typeLabel}</span>
+                    </div>
                   </div>
+                  <StatusBadge status={config.badgeStatus} label={config.label} />
                 </div>
-                <StatusBadge status={o.status === "pending" ? "new" : o.status === "dispatching" ? "processing" : o.status} label={statusLabel[o.status]} />
-              </div>
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2"><Building2 size={12} />{o.client}</p>
-              <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/50">
-                <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} />{o.date}</span>
-                <span className="font-extrabold text-sm text-primary">{o.amount}</span>
-              </div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2"><Building2 size={12} />{o.customerName}</p>
+                <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/50">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} />{o.createdAt}</span>
+                  <span className="font-extrabold text-sm text-primary">{o.amount || "Chờ báo giá"}</span>
+                </div>
+              </motion.button>
+            );
+          })}
 
-              {o.status === "pending" && (
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" variant="outline" className="flex-1 rounded-xl font-semibold gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
-                    <XCircle size={14} /> Từ chối
-                  </Button>
-                  <Button size="sm" className="flex-1 rounded-xl font-bold gap-1 gradient-primary border-0 shadow-glow">
-                    <CheckCircle size={14} /> Tiếp nhận
-                  </Button>
-                </div>
-              )}
-              {o.status === "accepted" && (
-                <Button size="sm" className="w-full mt-3 rounded-xl font-bold gap-1 gradient-primary border-0 shadow-glow">
-                  <Users size={14} /> Điều phối nhân sự
-                </Button>
-              )}
-            </motion.div>
-          ))}
+          {filtered.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-sm">Không có đơn hàng nào</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
