@@ -338,12 +338,20 @@ const CustomerCreateOrder = () => {
           ) : (
             <Button
               className="flex-1 touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-              onClick={handleSubmit}
+              onClick={handleRequestSubmit}
             >
               <Send size={18} /> Gửi đơn hàng
             </Button>
           )}
         </div>
+
+        {/* OTP Verification */}
+        <OtpVerifySheet
+          open={showOtp}
+          phone={form.phone}
+          onVerified={handleOtpVerified}
+          onCancel={() => setShowOtp(false)}
+        />
       </div>
     </div>
   );
