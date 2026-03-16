@@ -351,25 +351,58 @@ const CustomerTickets = () => {
               </div>
             </div>
 
-            {/* Context-aware select */}
+            {/* Context-aware select / QR scan */}
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">
                 {newTicket.type === "order" ? "Chọn đơn hàng" : newTicket.type === "service" ? "Chọn dịch vụ" : "Chọn nhà vệ sinh"}
               </label>
-              <Select value={newTicket.refId} onValueChange={(v) => setNewTicket({ ...newTicket, refId: v })}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder={
-                    newTicket.type === "order" ? "Chọn đơn hàng liên quan..." :
-                    newTicket.type === "service" ? "Chọn dịch vụ liên quan..." :
-                    "Chọn NVS liên quan..."
-                  } />
-                </SelectTrigger>
-                <SelectContent>
-                  {refOptions().map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {newTicket.type === "accident" ? (
+                <>
+                  {newTicket.refId ? (
+                    <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl p-3">
+                      <Bath size={18} className="text-primary shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-[10px] text-muted-foreground">Nhà vệ sinh</p>
+                        <p className="text-[13px] font-semibold text-foreground">{newTicket.refId}</p>
+                      </div>
+                      <button onClick={() => setNewTicket({ ...newTicket, refId: "" })} className="text-muted-foreground hover:text-foreground">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <motion.button
+                      type="button"
+                      className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-primary/30 rounded-xl p-6 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        // Mock QR scan - chọn random NVS
+                        const randomNvs = MOCK_NVS[Math.floor(Math.random() * MOCK_NVS.length)];
+                        setNewTicket({ ...newTicket, refId: randomNvs });
+                      }}
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <QrCode size={28} className="text-primary" />
+                      </div>
+                      <span className="text-[13px] font-semibold text-primary">Quét mã QR nhà vệ sinh</span>
+                      <span className="text-[10px] text-muted-foreground">Hướng camera vào mã QR trên NVS</span>
+                    </motion.button>
+                  )}
+                </>
+              ) : (
+                <Select value={newTicket.refId} onValueChange={(v) => setNewTicket({ ...newTicket, refId: v })}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder={
+                      newTicket.type === "order" ? "Chọn đơn hàng liên quan..." :
+                      "Chọn dịch vụ liên quan..."
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {refOptions().map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div>
