@@ -42,7 +42,6 @@ const CustomerCreateOrder = () => {
   const ServiceIcon = service.icon;
 
   const [step, setStep] = useState(1);
-  const [showOtp, setShowOtp] = useState(false);
   const [form, setForm] = useState({
     name: "Nguyễn Văn Khách",
     phone: "0901234567",
@@ -54,18 +53,92 @@ const CustomerCreateOrder = () => {
     attachments: [] as string[],
   });
 
-  const totalSteps = type === "netzero" ? 4 : 3;
+  // OTP state
+  const MOCK_OTP = "123456";
+  const OTP_LENGTH = 6;
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [otpError, setOtpError] = useState("");
+  const [otpCountdown, setOtpCountdown] = useState(60);
+  const [verifying, setVerifying] = useState(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleRequestSubmit = () => {
-    setShowOtp(true);
+  const totalSteps = type === "netzero" ? 4 : 3;
+  const isOtpStep = step === totalSteps;
+
+  // OTP countdown
+  useEffect(() => {
+    if (!isOtpStep) return;
+    setOtp(Array(OTP_LENGTH).fill(""));
+    setOtpError("");
+    setOtpCountdown(60);
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isOtpStep]);
+
+  // Focus first OTP input
+  useEffect(() => {
+    if (isOtpStep) {
+      setTimeout(() => inputRefs.current[0]?.focus(), 200);
+    }
+  }, [isOtpStep]);
+
+  const maskedPhone = form.phone
+    ? form.phone.slice(0, 4) + "***" + form.phone.slice(-3)
+    : "****";
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    setOtpError("");
+    if (value && index < OTP_LENGTH - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+    if (newOtp.every((d) => d !== "") && newOtp.join("").length === OTP_LENGTH) {
+      verifyOtp(newOtp.join(""));
+    }
   };
 
-  const handleOtpVerified = () => {
-    setShowOtp(false);
-    toast.success("Đơn hàng đã được tạo thành công!", {
-      description: `Đơn hàng ${service.label} đang chờ điều phối.`,
-    });
-    navigate("/customer/orders");
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
+    if (pasted.length === OTP_LENGTH) {
+      setOtp(pasted.split(""));
+      verifyOtp(pasted);
+    }
+  };
+
+  const verifyOtp = (code: string) => {
+    setVerifying(true);
+    setTimeout(() => {
+      if (code === MOCK_OTP) {
+        toast.success("Đơn hàng đã được tạo thành công!", {
+          description: `Đơn hàng ${service.label} đang chờ điều phối.`,
+        });
+        navigate("/customer/orders");
+      } else {
+        setOtpError("Mã OTP không đúng. Vui lòng thử lại.");
+        setOtp(Array(OTP_LENGTH).fill(""));
+        inputRefs.current[0]?.focus();
+      }
+      setVerifying(false);
+    }, 800);
+  };
+
+  const handleResendOtp = () => {
+    setOtpCountdown(60);
+    setOtp(Array(OTP_LENGTH).fill(""));
+    setOtpError("");
+    inputRefs.current[0]?.focus();
   };
 
   const updateForm = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
