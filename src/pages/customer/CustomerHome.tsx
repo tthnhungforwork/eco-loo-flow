@@ -25,10 +25,13 @@ const banners = [
   { id: 3, title: "Sản phẩm Xanh mới", subtitle: "Bộ sưu tập Eco Pro 2026", gradient: "gradient-warm", emoji: "🌿" },
 ];
 
-const servicePlans = [
-  { name: "Cơ bản", price: "Miễn phí", features: ["Quản lý 1 NVS", "Báo cáo cơ bản"], popular: false },
-  { name: "Nâng cao", price: "300K/tháng", features: ["Quản lý 10 NVS", "Báo cáo chi tiết", "Ưu tiên hỗ trợ"], popular: true },
-  { name: "VIP", price: "800K/tháng", features: ["Không giới hạn NVS", "Hỗ trợ 24/7", "API tích hợp"], popular: false },
+const myServices = [
+  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", gradient: "gradient-primary" },
+  { name: "Tư vấn số hóa", icon: FileText, status: "active", gradient: "gradient-blue" },
+  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "active", gradient: "gradient-warm" },
+  { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
+  { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
+  { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
 ];
 
 const news = [
