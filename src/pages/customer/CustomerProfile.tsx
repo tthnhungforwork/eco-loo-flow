@@ -34,12 +34,12 @@ const CustomerProfile = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className={`w-16 h-16 rounded-2xl ${currentRole.gradient} flex items-center justify-center text-primary-foreground font-extrabold text-xl shadow-glow`}>
-            {currentRole.initials}
+          <div className={`w-16 h-16 rounded-2xl ${currentAccount.gradient} flex items-center justify-center text-primary-foreground font-extrabold text-xl shadow-glow`}>
+            {currentAccount.initials}
           </div>
           <div className="flex-1">
-            <p className="font-bold text-foreground text-lg">{currentRole.label}</p>
-            <p className="text-xs text-muted-foreground">{currentRole.subtitle}</p>
+            <p className="font-bold text-foreground text-lg">{currentAccount.label}</p>
+            <p className="text-xs text-muted-foreground">{currentAccount.subtitle}</p>
             <button
               onClick={openSheet}
               className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-1 rounded-full bg-accent text-accent-foreground text-[10px] font-bold active:scale-95 transition-transform"
