@@ -11,14 +11,12 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const quickActions = [
-  { label: "Đơn hàng", icon: ShoppingCart, gradient: "gradient-primary", path: "/customer/orders" },
-  { label: "Công việc", icon: Briefcase, gradient: "gradient-blue", path: "/customer/tasks" },
-  { label: "Báo cáo", icon: BarChart3, gradient: "gradient-warm", path: "/customer/reports" },
-  { label: "NVS", icon: Bath, gradient: "gradient-primary", path: "/customer/toilets" },
-  { label: "Khảo sát", icon: ClipboardCheck, gradient: "gradient-blue", badge: "Mới" },
-  { label: "Tư vấn", icon: FileText, gradient: "gradient-warm" },
-  { label: "Bảo trì", icon: Wrench, gradient: "gradient-primary" },
-  { label: "Sản phẩm", icon: Package, gradient: "gradient-blue" },
+  { label: "Liên hệ tư vấn", icon: FileText, gradient: "gradient-blue", path: "/customer/surveys" },
+  { label: "Vệ sinh lau dọn", icon: Sparkles, gradient: "gradient-primary", path: "/customer/orders" },
+  { label: "Sửa chữa bảo dưỡng", icon: Wrench, gradient: "gradient-warm", path: "/customer/orders" },
+  { label: "Xây mới", icon: HardHat, gradient: "gradient-primary", path: "/customer/orders" },
+  { label: "Cải tạo", icon: Hammer, gradient: "gradient-blue", path: "/customer/orders" },
+  { label: "Netzero", icon: Recycle, gradient: "gradient-warm", path: "/customer/orders" },
 ];
 
 
