@@ -24,6 +24,7 @@ import CustomerBusinessInfo from "./pages/customer/CustomerBusinessInfo";
 import CustomerCreateOrder from "./pages/customer/CustomerCreateOrder";
 import CustomerRegisterPartner from "./pages/customer/CustomerRegisterPartner";
 import CustomerCart from "./pages/customer/CustomerCart";
+import CustomerOrderDetail from "./pages/customer/CustomerOrderDetail";
 
 import PartnerLayout from "./layouts/PartnerLayout";
 import PartnerHome from "./pages/partner/PartnerHome";
@@ -32,6 +33,7 @@ import PartnerTasks from "./pages/partner/PartnerTasks";
 import PartnerToilets from "./pages/partner/PartnerToilets";
 import PartnerSurveys from "./pages/partner/PartnerSurveys";
 import PartnerProfile from "./pages/partner/PartnerProfile";
+import PartnerOrderDetail from "./pages/partner/PartnerOrderDetail";
 
 import AdminLayout from "./layouts/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
@@ -70,11 +72,13 @@ const App = () => (
               <Route path="create-order" element={<CustomerCreateOrder />} />
               <Route path="register-partner" element={<CustomerRegisterPartner />} />
               <Route path="cart" element={<CustomerCart />} />
+              <Route path="orders/:orderId" element={<CustomerOrderDetail />} />
             </Route>
 
             <Route path="/partner" element={<PartnerLayout />}>
               <Route index element={<PartnerHome />} />
               <Route path="orders" element={<PartnerOrders />} />
+              <Route path="orders/:orderId" element={<PartnerOrderDetail />} />
               <Route path="tasks" element={<PartnerTasks />} />
               <Route path="toilets" element={<PartnerToilets />} />
               <Route path="surveys" element={<PartnerSurveys />} />
