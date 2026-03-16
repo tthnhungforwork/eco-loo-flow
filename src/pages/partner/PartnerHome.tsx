@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import PartnerHeader from "./components/PartnerHeader";
 import {
-  ArrowRight, Leaf, ShoppingCart, Star, Newspaper, Crown,
-  ChevronRight, ChevronDown, Bath, Calendar, Clock,
-  CheckCircle2, Package, ExternalLink
+  ArrowRight, Leaf, ShoppingCart, Star, Newspaper,
+  ChevronRight, Bath, Calendar, Clock,
+  CheckCircle2, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
