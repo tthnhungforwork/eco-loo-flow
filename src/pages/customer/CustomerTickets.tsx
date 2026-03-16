@@ -12,7 +12,7 @@ import {
 import {
   MessageSquareWarning, Plus, Calendar, Bath, Search,
   Send, Image as ImageIcon, Clock, CheckCircle2, AlertTriangle,
-  ShoppingCart, Wrench, FileText, Package
+  ShoppingCart, Wrench, FileText, Package, QrCode, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MOCK_CUSTOMER_ORDERS, SERVICE_TYPE_CONFIG } from "@/data/orderData";
