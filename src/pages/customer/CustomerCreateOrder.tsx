@@ -42,6 +42,7 @@ const CustomerCreateOrder = () => {
   const ServiceIcon = service.icon;
 
   const [step, setStep] = useState(1);
+  const [showOtp, setShowOtp] = useState(false);
   const [form, setForm] = useState({
     name: "Nguyễn Văn Khách",
     phone: "0901234567",
