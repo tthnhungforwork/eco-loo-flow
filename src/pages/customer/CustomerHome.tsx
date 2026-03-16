@@ -3,11 +3,12 @@ import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
   ChevronRight, Briefcase, BarChart3, Bath, FileText,
   Wrench, ClipboardCheck, Package, ChevronDown, Hammer, Recycle, HardHat, Sparkles,
-  CalendarDays, CheckCircle2, Clock, Plus
+  CalendarDays, CheckCircle2, Plus, MapPin, User, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const quickActions = [
   { label: "Đơn hàng", icon: ShoppingCart, gradient: "gradient-primary", path: "/customer/orders" },
@@ -27,9 +28,30 @@ const banners = [
 ];
 
 const myServices = [
-  { name: "Vệ sinh lau dọn", icon: Sparkles, status: "active", date: "01/01/2026", statusLabel: "Đang thực hiện", gradient: "gradient-primary" },
-  { name: "Tư vấn số hóa", icon: FileText, status: "active", date: "15/02/2026", statusLabel: "Đang thực hiện", gradient: "gradient-blue" },
-  { name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", date: "10/12/2025", statusLabel: "Hoàn thành", gradient: "gradient-warm" },
+  {
+    name: "Vệ sinh lau dọn", icon: Sparkles, status: "completed", gradient: "gradient-primary",
+    date: "01/01/2026", completedDate: "28/02/2026",
+    location: "Tòa nhà Landmark 81, Q. Bình Thạnh",
+    staff: "Nguyễn Văn A", contractCode: "HD-2026-001",
+    description: "Dịch vụ vệ sinh lau dọn định kỳ hàng tháng cho khu vực nhà vệ sinh công cộng.",
+    tasks: ["Lau sàn nhà vệ sinh", "Vệ sinh bồn cầu & lavabo", "Bổ sung vật tư tiêu hao", "Khử mùi & diệt khuẩn"],
+  },
+  {
+    name: "Tư vấn số hóa", icon: FileText, status: "completed", gradient: "gradient-blue",
+    date: "15/02/2026", completedDate: "10/03/2026",
+    location: "Trung tâm thương mại Vincom, Q.1",
+    staff: "Trần Thị B", contractCode: "HD-2026-015",
+    description: "Tư vấn giải pháp số hóa quản lý nhà vệ sinh thông minh, bao gồm IoT sensor và dashboard.",
+    tasks: ["Khảo sát hiện trạng", "Đề xuất giải pháp IoT", "Lắp đặt sensor thử nghiệm", "Bàn giao báo cáo"],
+  },
+  {
+    name: "Sửa chữa bảo dưỡng", icon: Wrench, status: "completed", gradient: "gradient-warm",
+    date: "10/12/2025", completedDate: "25/12/2025",
+    location: "Bệnh viện Đa khoa Q.7",
+    staff: "Lê Văn C", contractCode: "HD-2025-089",
+    description: "Sửa chữa và bảo dưỡng toàn bộ hệ thống ống nước, thiết bị vệ sinh tại tầng 1-3.",
+    tasks: ["Kiểm tra hệ thống ống nước", "Thay thế van vòi hỏng", "Bảo dưỡng bồn cầu", "Kiểm tra rò rỉ"],
+  },
   { name: "Xây mới", icon: HardHat, status: "inactive", gradient: "bg-muted" },
   { name: "Cải tạo", icon: Hammer, status: "inactive", gradient: "bg-muted" },
   { name: "Netzero", icon: Recycle, status: "inactive", gradient: "bg-muted" },
@@ -56,6 +78,7 @@ const stagger = {
 const CustomerHome = () => {
   const [visibleProducts, setVisibleProducts] = useState(4);
   const [showAllActions, setShowAllActions] = useState(false);
+  const [selectedService, setSelectedService] = useState<typeof myServices[0] | null>(null);
   const displayActions = showAllActions ? quickActions : quickActions.slice(0, 4);
 
   return (
@@ -188,11 +211,12 @@ const CustomerHome = () => {
             <button className="text-xs text-primary font-semibold flex items-center gap-0.5">Tất cả <ChevronRight size={14} /></button>
           </div>
           <div className="space-y-2.5">
-            {myServices.filter(s => s.status !== "inactive").map((svc) => (
+            {myServices.filter(s => s.status === "completed").map((svc) => (
               <motion.button
                 key={svc.name}
                 className="w-full rounded-2xl p-3.5 flex items-center gap-3 bg-card shadow-card border border-border/30 card-hover relative overflow-hidden text-left"
                 whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedService(svc)}
               >
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${svc.gradient} text-primary-foreground shadow-sm`}>
                   <svc.icon size={20} />
@@ -204,17 +228,9 @@ const CustomerHome = () => {
                     <span className="text-[10px] text-muted-foreground">{svc.date}</span>
                   </div>
                 </div>
-                <div className="shrink-0">
-                  {svc.status === "active" ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                      <Clock size={10} /> {svc.statusLabel}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent text-primary text-[10px] font-bold">
-                      <CheckCircle2 size={10} /> {svc.statusLabel}
-                    </span>
-                  )}
-                </div>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent text-primary text-[10px] font-bold shrink-0">
+                  <CheckCircle2 size={10} /> Hoàn thành
+                </span>
               </motion.button>
             ))}
             {/* Inactive services */}
@@ -235,6 +251,76 @@ const CustomerHome = () => {
             </div>
           </div>
         </motion.section>
+
+        {/* Service detail sheet */}
+        <Sheet open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
+          <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+            {selectedService && (
+              <>
+                <SheetHeader className="pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedService.gradient} text-primary-foreground shadow-sm`}>
+                      <selectedService.icon size={22} />
+                    </div>
+                    <div>
+                      <SheetTitle className="text-base text-left">{selectedService.name}</SheetTitle>
+                      <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-accent text-primary text-[10px] font-bold">
+                        <CheckCircle2 size={10} /> Hoàn thành
+                      </span>
+                    </div>
+                  </div>
+                </SheetHeader>
+
+                <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
+                  {selectedService.description}
+                </p>
+
+                <div className="space-y-3 mb-5">
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <FileText size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Mã hợp đồng</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.contractCode}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <CalendarDays size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Ngày đăng ký → Hoàn thành</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.date} → {selectedService.completedDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <MapPin size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Địa điểm</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
+                    <User size={16} className="text-primary shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Nhân viên phụ trách</p>
+                      <p className="text-[13px] font-semibold text-foreground">{selectedService.staff}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[12px] font-bold text-foreground mb-2">Hạng mục công việc</p>
+                  <div className="space-y-2">
+                    {selectedService.tasks?.map((task, i) => (
+                      <div key={i} className="flex items-center gap-2.5 bg-card border border-border/30 rounded-xl p-3">
+                        <CheckCircle2 size={16} className="text-primary shrink-0" />
+                        <span className="text-[12px] text-foreground">{task}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
 
         {/* Tin tức */}
         <motion.section variants={stagger.item}>
