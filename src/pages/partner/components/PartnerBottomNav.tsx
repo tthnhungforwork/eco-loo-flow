@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, ShoppingBag, Briefcase, Bath, ClipboardList, User } from "lucide-react";
+import { Home, ShoppingBag, Briefcase, Bath, ClipboardList, MoreHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
@@ -8,7 +8,7 @@ const navItems = [
   { label: "Công việc", icon: Briefcase, path: "/partner/tasks" },
   { label: "NVS", icon: Bath, path: "/partner/toilets" },
   { label: "Khảo sát", icon: ClipboardList, path: "/partner/surveys" },
-  { label: "Cá nhân", icon: User, path: "/partner/profile" },
+  { label: "Chung", icon: MoreHorizontal, path: "/partner/general" },
 ];
 
 const PartnerBottomNav = () => {
@@ -17,36 +17,38 @@ const PartnerBottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="max-w-lg mx-auto">
-        <div className="bg-card/95 backdrop-blur-2xl border-t border-border/30 rounded-t-2xl shadow-elevated mx-1 safe-bottom">
-          <div className="flex items-end justify-around px-1 pt-1">
+      <div className="max-w-lg mx-auto px-2">
+        <div className="bg-card/98 backdrop-blur-xl border-t border-border/20 rounded-t-2xl shadow-elevated safe-bottom">
+          <div className="grid grid-cols-6 h-[60px]">
             {navItems.map((item) => {
               const active = location.pathname === item.path;
               return (
                 <motion.button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className="flex flex-col items-center gap-0.5 py-2 px-1 min-w-0 flex-1 relative"
-                  whileTap={{ scale: 0.85 }}
-                  transition={{ type: "spring" as const, stiffness: 400, damping: 20 }}
+                  className="flex flex-col items-center justify-center gap-[3px] relative"
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 >
                   {active && (
                     <motion.span
-                      layoutId="partner-nav-indicator"
-                      className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full gradient-primary"
-                      transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
+                      layoutId="partner-nav-pill"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-primary"
+                      transition={{ type: "spring", stiffness: 500, damping: 32 }}
                     />
                   )}
-                  <div className={`p-1 rounded-xl transition-all duration-200 ${active ? "bg-accent/80" : ""}`}>
-                    <item.icon
-                      size={21}
-                      strokeWidth={active ? 2.5 : 1.5}
-                      className={`transition-colors duration-200 ${active ? "text-primary" : "text-muted-foreground"}`}
-                    />
-                  </div>
-                  <span className={`text-[10px] leading-tight truncate transition-all duration-200 ${
-                    active ? "font-bold text-primary" : "font-medium text-muted-foreground"
-                  }`}>
+                  <item.icon
+                    size={20}
+                    strokeWidth={active ? 2.4 : 1.6}
+                    className={`transition-colors duration-150 ${
+                      active ? "text-primary" : "text-muted-foreground/70"
+                    }`}
+                  />
+                  <span
+                    className={`text-[10px] leading-none transition-all duration-150 ${
+                      active ? "font-bold text-primary" : "font-medium text-muted-foreground/70"
+                    }`}
+                  >
                     {item.label}
                   </span>
                 </motion.button>
