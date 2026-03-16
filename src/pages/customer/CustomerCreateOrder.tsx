@@ -47,7 +47,7 @@ const CustomerCreateOrder = () => {
     email: "khach@email.com",
     address: "123 Nguyễn Huệ, Q.1, TP.HCM",
     content: "",
-    selectedToilet: null as number | null,
+    selectedToilets: [] as number[],
     netzeroLevel: "",
     attachments: [] as string[],
   });
@@ -62,6 +62,15 @@ const CustomerCreateOrder = () => {
   };
 
   const updateForm = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const toggleToilet = (id: number) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedToilets: prev.selectedToilets.includes(id)
+        ? prev.selectedToilets.filter((t) => t !== id)
+        : [...prev.selectedToilets, id],
+    }));
+  };
 
   return (
     <div className="gradient-surface min-h-screen">
@@ -152,27 +161,28 @@ const CustomerCreateOrder = () => {
                 ))}
               </div>
 
-              <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS đăng ký</p>
+               <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS đăng ký (có thể chọn nhiều)</p>
               <div className="space-y-2">
-                {existingToilets.map((t) => (
-                  <motion.button
-                    key={t.id}
-                    className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
-                      form.selectedToilet === t.id
-                        ? "bg-primary/5 border-primary/30"
-                        : "bg-card border-border/30"
-                    }`}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => updateForm("selectedToilet", t.id)}
-                  >
-                    <Bath size={16} className={form.selectedToilet === t.id ? "text-primary" : "text-muted-foreground"} />
-                    <div className="flex-1">
-                      <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{t.address}</p>
-                    </div>
-                    {form.selectedToilet === t.id && <CheckCircle2 size={16} className="text-primary" />}
-                  </motion.button>
-                ))}
+                {existingToilets.map((t) => {
+                  const selected = form.selectedToilets.includes(t.id);
+                  return (
+                    <motion.button
+                      key={t.id}
+                      className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
+                        selected ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"
+                      }`}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => toggleToilet(t.id)}
+                    >
+                      <Bath size={16} className={selected ? "text-primary" : "text-muted-foreground"} />
+                      <div className="flex-1">
+                        <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{t.address}</p>
+                      </div>
+                      {selected && <CheckCircle2 size={16} className="text-primary" />}
+                    </motion.button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
@@ -195,27 +205,28 @@ const CustomerCreateOrder = () => {
 
               {(type === "vsld" || type === "scbd" || type === "xaymoi" || type === "caitao") && (
                 <>
-                  <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS liên quan (tùy chọn)</p>
+                  <p className="text-[13px] font-bold text-foreground pt-2">Chọn NVS liên quan (có thể chọn nhiều)</p>
                   <div className="space-y-2">
-                    {existingToilets.map((t) => (
-                      <motion.button
-                        key={t.id}
-                        className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
-                          form.selectedToilet === t.id
-                            ? "bg-primary/5 border-primary/30"
-                            : "bg-card border-border/30"
-                        }`}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => updateForm("selectedToilet", form.selectedToilet === t.id ? null : t.id)}
-                      >
-                        <Bath size={16} className={form.selectedToilet === t.id ? "text-primary" : "text-muted-foreground"} />
-                        <div className="flex-1">
-                          <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{t.address}</p>
-                        </div>
-                        {form.selectedToilet === t.id && <CheckCircle2 size={16} className="text-primary" />}
-                      </motion.button>
-                    ))}
+                    {existingToilets.map((t) => {
+                      const selected = form.selectedToilets.includes(t.id);
+                      return (
+                        <motion.button
+                          key={t.id}
+                          className={`w-full rounded-2xl p-3.5 flex items-center gap-3 text-left border transition-colors ${
+                            selected ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"
+                          }`}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => toggleToilet(t.id)}
+                        >
+                          <Bath size={16} className={selected ? "text-primary" : "text-muted-foreground"} />
+                          <div className="flex-1">
+                            <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{t.address}</p>
+                          </div>
+                          {selected && <CheckCircle2 size={16} className="text-primary" />}
+                        </motion.button>
+                      );
+                    })}
                   </div>
                 </>
               )}
@@ -247,8 +258,8 @@ const CustomerCreateOrder = () => {
                   <p>👤 {form.name} · {form.phone}</p>
                   <p>📍 {form.address}</p>
                   {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
-                  {form.selectedToilet && (
-                    <p>🚻 {existingToilets.find(t => t.id === form.selectedToilet)?.name}</p>
+                  {form.selectedToilets.length > 0 && (
+                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
                   )}
                 </div>
               </div>
@@ -289,8 +300,8 @@ const CustomerCreateOrder = () => {
                   <p>👤 {form.name} · {form.phone}</p>
                   <p>📍 {form.address}</p>
                   <p>🏅 Cấp đăng ký: {netzeroOptions.find(o => o.id === form.netzeroLevel)?.label || "Chưa chọn"}</p>
-                  {form.selectedToilet && (
-                    <p>🚻 {existingToilets.find(t => t.id === form.selectedToilet)?.name}</p>
+                  {form.selectedToilets.length > 0 && (
+                    <p>🚻 {form.selectedToilets.map(id => existingToilets.find(t => t.id === id)?.name).join(", ")}</p>
                   )}
                   {form.content && <p>📝 {form.content.substring(0, 80)}...</p>}
                 </div>
