@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import {
   Newspaper, ShoppingCart, Leaf, ArrowRight, Star, Crown,
   ChevronRight, Briefcase, BarChart3, Bath, FileText,
@@ -74,7 +74,7 @@ const CustomerHome = () => {
 
   return (
     <div className="min-h-screen">
-      <MobileHeader showSwitcher />
+      <CustomerHeader showSwitcher />
 
       {/* Hero area with gradient continuation from header */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">

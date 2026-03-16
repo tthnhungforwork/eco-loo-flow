@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import { BarChart3, TrendingUp, AlertTriangle, ShoppingBag, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
@@ -52,7 +52,7 @@ const monthlyData = [
 const CustomerReports = () => {
   return (
     <div>
-      <MobileHeader title="Báo cáo" />
+      <CustomerHeader title="Báo cáo" />
       <div className="px-4 py-5 space-y-6">
         {/* Report sections */}
         {reportSections.map((section, si) => (

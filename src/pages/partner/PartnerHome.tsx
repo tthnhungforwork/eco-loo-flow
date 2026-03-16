@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import {
   ArrowRight, Leaf, ShoppingCart, Star, Newspaper, Crown,
   ChevronRight, ChevronDown, Briefcase, Bath, ClipboardCheck,
@@ -51,7 +51,7 @@ const PartnerHome = () => {
 
   return (
     <div className="min-h-screen">
-      <MobileHeader showSwitcher />
+      <PartnerHeader showSwitcher />
 
       {/* Hero */}
       <div className="bg-primary px-4 pb-8 pt-3 relative overflow-hidden">

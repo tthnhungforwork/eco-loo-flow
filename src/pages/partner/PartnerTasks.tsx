@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Clock, User, Play, Search, MapPin, FileText, Plus } from "lucide-react";
@@ -48,7 +48,7 @@ const PartnerTasks = () => {
 
   return (
     <div>
-      <MobileHeader title="QL Công việc" />
+      <PartnerHeader title="QL Công việc" />
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 

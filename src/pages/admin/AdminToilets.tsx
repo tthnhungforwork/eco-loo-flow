@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import { MapPin, QrCode, Plus, ScanLine, ChevronRight, Phone, User, FileText, Award, Briefcase, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ const AdminToilets = () => {
 
   return (
     <div>
-      <MobileHeader title="QL Nhà vệ sinh" />
+      <AdminHeader title="QL Nhà vệ sinh" />
       <AnimatePresence mode="wait">
         {selectedId && selected ? (
           <motion.div key="detail" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="px-4 py-5 space-y-4">

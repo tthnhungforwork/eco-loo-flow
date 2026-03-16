@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Building2, Search, Users } from "lucide-react";
@@ -35,7 +35,7 @@ const AdminOrders = () => {
 
   return (
     <div>
-      <MobileHeader title="Đơn hàng" />
+      <AdminHeader title="Đơn hàng" />
       <div className="py-4">
         <div className="px-4 mb-4 relative">
           <Search size={16} className="absolute left-7 top-1/2 -translate-y-1/2 text-muted-foreground" />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import { MapPin, QrCode, ScanLine, ChevronRight, Phone, User, FileText, Award, Briefcase, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +47,7 @@ const CustomerToilets = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Nhà vệ sinh" />
+      <CustomerHeader title="Nhà vệ sinh" />
 
       <AnimatePresence mode="wait">
         {selectedId && selected ? (

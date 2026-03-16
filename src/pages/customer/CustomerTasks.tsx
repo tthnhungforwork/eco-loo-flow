@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -100,7 +100,7 @@ const CustomerTasks = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Công việc" />
+      <CustomerHeader title="Công việc" />
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 

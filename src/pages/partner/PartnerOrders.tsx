@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Building2, Search, CheckCircle, XCircle, Users } from "lucide-react";
@@ -28,7 +28,7 @@ const PartnerOrders = () => {
 
   return (
     <div>
-      <MobileHeader title="QL Đơn hàng" />
+      <PartnerHeader title="QL Đơn hàng" />
       <div className="py-4">
         <div className="px-4 mb-4 relative">
           <Search size={16} className="absolute left-7 top-1/2 -translate-y-1/2 text-muted-foreground" />

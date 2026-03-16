@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import StatusBadge from "@/components/StatusBadge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ const CustomerTickets = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Ticket hỗ trợ" />
+      <CustomerHeader title="Ticket hỗ trợ" />
 
       <div className="px-4 pt-5 pb-3">
         <div className="relative">

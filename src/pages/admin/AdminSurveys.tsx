@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import AdminHeader from "./components/AdminHeader";
 import { FileText, BarChart, ChevronRight, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -35,7 +35,7 @@ const AdminSurveys = () => {
 
   return (
     <div>
-      <MobileHeader title="Khảo sát" />
+      <AdminHeader title="Khảo sát" />
       <div className="px-4 py-5 space-y-3">
         {surveySections.map((s, i) => (
           <motion.div key={s.title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>

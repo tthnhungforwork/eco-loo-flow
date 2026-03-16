@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import StatusBadge from "@/components/StatusBadge";
@@ -71,7 +71,7 @@ const CustomerSurveys = () => {
 
   return (
     <div className="gradient-surface min-h-screen">
-      <MobileHeader title="Khảo sát" />
+      <CustomerHeader title="Khảo sát" />
       <div className="py-4">
         <SegmentedControl
           tabs={["Tư vấn Số hóa NVS", "Sạch - Xanh - Tuần hoàn"]}

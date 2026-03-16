@@ -1,4 +1,4 @@
-import MobileHeader from "@/components/MobileHeader";
+import CustomerHeader from "./components/CustomerHeader";
 import { useRole } from "@/contexts/RoleContext";
 import { Building2, Users, ShoppingBag, Heart, MessageSquareWarning, FileText, ChevronRight, Settings, LogOut, Shield } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,7 +22,7 @@ const CustomerProfile = () => {
 
   return (
     <div>
-      <MobileHeader title="Chung" />
+      <CustomerHeader title="Chung" />
       <div className="px-4 py-5 space-y-5">
         <motion.div className="glass-card rounded-2xl p-5 flex items-center gap-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className={`w-16 h-16 rounded-full ${currentAccount.gradient} flex items-center justify-center text-primary-foreground font-bold text-lg shadow-glow`}>

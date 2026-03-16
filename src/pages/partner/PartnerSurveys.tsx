@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MobileHeader from "@/components/MobileHeader";
+import PartnerHeader from "./components/PartnerHeader";
 import { FileText, BarChart, ChevronRight, Eye, Calendar, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -33,7 +33,7 @@ const PartnerSurveys = () => {
 
   return (
     <div>
-      <MobileHeader title="Khảo sát" />
+      <PartnerHeader title="Khảo sát" />
       <div className="px-4 py-5 space-y-3">
         {surveySections.map((s, i) => (
           <motion.div key={s.title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
