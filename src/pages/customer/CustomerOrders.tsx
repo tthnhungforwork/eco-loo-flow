@@ -46,11 +46,6 @@ const CustomerOrders = () => {
   const filteredService = statusKeys[statusFilter] === "all" ? serviceOrders : serviceOrders.filter((o) => o.status === statusKeys[statusFilter]);
   const filteredProduct = statusKeys[statusFilter] === "all" ? productOrders : productOrders.filter((o) => o.status === statusKeys[statusFilter]);
 
-  const handleCreateOrder = () => {
-    setShowCreate(false);
-    setNewOrder({ type: "Tư vấn", content: "", address: "" });
-  };
-
   const handleRate = () => {
     setShowRate(null);
     setRating(5);
