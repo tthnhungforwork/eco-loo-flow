@@ -2,7 +2,8 @@ import { useState } from "react";
 import MobileHeader from "@/components/MobileHeader";
 import SegmentedControl from "@/components/SegmentedControl";
 import StatusBadge from "@/components/StatusBadge";
-import { Package, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 
 const orders = [
   { id: "DH-001", name: "Gói vệ sinh tháng", date: "16/03/2026", amount: "2.500.000đ", status: "new" },
@@ -22,28 +23,39 @@ const CustomerOrders = () => {
   return (
     <div>
       <MobileHeader title="Đơn hàng" />
-      <div className="py-4 animate-fade-in">
+      <div className="py-4">
         <SegmentedControl tabs={tabLabels} active={tab} onChange={setTab} />
         <div className="px-4 space-y-3">
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground text-sm">Không có đơn hàng nào</div>
+            <div className="text-center py-16">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-muted flex items-center justify-center">
+                <Calendar size={28} className="text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground text-sm font-medium">Không có đơn hàng nào</p>
+            </div>
           )}
-          {filtered.map((o) => (
-            <div key={o.id} className="bg-card rounded-xl border border-border p-4">
+          {filtered.map((o, i) => (
+            <motion.div
+              key={o.id}
+              className="glass-card rounded-2xl p-4 card-hover"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 mr-2">
-                  <p className="font-semibold text-sm text-foreground">{o.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">#{o.id}</p>
+                  <p className="font-bold text-sm text-foreground">{o.name}</p>
+                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">#{o.id}</p>
                 </div>
                 <StatusBadge status={o.status} label={statusLabel[o.status]} />
               </div>
-              <div className="flex justify-between items-center mt-2">
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar size={12} />{o.date}
                 </span>
-                <span className="font-bold text-sm text-primary">{o.amount}</span>
+                <span className="font-extrabold text-sm text-primary">{o.amount}</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
