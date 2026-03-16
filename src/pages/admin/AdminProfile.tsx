@@ -28,7 +28,7 @@ const AdminProfile = () => {
 
   return (
     <div>
-      <MobileHeader title="Chung" />
+      <MobileHeader title="Chung" showSwitcher />
       <div className="px-4 py-5 space-y-5">
         {/* Avatar */}
         <motion.div className="glass-card rounded-2xl p-5 flex items-center gap-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>

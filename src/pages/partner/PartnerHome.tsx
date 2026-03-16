@@ -24,7 +24,7 @@ const stagger = {
 
 const PartnerHome = () => (
   <div>
-    <MobileHeader />
+    <MobileHeader showSwitcher />
     <motion.div className="px-4 py-5 space-y-7" variants={stagger.container} initial="hidden" animate="show">
       {/* Welcome */}
       <motion.section variants={stagger.item} className="gradient-blue rounded-3xl p-5 text-secondary-foreground relative overflow-hidden">

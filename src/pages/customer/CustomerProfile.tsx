@@ -24,7 +24,7 @@ const CustomerProfile = () => {
 
   return (
     <div>
-      <MobileHeader title="Chung" />
+      <MobileHeader title="Chung" showSwitcher />
       <div className="px-4 py-5 space-y-5">
         {/* Avatar Section */}
         <motion.div
