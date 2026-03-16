@@ -163,39 +163,6 @@ const CustomerHome = () => {
       </div>
 
       <motion.div className="px-4 py-5 space-y-6" variants={stagger.container} initial="hidden" animate="show">
-        {/* Banner carousel */}
-        <motion.section variants={stagger.item}>
-          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
-            {banners.map((b, i) => (
-              <motion.div
-                key={b.id}
-                className={`min-w-[85%] rounded-2xl p-5 shrink-0 snap-center relative overflow-hidden noise-overlay ${b.gradient}`}
-                whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.08 }}
-              >
-                <div className="relative z-10 flex items-center gap-3">
-                  <div className="flex-1">
-                    <h3 className="text-base font-bold text-primary-foreground mb-1 leading-snug">{b.title}</h3>
-                    <p className="text-xs text-primary-foreground/75 mb-3">{b.subtitle}</p>
-                    <Button size="sm" className="bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground border-0 rounded-xl text-xs font-bold h-8 px-4 backdrop-blur-sm">
-                      Xem ngay
-                    </Button>
-                  </div>
-                  <span className="text-5xl opacity-80">{b.emoji}</span>
-                </div>
-                <div className="orb w-20 h-20 bg-primary-foreground/10 -bottom-6 -right-6" />
-              </motion.div>
-            ))}
-          </div>
-          {/* Dots indicator */}
-          <div className="flex justify-center gap-1.5 mt-3">
-            {banners.map((_, i) => (
-              <span key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === 0 ? "w-4 bg-primary" : "bg-muted-foreground/30"}`} />
-            ))}
-          </div>
-        </motion.section>
 
         {/* Gói dịch vụ */}
         <motion.section variants={stagger.item}>
