@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Clock, User, Play, Search, MapPin, FileText, Bath, Calendar,
   CheckCircle2, ClipboardList, Image as ImageIcon, ChevronRight,
-  Plus, Trash2, X, Sparkles, Wrench, RotateCcw
+  Plus, Trash2, X, Sparkles, Wrench, RotateCcw, SlidersHorizontal
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
