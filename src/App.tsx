@@ -56,6 +56,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <RoleProvider>
+          <OrderProvider>
           <RoleSwitcherSheet />
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
