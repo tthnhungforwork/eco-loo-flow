@@ -194,7 +194,13 @@ const PartnerTasks = () => {
     <div className="gradient-surface min-h-screen">
       <PartnerHeader title="Công việc" />
       <div className="py-4">
-        <SegmentedControl tabs={tabs} active={tab} onChange={setTab} />
+        {isBusinessOwner ? (
+          <SegmentedControl tabs={tabs} active={tab} onChange={setTab} />
+        ) : (
+          <div className="px-4 mb-2">
+            <h2 className="text-lg font-bold text-foreground tracking-tight">Việc của tôi</h2>
+          </div>
+        )}
 
         {/* Search + Filter button */}
         <div className="px-4 mb-4 flex gap-2">
