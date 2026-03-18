@@ -334,6 +334,85 @@ const CustomerTasks = () => {
         </div>
       </div>
 
+      {/* ═══ Advanced Filter Sheet ═══ */}
+      <Sheet open={showFilter} onOpenChange={setShowFilter}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">Bộ lọc nâng cao</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nhà vệ sinh</label>
+              <Select value={filterNvs} onValueChange={setFilterNvs}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả NVS" /></SelectTrigger>
+                <SelectContent>
+                  {nvsOptions.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Đơn hàng</label>
+              <Select value={filterOrder} onValueChange={setFilterOrder}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả đơn hàng" /></SelectTrigger>
+                <SelectContent>
+                  {orderOptions.map((o) => <SelectItem key={o} value={o}>#{o}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thời gian</label>
+              <Select value={filterTime} onValueChange={setFilterTime}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả thời gian" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Hôm nay</SelectItem>
+                  <SelectItem value="week">Tuần này</SelectItem>
+                  <SelectItem value="month">Tháng này</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Trạng thái</label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả trạng thái" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">Mới</SelectItem>
+                  <SelectItem value="processing">Đang xử lý</SelectItem>
+                  <SelectItem value="done">Hoàn thành</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Người thực hiện</label>
+              <Select value={filterAssignee} onValueChange={setFilterAssignee}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả nhân viên" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tôi">Tôi</SelectItem>
+                  {employeeOptions.map((e) => <SelectItem key={e.name} value={e.name}>{e.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại công việc</label>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả loại" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="VSLD">Vệ sinh lau dọn</SelectItem>
+                  <SelectItem value="SCBD">Sửa chữa bảo dưỡng</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={resetFilters}>
+                Xóa bộ lọc
+              </Button>
+              <Button className="flex-1 rounded-2xl h-12 font-bold gradient-primary border-0 text-primary-foreground" onClick={() => setShowFilter(false)}>
+                Áp dụng
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* ═══ Task Detail Sheet ═══ */}
       <Sheet open={!!selectedTask && !showComplete} onOpenChange={() => setSelectedTask(null)}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
