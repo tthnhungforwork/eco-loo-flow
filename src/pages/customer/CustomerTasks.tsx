@@ -269,16 +269,6 @@ const CustomerTasks = () => {
                     <Play size={12} /> Thực hiện
                   </Button>
                 )}
-                {t.assignee !== "Tôi" && t.creator === "Tôi" && t.status !== "done" && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full mt-3 h-9 font-bold rounded-xl text-xs gap-1 border-primary/30 text-primary"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Clock size={12} /> Nhắc nhở
-                  </Button>
-                )}
               </motion.div>
             ))}
           </AnimatePresence>
@@ -393,15 +383,6 @@ const CustomerTasks = () => {
                     onClick={() => setShowComplete(true)}
                   >
                     <CheckCircle2 size={18} /> Khai báo hoàn thành
-                  </Button>
-                )}
-                {selectedTask.assignee !== "Tôi" && selectedTask.creator === "Tôi" && selectedTask.status !== "done" && (
-                  <Button
-                    variant="outline"
-                    className="w-full touch-target font-bold rounded-2xl h-14 gap-2 border-primary/30 text-primary"
-                    onClick={() => {/* TODO: send reminder */}}
-                  >
-                    <Clock size={18} /> Nhắc nhở
                   </Button>
                 )}
               </div>
