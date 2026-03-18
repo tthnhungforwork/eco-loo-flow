@@ -21,14 +21,16 @@ const tabStatus = ["all", "dispatch", "processing", "done"];
 
 const AdminOrders = () => {
   const navigate = useNavigate();
+  const { getAdminOrders } = useOrders();
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
 
-  const filtered = MOCK_ADMIN_ORDERS
+  const adminOrders = getAdminOrders();
+  const filtered = adminOrders
     .filter((o) => tabStatus[tab] === "all" || statusToFilter(o.status) === tabStatus[tab])
     .filter((o) => o.name.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase()));
 
-  const dispatchCount = MOCK_ADMIN_ORDERS.filter((o) => o.status === "cho_dieu_phoi").length;
+  const dispatchCount = adminOrders.filter((o) => o.status === "cho_dieu_phoi").length;
 
   return (
     <div>

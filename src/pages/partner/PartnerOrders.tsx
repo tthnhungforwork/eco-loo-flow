@@ -22,10 +22,12 @@ const tabStatus = ["all", "pending", "accepted", "dispatching", "done"];
 
 const PartnerOrders = () => {
   const navigate = useNavigate();
+  const { getPartnerOrders } = useOrders();
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
 
-  const filtered = MOCK_PARTNER_ORDERS
+  const partnerOrders = getPartnerOrders();
+  const filtered = partnerOrders
     .filter((o) => tabStatus[tab] === "all" || statusToFilter(o.status) === tabStatus[tab])
     .filter((o) => o.name.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase()));
 
