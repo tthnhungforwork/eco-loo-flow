@@ -11,9 +11,9 @@ import { ORDER_STATUS_CONFIG } from "@/data/orderData";
 
 const statusToFilter = (status: string) => {
   if (["cho_tiep_nhan"].includes(status)) return "pending";
-  if (["da_tiep_nhan", "dang_khao_sat", "da_bao_gia"].includes(status)) return "accepted";
+  if (["da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_duyet_bao_gia"].includes(status)) return "accepted";
   if (["da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu"].includes(status)) return "dispatching";
-  if (["hoan_thanh", "da_danh_gia"].includes(status)) return "done";
+  if (["hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"].includes(status)) return "done";
   return "all";
 };
 

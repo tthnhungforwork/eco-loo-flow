@@ -10,8 +10,8 @@ import { ORDER_STATUS_CONFIG, SERVICE_TYPE_CONFIG } from "@/data/orderData";
 
 const statusToFilter = (status: string) => {
   if (["cho_dieu_phoi"].includes(status)) return "dispatch";
-  if (["cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu"].includes(status)) return "processing";
-  if (["hoan_thanh", "da_danh_gia"].includes(status)) return "done";
+  if (["cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_duyet_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu"].includes(status)) return "processing";
+  if (["hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"].includes(status)) return "done";
   if (status === "da_huy") return "cancelled";
   return "all";
 };
