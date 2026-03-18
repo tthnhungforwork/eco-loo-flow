@@ -337,10 +337,85 @@ const CustomerTasks = () => {
       {/* ═══ Advanced Filter Sheet ═══ */}
       <Sheet open={showFilter} onOpenChange={setShowFilter}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
-          <SheetHeader className="pb-4">
+          <SheetHeader className="pb-3">
             <SheetTitle className="text-base text-left">Bộ lọc nâng cao</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* Loại công việc - chips */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-2 block">Loại công việc</label>
+              <div className="flex gap-2">
+                {[
+                  { value: "", label: "Tất cả", icon: <ClipboardList size={13} /> },
+                  { value: "VSLD", label: "Vệ sinh", icon: <Sparkles size={13} /> },
+                  { value: "SCBD", label: "Sửa chữa", icon: <Wrench size={13} /> },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterType(opt.value)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all ${
+                      filterType === opt.value
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {opt.icon} {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Trạng thái - chips */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-2 block">Trạng thái</label>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  { value: "", label: "Tất cả" },
+                  { value: "new", label: "Mới" },
+                  { value: "processing", label: "Đang xử lý" },
+                  { value: "done", label: "Hoàn thành" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterStatus(opt.value)}
+                    className={`px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all ${
+                      filterStatus === opt.value
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Thời gian - chips */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-2 block">Thời gian</label>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  { value: "", label: "Tất cả" },
+                  { value: "today", label: "Hôm nay" },
+                  { value: "week", label: "Tuần này" },
+                  { value: "month", label: "Tháng này" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterTime(opt.value)}
+                    className={`px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all ${
+                      filterTime === opt.value
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* NVS - select */}
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nhà vệ sinh</label>
               <Select value={filterNvs} onValueChange={setFilterNvs}>
@@ -350,6 +425,8 @@ const CustomerTasks = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Đơn hàng - select */}
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Đơn hàng</label>
               <Select value={filterOrder} onValueChange={setFilterOrder}>
@@ -359,28 +436,8 @@ const CustomerTasks = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thời gian</label>
-              <Select value={filterTime} onValueChange={setFilterTime}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả thời gian" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Hôm nay</SelectItem>
-                  <SelectItem value="week">Tuần này</SelectItem>
-                  <SelectItem value="month">Tháng này</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Trạng thái</label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả trạng thái" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new">Mới</SelectItem>
-                  <SelectItem value="processing">Đang xử lý</SelectItem>
-                  <SelectItem value="done">Hoàn thành</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
+            {/* Người thực hiện - select */}
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Người thực hiện</label>
               <Select value={filterAssignee} onValueChange={setFilterAssignee}>
@@ -391,16 +448,7 @@ const CustomerTasks = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại công việc</label>
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả loại" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="VSLD">Vệ sinh lau dọn</SelectItem>
-                  <SelectItem value="SCBD">Sửa chữa bảo dưỡng</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
             <div className="flex gap-3 pt-2">
               <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={resetFilters}>
                 Xóa bộ lọc
