@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Clock, User, Play, Search, MapPin, FileText, Bath, Calendar,
   CheckCircle2, ClipboardList, Image as ImageIcon, ChevronRight,
-  Plus, Trash2, X, Sparkles, Wrench, RotateCcw
+  Plus, Trash2, X, Sparkles, Wrench, RotateCcw, SlidersHorizontal
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -49,6 +49,7 @@ const employeeOptions = [
   { name: "Hoàng Thị E", role: "VSLD" },
 ];
 const deviceOptions = ["Bồn cầu", "Vòi nước", "Lavabo", "Bình nước nóng", "Quạt hút", "Van xả", "Ống thoát nước", "Máy sấy tay"];
+const orderOptions = ["DV-101", "DV-102", "DV-103", "DV-104"];
 
 const allTasks: Task[] = [
   {
@@ -104,10 +105,18 @@ const typeColor: Record<string, string> = { VSLD: "bg-primary/10 text-primary", 
 const CustomerTasks = () => {
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showComplete, setShowComplete] = useState(false);
   const [completeNote, setCompleteNote] = useState("");
+
+  // Advanced filter state
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterNvs, setFilterNvs] = useState("");
+  const [filterOrder, setFilterOrder] = useState("");
+  const [filterTime, setFilterTime] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterAssignee, setFilterAssignee] = useState("");
+  const [filterType, setFilterType] = useState("");
 
   // Create task state
   const [showCreate, setShowCreate] = useState(false);
@@ -121,6 +130,8 @@ const CustomerTasks = () => {
   const [createDevices, setCreateDevices] = useState<string[]>([]);
   const [createRecurring, setCreateRecurring] = useState("");
 
+  const activeFilterCount = [filterNvs, filterOrder, filterTime, filterStatus, filterAssignee, filterType].filter(Boolean).length;
+
   const filtered = allTasks
     .filter((t) => {
       if (tab === 1) return t.creator === "Tôi";
@@ -128,6 +139,10 @@ const CustomerTasks = () => {
       return true;
     })
     .filter((t) => !filterType || t.type === filterType)
+    .filter((t) => !filterNvs || t.nvs === filterNvs)
+    .filter((t) => !filterOrder || t.orderId === filterOrder)
+    .filter((t) => !filterStatus || t.status === filterStatus)
+    .filter((t) => !filterAssignee || t.assignee === filterAssignee)
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 
   const filteredEmployees = employeeOptions.filter((e) =>
@@ -143,6 +158,15 @@ const CustomerTasks = () => {
     setCreateChecklist([""]);
     setCreateDevices([]);
     setCreateRecurring("");
+  };
+
+  const resetFilters = () => {
+    setFilterNvs("");
+    setFilterOrder("");
+    setFilterTime("");
+    setFilterStatus("");
+    setFilterAssignee("");
+    setFilterType("");
   };
 
   const handleCreate = () => {
@@ -162,8 +186,9 @@ const CustomerTasks = () => {
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 
-        <div className="px-4 mb-4">
-          <div className="relative">
+        {/* Search + Filter button */}
+        <div className="px-4 mb-4 flex gap-2">
+          <div className="relative flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Tìm công việc..."
@@ -172,24 +197,58 @@ const CustomerTasks = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-11 w-11 rounded-xl shrink-0 border-border/40 relative"
+            onClick={() => setShowFilter(true)}
+          >
+            <SlidersHorizontal size={16} />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full gradient-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
         </div>
 
-        <div className="px-4 mb-4 flex gap-2">
-          {[
-            { key: null, label: "Tất cả" },
-            { key: "VSLD", label: "VSLD" },
-            { key: "SCBD", label: "SCBD" },
-          ].map((f) => (
-            <motion.button
-              key={f.label}
-              onClick={() => setFilterType(f.key)}
-              className={`chip ${filterType === f.key ? "chip-active" : "chip-inactive"}`}
-              whileTap={{ scale: 0.93 }}
-            >
-              {f.label}
-            </motion.button>
-          ))}
-        </div>
+        {/* Active filter chips */}
+        {activeFilterCount > 0 && (
+          <div className="px-4 mb-4 flex gap-2 flex-wrap">
+            {filterNvs && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterNvs} <X size={10} className="cursor-pointer" onClick={() => setFilterNvs("")} />
+              </span>
+            )}
+            {filterOrder && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                #{filterOrder} <X size={10} className="cursor-pointer" onClick={() => setFilterOrder("")} />
+              </span>
+            )}
+            {filterStatus && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {statusLabel[filterStatus]} <X size={10} className="cursor-pointer" onClick={() => setFilterStatus("")} />
+              </span>
+            )}
+            {filterAssignee && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterAssignee} <X size={10} className="cursor-pointer" onClick={() => setFilterAssignee("")} />
+              </span>
+            )}
+            {filterType && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {typeLabel[filterType]} <X size={10} className="cursor-pointer" onClick={() => setFilterType("")} />
+              </span>
+            )}
+            {filterTime && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterTime === "today" ? "Hôm nay" : filterTime === "week" ? "Tuần này" : "Tháng này"}
+                <X size={10} className="cursor-pointer" onClick={() => setFilterTime("")} />
+              </span>
+            )}
+            <button onClick={resetFilters} className="text-[10px] text-destructive font-semibold underline">Xóa tất cả</button>
+          </div>
+        )}
 
         {/* Create task button - only on "Việc tôi giao" tab */}
         {tab === 1 && (
@@ -274,6 +333,85 @@ const CustomerTasks = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* ═══ Advanced Filter Sheet ═══ */}
+      <Sheet open={showFilter} onOpenChange={setShowFilter}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">Bộ lọc nâng cao</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nhà vệ sinh</label>
+              <Select value={filterNvs} onValueChange={setFilterNvs}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả NVS" /></SelectTrigger>
+                <SelectContent>
+                  {nvsOptions.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Đơn hàng</label>
+              <Select value={filterOrder} onValueChange={setFilterOrder}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả đơn hàng" /></SelectTrigger>
+                <SelectContent>
+                  {orderOptions.map((o) => <SelectItem key={o} value={o}>#{o}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thời gian</label>
+              <Select value={filterTime} onValueChange={setFilterTime}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả thời gian" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Hôm nay</SelectItem>
+                  <SelectItem value="week">Tuần này</SelectItem>
+                  <SelectItem value="month">Tháng này</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Trạng thái</label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả trạng thái" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">Mới</SelectItem>
+                  <SelectItem value="processing">Đang xử lý</SelectItem>
+                  <SelectItem value="done">Hoàn thành</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Người thực hiện</label>
+              <Select value={filterAssignee} onValueChange={setFilterAssignee}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả nhân viên" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tôi">Tôi</SelectItem>
+                  {employeeOptions.map((e) => <SelectItem key={e.name} value={e.name}>{e.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Loại công việc</label>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Tất cả loại" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="VSLD">Vệ sinh lau dọn</SelectItem>
+                  <SelectItem value="SCBD">Sửa chữa bảo dưỡng</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={resetFilters}>
+                Xóa bộ lọc
+              </Button>
+              <Button className="flex-1 rounded-2xl h-12 font-bold gradient-primary border-0 text-primary-foreground" onClick={() => setShowFilter(false)}>
+                Áp dụng
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* ═══ Task Detail Sheet ═══ */}
       <Sheet open={!!selectedTask && !showComplete} onOpenChange={() => setSelectedTask(null)}>
