@@ -134,7 +134,7 @@ const PartnerTasks = () => {
 
   const tabs = isBusinessOwner
     ? ["Tất cả", "Việc tôi giao", "Việc của tôi"]
-    : ["Tất cả", "Việc của tôi"];
+    : ["Việc của tôi"];
 
   const activeFilterCount = [filterNvs, filterOrder, filterTime, filterStatus, filterAssignee, filterType].filter(Boolean).length;
 
@@ -144,7 +144,7 @@ const PartnerTasks = () => {
         if (tab === 1) return t.creator === "Tôi";
         if (tab === 2) return t.assignee === "Tôi";
       } else {
-        if (tab === 1) return t.assignee === "Tôi";
+        return t.assignee === "Tôi";
       }
       return true;
     })
