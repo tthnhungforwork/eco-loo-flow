@@ -51,18 +51,6 @@ const AdminOrderDetail = () => {
     (p) => p.status === "active" && p.services.includes(order.type)
   );
 
-  const handleAutoDispatch = () => {
-    if (eligiblePartners.length === 0) {
-      toast.error("Không tìm thấy đối tác phù hợp. Đơn hàng được gán về KTX.");
-    } else {
-      const best = [...eligiblePartners].sort((a, b) => b.rating - a.rating)[0];
-      toast.success(`Đã điều phối tự động đến ${best.name}`, {
-        description: `Đánh giá: ${best.rating}⭐ · ${best.completedOrders} đơn hoàn thành`,
-      });
-    }
-    setActiveSheet(null);
-  };
-
   const handleManualDispatch = () => {
     if (!selectedPartner) {
       toast.error("Vui lòng chọn đối tác");
