@@ -8,26 +8,26 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Clock, ChevronDown, ChevronUp,
-  Users, Send, Star, MapPinned, ArrowRight
+  Users, Send, Star, ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useOrders, TEST_ORDER_ID } from "@/contexts/OrderContext";
 import {
-  MOCK_ADMIN_ORDERS, MOCK_PARTNERS, ORDER_STATUS_CONFIG,
-  SERVICE_TYPE_CONFIG, SERVICE_STEPS, type PartnerInfo
+  MOCK_PARTNERS, ORDER_STATUS_CONFIG,
+  SERVICE_TYPE_CONFIG, SERVICE_STEPS
 } from "@/data/orderData";
-
-type SheetType = "dispatch_manual" | null;
 
 const AdminOrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const { getOrder, dispatchToPartner } = useOrders();
   const [showTimeline, setShowTimeline] = useState(false);
-  const [activeSheet, setActiveSheet] = useState<SheetType>(null);
+  const [showDispatch, setShowDispatch] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<string | null>(null);
   const [dispatchNote, setDispatchNote] = useState("");
 
-  const order = MOCK_ADMIN_ORDERS.find((o) => o.id === orderId);
+  const order = getOrder(orderId || "");
   if (!order) {
     return (
       <div className="min-h-screen">
@@ -46,21 +46,18 @@ const AdminOrderDetail = () => {
   const steps = SERVICE_STEPS[order.type];
   const currentStepIndex = steps.indexOf(order.status);
 
-  // Filter partners who provide this service type
-  const eligiblePartners = MOCK_PARTNERS.filter(
-    (p) => p.status === "active" && p.services.includes(order.type)
-  );
-
   const handleManualDispatch = () => {
     if (!selectedPartner) {
       toast.error("Vui lòng chọn đối tác");
       return;
     }
     const partner = MOCK_PARTNERS.find((p) => p.id === selectedPartner);
-    toast.success(`Đã gán đơn hàng cho ${partner?.name}`, {
-      description: dispatchNote || "Đơn hàng đang chờ đối tác tiếp nhận.",
+    if (!partner) return;
+    dispatchToPartner(orderId || "", partner.name, partner.phone, dispatchNote);
+    toast.success(`Đã gán đơn hàng cho ${partner.name}`, {
+      description: "Đơn hàng đang chờ đối tác tiếp nhận.",
     });
-    setActiveSheet(null);
+    setShowDispatch(false);
     setSelectedPartner(null);
     setDispatchNote("");
   };
@@ -181,7 +178,7 @@ const AdminOrderDetail = () => {
           <motion.div className="space-y-2.5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
             <Button
               className="w-full h-12 rounded-2xl font-bold gap-2 gradient-primary border-0 shadow-glow text-primary-foreground"
-              onClick={() => setActiveSheet("dispatch_manual")}
+              onClick={() => setShowDispatch(true)}
             >
               <Users size={16} /> Gán thủ công cho đối tác
             </Button>
@@ -190,12 +187,11 @@ const AdminOrderDetail = () => {
       </div>
 
       {/* Manual dispatch */}
-      <Sheet open={activeSheet === "dispatch_manual"} onOpenChange={() => setActiveSheet(null)}>
+      <Sheet open={showDispatch} onOpenChange={setShowDispatch}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
           <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Gán thủ công cho đối tác</SheetTitle></SheetHeader>
           <div className="space-y-4">
             <p className="text-[13px] text-muted-foreground">Chọn đối tác để gán đơn hàng:</p>
-
             <div className="space-y-2">
               {MOCK_PARTNERS.filter((p) => p.status === "active").map((p) => {
                 const selected = selectedPartner === p.id;
@@ -215,13 +211,13 @@ const AdminOrderDetail = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-1.5">
                         <p className="text-[12px] font-semibold text-foreground">{p.name}</p>
-                        {!hasService && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Khác DV</span>}
+                        {!hasService && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground font-medium">Khác DV</span>}
                       </div>
                       <p className="text-[10px] text-muted-foreground">
                         {p.services.map((s) => SERVICE_TYPE_CONFIG[s].label).join(", ")}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
-                        <Star size={9} className="inline text-amber-500 fill-amber-500" /> {p.rating} · {p.completedOrders} đơn · {p.address}
+                        <Star size={9} className="inline text-primary fill-primary" /> {p.rating} · {p.completedOrders} đơn · {p.address}
                       </p>
                     </div>
                     {selected && <CheckCircle2 size={16} className="text-primary shrink-0" />}
@@ -229,14 +225,12 @@ const AdminOrderDetail = () => {
                 );
               })}
             </div>
-
             <Textarea
               placeholder="Ghi chú điều phối (tùy chọn)..."
               className="rounded-xl min-h-[60px]"
               value={dispatchNote}
               onChange={(e) => setDispatchNote(e.target.value)}
             />
-
             <Button className="w-full h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-1.5" onClick={handleManualDispatch}>
               <Send size={16} /> Gán đối tác
             </Button>

@@ -6,7 +6,8 @@ import { Calendar, Building2, Search, CheckCircle, XCircle, Users } from "lucide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { MOCK_PARTNER_ORDERS, ORDER_STATUS_CONFIG } from "@/data/orderData";
+import { useOrders } from "@/contexts/OrderContext";
+import { ORDER_STATUS_CONFIG } from "@/data/orderData";
 
 const statusToFilter = (status: string) => {
   if (["cho_tiep_nhan"].includes(status)) return "pending";
@@ -21,10 +22,12 @@ const tabStatus = ["all", "pending", "accepted", "dispatching", "done"];
 
 const PartnerOrders = () => {
   const navigate = useNavigate();
+  const { getPartnerOrders } = useOrders();
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
 
-  const filtered = MOCK_PARTNER_ORDERS
+  const partnerOrders = getPartnerOrders();
+  const filtered = partnerOrders
     .filter((o) => tabStatus[tab] === "all" || statusToFilter(o.status) === tabStatus[tab])
     .filter((o) => o.name.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase()));
 

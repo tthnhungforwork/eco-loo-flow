@@ -13,9 +13,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useOrders } from "@/contexts/OrderContext";
 import {
-  MOCK_PARTNER_ORDERS, MOCK_PARTNER_STAFF, ORDER_STATUS_CONFIG,
-  SERVICE_TYPE_CONFIG, SERVICE_STEPS, type OrderData, type StaffMember
+  MOCK_PARTNER_STAFF, ORDER_STATUS_CONFIG,
+  SERVICE_TYPE_CONFIG, SERVICE_STEPS, type StaffMember
 } from "@/data/orderData";
 
 type SheetType = "accept" | "dispatch" | "survey" | "quote" | "contract" | "complete" | null;
@@ -23,6 +24,7 @@ type SheetType = "accept" | "dispatch" | "survey" | "quote" | "contract" | "comp
 const PartnerOrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const { getOrder, advanceOrder, assignStaff } = useOrders();
   const [showTimeline, setShowTimeline] = useState(false);
   const [activeSheet, setActiveSheet] = useState<SheetType>(null);
   const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
@@ -30,7 +32,7 @@ const PartnerOrderDetail = () => {
   const [quoteAmount, setQuoteAmount] = useState("");
   const [contractNote, setContractNote] = useState("");
 
-  const order = MOCK_PARTNER_ORDERS.find((o) => o.id === orderId);
+  const order = getOrder(orderId || "");
   if (!order) {
     return (
       <div className="min-h-screen">
@@ -54,11 +56,13 @@ const PartnerOrderDetail = () => {
   };
 
   const handleAccept = () => {
+    advanceOrder(orderId || "", "da_tiep_nhan", "Đối tác đã tiếp nhận đơn hàng", "Eco Clean Co.");
     toast.success("Đã tiếp nhận đơn hàng!");
     setActiveSheet(null);
   };
 
   const handleReject = () => {
+    advanceOrder(orderId || "", "da_huy", "Đối tác từ chối đơn hàng", "Eco Clean Co.");
     toast.info("Đã từ chối đơn hàng");
     setActiveSheet(null);
     navigate("/partner/orders");
@@ -69,12 +73,27 @@ const PartnerOrderDetail = () => {
       toast.error("Vui lòng chọn ít nhất 1 nhân viên");
       return;
     }
+    const staffMembers = MOCK_PARTNER_STAFF.filter(s => selectedStaff.includes(s.id));
+    assignStaff(orderId || "", staffMembers);
+    const staffNames = staffMembers.map(s => s.name).join(", ");
+    
+    // If order is da_ky_hop_dong, advance to dang_thuc_hien
+    if (order.status === "da_ky_hop_dong") {
+      advanceOrder(orderId || "", "dang_thuc_hien", `Gán nhân viên thực hiện: ${staffNames}`, "Eco Clean Co.");
+    } else {
+      // Just add timeline entry for staff dispatch
+      advanceOrder(orderId || "", order.status, `Điều phối nhân sự: ${staffNames}`, "Eco Clean Co.");
+    }
+    
     toast.success(`Đã điều phối ${selectedStaff.length} nhân viên!`);
     setActiveSheet(null);
     setSelectedStaff([]);
   };
 
   const handleSurvey = () => {
+    advanceOrder(orderId || "", "dang_khao_sat", "Hoàn tất khảo sát NVS", "Eco Clean Co.", {
+      surveyNote,
+    });
     toast.success("Đã hoàn tất khảo sát!");
     setActiveSheet(null);
     setSurveyNote("");
@@ -85,18 +104,26 @@ const PartnerOrderDetail = () => {
       toast.error("Vui lòng nhập giá trị báo giá");
       return;
     }
+    const formatted = Number(quoteAmount).toLocaleString("vi-VN") + "đ";
+    advanceOrder(orderId || "", "da_bao_gia", `Gửi báo giá: ${formatted}`, "Eco Clean Co.", {
+      amount: formatted,
+    });
     toast.success("Đã gửi báo giá!");
     setActiveSheet(null);
     setQuoteAmount("");
   };
 
   const handleContract = () => {
+    advanceOrder(orderId || "", "da_ky_hop_dong", "Hợp đồng đã được ký kết", "Eco Clean Co.", {
+      contractFile: "contract_signed.pdf",
+    });
     toast.success("Đã cập nhật hợp đồng!");
     setActiveSheet(null);
     setContractNote("");
   };
 
   const handleComplete = () => {
+    advanceOrder(orderId || "", "cho_nghiem_thu", "Gửi yêu cầu nghiệm thu đến khách hàng", "Eco Clean Co.");
     toast.success("Đã gửi yêu cầu nghiệm thu!");
     setActiveSheet(null);
   };
@@ -131,15 +158,13 @@ const PartnerOrderDetail = () => {
             >
               <Users size={16} /> Điều phối nhân sự
             </Button>
-            {(order.type === "vsld" || order.type === "scbd" || order.type === "netzero") && (
-              <Button
-                variant="outline"
-                className="w-full h-12 rounded-2xl font-semibold gap-1.5"
-                onClick={() => setActiveSheet("survey")}
-              >
-                <ClipboardCheck size={16} /> Bắt đầu khảo sát
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-2xl font-semibold gap-1.5"
+              onClick={() => setActiveSheet("survey")}
+            >
+              <ClipboardCheck size={16} /> Bắt đầu khảo sát
+            </Button>
           </div>
         );
       case "dang_khao_sat":
@@ -147,21 +172,28 @@ const PartnerOrderDetail = () => {
           <div className="space-y-2.5">
             <Button
               className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
-              onClick={() => setActiveSheet("survey")}
+              onClick={() => setActiveSheet("quote")}
             >
-              <ClipboardCheck size={16} /> Hoàn tất khảo sát
+              <DollarSign size={16} /> Gửi báo giá
             </Button>
           </div>
         );
       case "da_bao_gia":
-        return null; // Waiting for customer
+        return (
+          <Button
+            className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
+            onClick={() => setActiveSheet("contract")}
+          >
+            <FileSignature size={16} /> Cập nhật hợp đồng
+          </Button>
+        );
       case "da_ky_hop_dong":
         return (
           <Button
             className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
             onClick={() => setActiveSheet("dispatch")}
           >
-            <Users size={16} /> Gán nhân viên vào NVS
+            <Users size={16} /> Gán nhân viên & bắt đầu thực hiện
           </Button>
         );
       case "dang_thuc_hien":
@@ -170,38 +202,12 @@ const PartnerOrderDetail = () => {
             className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
             onClick={() => setActiveSheet("complete")}
           >
-            <CheckCircle2 size={16} /> Gửi yêu cầu nghiệm thu
+            <CheckCircle2 size={16} /> Hoàn thành & gửi nghiệm thu
           </Button>
         );
       default:
         return null;
     }
-  };
-
-  // After survey, show quote button
-  const getSecondaryActions = () => {
-    if (order.status === "dang_khao_sat" || order.status === "da_tiep_nhan") {
-      return (
-        <Button
-          variant="outline"
-          className="w-full h-12 rounded-2xl font-semibold gap-1.5 mt-2.5"
-          onClick={() => setActiveSheet("quote")}
-        >
-          <DollarSign size={16} /> Gửi báo giá
-        </Button>
-      );
-    }
-    if (order.status === "da_bao_gia") {
-      return (
-        <Button
-          className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
-          onClick={() => setActiveSheet("contract")}
-        >
-          <FileSignature size={16} /> Cập nhật hợp đồng
-        </Button>
-      );
-    }
-    return null;
   };
 
   return (
@@ -256,21 +262,18 @@ const PartnerOrderDetail = () => {
             {showTimeline && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="mt-3 space-y-0">
-                  {[...order.timeline].reverse().map((t, i) => {
-                    const isFirst = i === 0;
-                    return (
-                      <div key={i} className="flex gap-3 relative">
-                        <div className="flex flex-col items-center">
-                          {isFirst ? <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" /> : <Circle size={14} className="text-muted-foreground/40 shrink-0 mt-1" />}
-                          {i < order.timeline.length - 1 && <div className="w-px flex-1 bg-border/50 my-1" />}
-                        </div>
-                        <div className="pb-3 min-w-0">
-                          <p className={`text-[12px] font-semibold ${isFirst ? "text-foreground" : "text-muted-foreground"}`}>{t.label}</p>
-                          <p className="text-[10px] text-muted-foreground/70 mt-0.5">{t.date} {t.actor && `· ${t.actor}`}</p>
-                        </div>
+                  {[...order.timeline].reverse().map((t, i) => (
+                    <div key={i} className="flex gap-3 relative">
+                      <div className="flex flex-col items-center">
+                        {i === 0 ? <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" /> : <Circle size={14} className="text-muted-foreground/40 shrink-0 mt-1" />}
+                        {i < order.timeline.length - 1 && <div className="w-px flex-1 bg-border/50 my-1" />}
                       </div>
-                    );
-                  })}
+                      <div className="pb-3 min-w-0">
+                        <p className={`text-[12px] font-semibold ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{t.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">{t.date} {t.actor && `· ${t.actor}`}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -320,7 +323,6 @@ const PartnerOrderDetail = () => {
         {/* Action buttons */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           {getActions()}
-          {getSecondaryActions()}
         </motion.div>
       </div>
 
@@ -330,6 +332,7 @@ const PartnerOrderDetail = () => {
           <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Xác nhận tiếp nhận</SheetTitle></SheetHeader>
           <div className="space-y-4">
             <p className="text-[13px] text-muted-foreground">Bạn xác nhận tiếp nhận đơn hàng <strong>#{order.id}</strong> - {order.name}?</p>
+            <p className="text-[12px] text-muted-foreground">Lưu ý: Nếu từ chối sau khi tiếp nhận, bạn sẽ không thể nhận lại đơn hàng này.</p>
             <div className="flex gap-2.5">
               <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold" onClick={() => setActiveSheet(null)}>Hủy</Button>
               <Button className="flex-1 h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-1.5" onClick={handleAccept}>
@@ -343,7 +346,11 @@ const PartnerOrderDetail = () => {
       {/* Dispatch staff */}
       <Sheet open={activeSheet === "dispatch"} onOpenChange={() => setActiveSheet(null)}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
-          <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Điều phối nhân sự</SheetTitle></SheetHeader>
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">
+              {order.status === "da_ky_hop_dong" ? "Gán nhân viên & bắt đầu thực hiện" : "Điều phối nhân sự"}
+            </SheetTitle>
+          </SheetHeader>
           <div className="space-y-4">
             <p className="text-[13px] text-muted-foreground">Chọn nhân viên thực hiện đơn hàng này:</p>
             <div className="space-y-2">
@@ -371,7 +378,7 @@ const PartnerOrderDetail = () => {
               })}
             </div>
             <Button className="w-full h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-1.5" onClick={handleDispatch}>
-              <Send size={16} /> Xác nhận điều phối ({selectedStaff.length})
+              <Send size={16} /> {order.status === "da_ky_hop_dong" ? `Gán & bắt đầu (${selectedStaff.length})` : `Xác nhận điều phối (${selectedStaff.length})`}
             </Button>
           </div>
         </SheetContent>
@@ -384,7 +391,7 @@ const PartnerOrderDetail = () => {
           <div className="space-y-4">
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Ghi nhận tổng quan</label>
-              <Textarea placeholder="Diện tích, mức độ bẩn, tần suất sử dụng, thiết bị hiện hữu..." className="rounded-xl min-h-[100px]" value={surveyNote} onChange={(e) => setSurveyNote(e.target.value)} />
+              <Textarea placeholder="Diện tích, mức độ bẩn, tần suất sử dụng, thiết bị hiện hữu, chế phẩm sinh học, thời gian thực hiện phù hợp..." className="rounded-xl min-h-[100px]" value={surveyNote} onChange={(e) => setSurveyNote(e.target.value)} />
             </div>
             <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
               <Upload size={16} /> Đính kèm hình ảnh khảo sát
@@ -403,7 +410,7 @@ const PartnerOrderDetail = () => {
           <div className="space-y-4">
             <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Giá trị báo giá (VNĐ)</label>
-              <Input placeholder="VD: 5000000" className="rounded-xl" value={quoteAmount} onChange={(e) => setQuoteAmount(e.target.value)} />
+              <Input placeholder="VD: 5000000" className="rounded-xl" type="number" value={quoteAmount} onChange={(e) => setQuoteAmount(e.target.value)} />
             </div>
             <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
               <Upload size={16} /> Đính kèm file báo giá
@@ -421,11 +428,23 @@ const PartnerOrderDetail = () => {
           <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Cập nhật hợp đồng</SheetTitle></SheetHeader>
           <div className="space-y-4">
             <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Các bên tham gia</label>
+              <Input placeholder="Tự fill thông tin..." className="rounded-xl" defaultValue="Eco Clean Co. & Nguyễn Văn Khách" />
+            </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Giá trị đơn hàng</label>
+              <Input placeholder="Giá trị..." className="rounded-xl" defaultValue={order.amount || ""} readOnly />
+            </div>
+            <div>
               <label className="text-[12px] font-bold text-foreground mb-1.5 block">Điều khoản thanh toán</label>
               <Textarea placeholder="Nhập điều khoản thanh toán..." className="rounded-xl min-h-[80px]" value={contractNote} onChange={(e) => setContractNote(e.target.value)} />
             </div>
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thời hạn thực hiện</label>
+              <Input placeholder="VD: 30 ngày kể từ ngày ký" className="rounded-xl" />
+            </div>
             <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
-              <Upload size={16} /> Đính kèm file hợp đồng đã ký
+              <Upload size={16} /> Đính kèm file hợp đồng đã ký (2 bên)
             </Button>
             <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
               <Upload size={16} /> Đính kèm phụ lục
@@ -440,11 +459,12 @@ const PartnerOrderDetail = () => {
       {/* Complete / request acceptance */}
       <Sheet open={activeSheet === "complete"} onOpenChange={() => setActiveSheet(null)}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
-          <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Gửi yêu cầu nghiệm thu</SheetTitle></SheetHeader>
+          <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Hoàn thành & gửi nghiệm thu</SheetTitle></SheetHeader>
           <div className="space-y-4">
             <p className="text-[13px] text-muted-foreground">Xác nhận đã hoàn thành dịch vụ và gửi yêu cầu nghiệm thu đến khách hàng.</p>
+            <p className="text-[11px] text-muted-foreground">Lưu ý: Sau khi hoàn thành, nếu khách hàng không xác nhận trong 3 ngày, hệ thống sẽ tự động liên hệ KTX để kiểm tra và xác nhận giúp.</p>
             <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed">
-              <Upload size={16} /> Đính kèm tài liệu nghiệm thu
+              <Upload size={16} /> Đính kèm văn bản/tài liệu nghiệm thu
             </Button>
             <Textarea placeholder="Ghi chú kết quả thực hiện..." className="rounded-xl min-h-[80px]" />
             <Button className="w-full h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-1.5" onClick={handleComplete}>

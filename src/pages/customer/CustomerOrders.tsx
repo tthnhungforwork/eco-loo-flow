@@ -6,7 +6,8 @@ import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Star, Heart, ShoppingCart, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { MOCK_CUSTOMER_ORDERS, ORDER_STATUS_CONFIG } from "@/data/orderData";
+import { useOrders } from "@/contexts/OrderContext";
+import { ORDER_STATUS_CONFIG } from "@/data/orderData";
 
 const productOrders = [
   { id: "SP-001", name: "Nước rửa tay hữu cơ x10", date: "15/03/2026", amount: "850.000đ", status: "processing" },
@@ -32,15 +33,17 @@ const statusToFilter = (status: string) => {
 
 const CustomerOrders = () => {
   const navigate = useNavigate();
+  const { getCustomerOrders } = useOrders();
   const [mainTab, setMainTab] = useState(0);
   const [statusFilter, setStatusFilter] = useState(0);
 
   const statusFilters = ["Tất cả", "Mới", "Đang xử lý", "Hoàn thành", "Hủy/Hoàn"];
   const statusKeys = ["all", "new", "processing", "done", "cancelled"];
 
+  const customerOrders = getCustomerOrders();
   const filteredService = statusKeys[statusFilter] === "all"
-    ? MOCK_CUSTOMER_ORDERS
-    : MOCK_CUSTOMER_ORDERS.filter((o) => statusToFilter(o.status) === statusKeys[statusFilter]);
+    ? customerOrders
+    : customerOrders.filter((o) => statusToFilter(o.status) === statusKeys[statusFilter]);
 
   const filteredProduct = statusKeys[statusFilter] === "all"
     ? productOrders

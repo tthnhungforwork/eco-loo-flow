@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RoleProvider } from "@/contexts/RoleContext";
+import { OrderProvider } from "@/contexts/OrderContext";
 import RoleSwitcherSheet from "@/components/RoleSwitcherSheet";
 
 import Login from "./pages/Login";
@@ -55,6 +56,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <RoleProvider>
+          <OrderProvider>
           <RoleSwitcherSheet />
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -102,6 +104,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </OrderProvider>
         </RoleProvider>
       </BrowserRouter>
     </TooltipProvider>
