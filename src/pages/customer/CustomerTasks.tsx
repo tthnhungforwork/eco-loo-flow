@@ -160,6 +160,15 @@ const CustomerTasks = () => {
     setCreateRecurring("");
   };
 
+  const resetFilters = () => {
+    setFilterNvs("");
+    setFilterOrder("");
+    setFilterTime("");
+    setFilterStatus("");
+    setFilterAssignee("");
+    setFilterType("");
+  };
+
   const handleCreate = () => {
     setShowCreate(false);
     resetCreateForm();
