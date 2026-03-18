@@ -5,7 +5,8 @@ import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Building2, Search, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { MOCK_ADMIN_ORDERS, ORDER_STATUS_CONFIG, SERVICE_TYPE_CONFIG } from "@/data/orderData";
+import { useOrders } from "@/contexts/OrderContext";
+import { ORDER_STATUS_CONFIG, SERVICE_TYPE_CONFIG } from "@/data/orderData";
 
 const statusToFilter = (status: string) => {
   if (["cho_dieu_phoi"].includes(status)) return "dispatch";

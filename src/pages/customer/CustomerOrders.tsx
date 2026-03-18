@@ -6,7 +6,8 @@ import StatusBadge from "@/components/StatusBadge";
 import { Calendar, Star, Heart, ShoppingCart, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { MOCK_CUSTOMER_ORDERS, ORDER_STATUS_CONFIG } from "@/data/orderData";
+import { useOrders } from "@/contexts/OrderContext";
+import { ORDER_STATUS_CONFIG } from "@/data/orderData";
 
 const productOrders = [
   { id: "SP-001", name: "Nước rửa tay hữu cơ x10", date: "15/03/2026", amount: "850.000đ", status: "processing" },

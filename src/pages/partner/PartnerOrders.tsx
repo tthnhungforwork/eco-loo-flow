@@ -6,7 +6,8 @@ import { Calendar, Building2, Search, CheckCircle, XCircle, Users } from "lucide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { MOCK_PARTNER_ORDERS, ORDER_STATUS_CONFIG } from "@/data/orderData";
+import { useOrders } from "@/contexts/OrderContext";
+import { ORDER_STATUS_CONFIG } from "@/data/orderData";
 
 const statusToFilter = (status: string) => {
   if (["cho_tiep_nhan"].includes(status)) return "pending";
