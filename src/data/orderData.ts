@@ -6,11 +6,14 @@ export type OrderStatus =
   | "cho_tiep_nhan"    // Chờ tiếp nhận (after dispatch to partner)
   | "da_tiep_nhan"     // Đã tiếp nhận (partner accepted)
   | "dang_khao_sat"    // Đang khảo sát
-  | "da_bao_gia"       // Đã báo giá
+  | "da_bao_gia"       // Đã báo giá (chờ KH duyệt)
+  | "da_duyet_bao_gia" // KH đã duyệt báo giá
   | "da_ky_hop_dong"   // Đã ký hợp đồng
   | "dang_thuc_hien"   // Đang thực hiện
-  | "cho_nghiem_thu"   // Chờ nghiệm thu
-  | "hoan_thanh"       // Hoàn thành
+  | "cho_nghiem_thu"   // Chờ nghiệm thu (BBNT sent)
+  | "hoan_thanh"       // Hoàn thành (KH nghiệm thu OK)
+  | "cho_thanh_ly"     // Chờ thanh lý HĐ
+  | "da_thanh_ly"      // Đã thanh lý HĐ
   | "da_danh_gia"      // Đã đánh giá
   | "da_huy";          // Đã hủy
 
@@ -32,6 +35,58 @@ export interface StaffMember {
   avatar?: string;
 }
 
+export interface SurveyToiletItem {
+  toiletName: string;
+  area: string;
+  toiletType: string;
+  usageFrequency: string;
+  condition: string;
+  equipmentCondition: string;
+  notes: string;
+}
+
+export interface SurveyEquipment {
+  id: string;
+  name: string;
+  quantity: number;
+  condition: string;
+  description: string;
+}
+
+export interface QuotationItem {
+  id: string;
+  category: "thiet_bi" | "che_pham" | "vat_tu" | "nhan_cong" | "khac";
+  categoryLabel: string;
+  name: string;
+  unit: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface ContractInfo {
+  contractNo: string;
+  partyA: string;
+  partyB: string;
+  value: string;
+  terms: string;
+  duration: string;
+  signedDate?: string;
+}
+
+export interface AcceptanceReport {
+  completedItems: string[];
+  notes: string;
+  sentDate?: string;
+}
+
+export interface SettlementInfo {
+  finalAmount: string;
+  deductions: string;
+  notes: string;
+  signedDate?: string;
+}
+
 export interface OrderData {
   id: string;
   type: ServiceType;
@@ -50,12 +105,35 @@ export interface OrderData {
   status: OrderStatus;
   timeline: OrderTimeline[];
   assignedStaff?: StaffMember[];
+  // Survey
   surveyNote?: string;
+  surveyItems?: SurveyToiletItem[];
+  surveyEquipment?: SurveyEquipment[];
+  surveyBioProducts?: string[];
+  surveyCompleted?: boolean;
+  // Quotation
+  quotationItems?: QuotationItem[];
+  quotationTotal?: number;
+  quotationPaymentTerms?: string;
+  quotationBankInfo?: string;
+  quotationApproved?: boolean;
+  quotationRejectedReason?: string;
+  // Contract
+  contract?: ContractInfo;
+  // Design (for xaymoi/caitao)
+  designFile?: string;
+  designNote?: string;
+  // Acceptance report
+  acceptanceReport?: AcceptanceReport;
+  // Settlement
+  settlement?: SettlementInfo;
+  // Rating
+  rating?: number;
+  ratingContent?: string;
+  // Legacy
   quoteFile?: string;
   contractFile?: string;
   netzeroLevel?: string;
-  rating?: number;
-  ratingContent?: string;
 }
 
 export const ORDER_STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; badgeStatus: string }> = {
@@ -63,24 +141,34 @@ export const ORDER_STATUS_CONFIG: Record<OrderStatus, { label: string; color: st
   cho_tiep_nhan: { label: "Chờ tiếp nhận", color: "text-secondary", badgeStatus: "new" },
   da_tiep_nhan: { label: "Đã tiếp nhận", color: "text-blue-600", badgeStatus: "processing" },
   dang_khao_sat: { label: "Đang khảo sát", color: "text-blue-600", badgeStatus: "processing" },
-  da_bao_gia: { label: "Đã báo giá", color: "text-blue-600", badgeStatus: "processing" },
+  da_bao_gia: { label: "Chờ duyệt báo giá", color: "text-amber-600", badgeStatus: "processing" },
+  da_duyet_bao_gia: { label: "Đã duyệt báo giá", color: "text-blue-600", badgeStatus: "processing" },
   da_ky_hop_dong: { label: "Đã ký hợp đồng", color: "text-primary", badgeStatus: "processing" },
   dang_thuc_hien: { label: "Đang thực hiện", color: "text-primary", badgeStatus: "processing" },
   cho_nghiem_thu: { label: "Chờ nghiệm thu", color: "text-amber-600", badgeStatus: "processing" },
-  hoan_thanh: { label: "Hoàn thành", color: "text-primary", badgeStatus: "done" },
+  hoan_thanh: { label: "Đã nghiệm thu", color: "text-primary", badgeStatus: "done" },
+  cho_thanh_ly: { label: "Chờ thanh lý HĐ", color: "text-amber-600", badgeStatus: "processing" },
+  da_thanh_ly: { label: "Đã thanh lý HĐ", color: "text-primary", badgeStatus: "done" },
   da_danh_gia: { label: "Đã đánh giá", color: "text-primary", badgeStatus: "done" },
   da_huy: { label: "Đã hủy", color: "text-destructive", badgeStatus: "cancelled" },
 };
 
-// Steps that apply per service type
 export const SERVICE_STEPS: Record<ServiceType, OrderStatus[]> = {
   tuvan: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_thuc_hien", "hoan_thanh", "da_danh_gia"],
-  vsld: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "da_danh_gia"],
-  scbd: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "da_danh_gia"],
-  xaymoi: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "da_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "da_danh_gia"],
-  caitao: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "da_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "da_danh_gia"],
+  vsld: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_duyet_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"],
+  scbd: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_duyet_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"],
+  xaymoi: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "da_bao_gia", "da_duyet_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"],
+  caitao: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "da_bao_gia", "da_duyet_bao_gia", "da_ky_hop_dong", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"],
   netzero: ["cho_dieu_phoi", "cho_tiep_nhan", "da_tiep_nhan", "dang_khao_sat", "dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "da_danh_gia"],
 };
+
+export const QUOTATION_CATEGORIES = [
+  { key: "thiet_bi", label: "Thiết bị" },
+  { key: "che_pham", label: "Chế phẩm sinh học" },
+  { key: "vat_tu", label: "Vật tư" },
+  { key: "nhan_cong", label: "Nhân công" },
+  { key: "khac", label: "Hệ thống phụ trợ" },
+] as const;
 
 export const SERVICE_TYPE_CONFIG: Record<ServiceType, { label: string; icon: any; gradient: string }> = {
   tuvan: { label: "Tư vấn", icon: FileText, gradient: "gradient-blue" },
@@ -97,6 +185,8 @@ export const MOCK_PARTNER_STAFF: StaffMember[] = [
   { id: 2, name: "Lê Thị Hương", role: "VSLD", phone: "0923456789" },
   { id: 3, name: "Nguyễn Hoàng Nam", role: "SCBD", phone: "0934567890" },
   { id: 4, name: "Phạm Thị Lan", role: "VSLD", phone: "0945678901" },
+  { id: 5, name: "Võ Minh Tuấn", role: "Xây dựng", phone: "0956789012" },
+  { id: 6, name: "Đặng Văn Hùng", role: "Cải tạo", phone: "0967890123" },
 ];
 
 export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
@@ -122,6 +212,7 @@ export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
       { status: "da_tiep_nhan", label: "Đối tác đã tiếp nhận", date: "10/03/2026 10:00", actor: "Eco Clean Co." },
       { status: "dang_khao_sat", label: "Bắt đầu khảo sát NVS", date: "11/03/2026 08:00", actor: "Trần Văn Minh" },
       { status: "da_bao_gia", label: "Đã gửi báo giá: 2.500.000đ", date: "11/03/2026 16:00", actor: "Eco Clean Co." },
+      { status: "da_duyet_bao_gia", label: "KH duyệt báo giá", date: "12/03/2026 08:00", actor: "Nguyễn Văn Khách" },
       { status: "da_ky_hop_dong", label: "Hợp đồng đã được ký", date: "12/03/2026 09:00", actor: "Eco Clean Co." },
       { status: "dang_thuc_hien", label: "Đang thực hiện dịch vụ", date: "13/03/2026 07:30", actor: "Trần Văn Minh, Lê Thị Hương" },
     ],
@@ -165,6 +256,7 @@ export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
       { status: "da_tiep_nhan", label: "Đối tác đã tiếp nhận", date: "01/03/2026 10:30", actor: "Green Tech" },
       { status: "dang_khao_sat", label: "Khảo sát NVS", date: "02/03/2026 08:00", actor: "Nguyễn Hoàng Nam" },
       { status: "da_bao_gia", label: "Báo giá: 5.000.000đ", date: "02/03/2026 17:00", actor: "Green Tech" },
+      { status: "da_duyet_bao_gia", label: "KH duyệt báo giá", date: "03/03/2026 08:00", actor: "Nguyễn Văn Khách" },
       { status: "da_ky_hop_dong", label: "Ký hợp đồng", date: "03/03/2026 09:00", actor: "Green Tech" },
       { status: "dang_thuc_hien", label: "Thực hiện sửa chữa", date: "04/03/2026 07:00", actor: "Nguyễn Hoàng Nam" },
       { status: "cho_nghiem_thu", label: "Chờ nghiệm thu", date: "08/03/2026 16:00", actor: "Green Tech" },
@@ -221,52 +313,6 @@ export const MOCK_PARTNER_ORDERS: OrderData[] = [
     ],
     assignedStaff: [],
   },
-  {
-    id: "PDH-003",
-    type: "tuvan",
-    typeLabel: "Tư vấn",
-    name: "Tư vấn số hóa NVS",
-    customerName: "Trường THPT Y",
-    customerPhone: "0287654321",
-    customerEmail: "thpt@email.com",
-    address: "789 Nguyễn Trãi, Q.5",
-    content: "Tư vấn giải pháp số hóa NVS cho trường học",
-    toilets: [],
-    createdAt: "12/03/2026",
-    status: "cho_tiep_nhan",
-    timeline: [
-      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "12/03/2026 08:00", actor: "Trường THPT Y" },
-      { status: "cho_tiep_nhan", label: "Điều phối đến Eco Clean Co.", date: "12/03/2026 10:00", actor: "KTX" },
-    ],
-  },
-  {
-    id: "PDH-004",
-    type: "scbd",
-    typeLabel: "Sửa chữa bảo dưỡng",
-    name: "Lắp đặt thiết bị mới",
-    customerName: "Công ty Green",
-    customerPhone: "0281112233",
-    customerEmail: "green@email.com",
-    address: "321 Võ Văn Tần, Q.3",
-    content: "Lắp đặt hệ thống thiết bị vệ sinh mới cho tòa nhà",
-    toilets: ["NVS Tầng 1 - Green Tower"],
-    partnerName: "Eco Clean Co.",
-    amount: "15.000.000đ",
-    createdAt: "01/03/2026",
-    status: "hoan_thanh",
-    timeline: [
-      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "01/03/2026 08:00", actor: "Công ty Green" },
-      { status: "cho_tiep_nhan", label: "Điều phối", date: "01/03/2026 09:00", actor: "Hệ thống" },
-      { status: "da_tiep_nhan", label: "Tiếp nhận", date: "01/03/2026 10:00", actor: "Eco Clean Co." },
-      { status: "dang_khao_sat", label: "Khảo sát", date: "02/03/2026 08:00", actor: "Nguyễn Hoàng Nam" },
-      { status: "da_bao_gia", label: "Báo giá: 15.000.000đ", date: "03/03/2026 10:00", actor: "Eco Clean Co." },
-      { status: "da_ky_hop_dong", label: "Ký hợp đồng", date: "04/03/2026 09:00", actor: "Eco Clean Co." },
-      { status: "dang_thuc_hien", label: "Thực hiện", date: "05/03/2026 07:00", actor: "Nguyễn Hoàng Nam" },
-      { status: "cho_nghiem_thu", label: "Chờ nghiệm thu", date: "08/03/2026 16:00", actor: "Eco Clean Co." },
-      { status: "hoan_thanh", label: "Hoàn thành", date: "10/03/2026 10:00", actor: "Công ty Green" },
-    ],
-    assignedStaff: [MOCK_PARTNER_STAFF[2]],
-  },
 ];
 
 // Partner directory for admin dispatch
@@ -287,13 +333,11 @@ export interface PartnerInfo {
 }
 
 export const MOCK_PARTNERS: PartnerInfo[] = [
-  { id: "DT-001", name: "Eco Clean Co.", type: "business", services: ["vsld", "scbd"], phone: "0281234567", email: "info@ecoclean.vn", address: "100 Nguyễn Thị Minh Khai, Q.3", rating: 4.8, completedOrders: 156, status: "active", registeredAt: "15/01/2025", taxCode: "0123456789", staffCount: 25 },
+  { id: "DT-001", name: "Eco Clean Co.", type: "business", services: ["vsld", "scbd", "caitao"], phone: "0281234567", email: "info@ecoclean.vn", address: "100 Nguyễn Thị Minh Khai, Q.3", rating: 4.8, completedOrders: 156, status: "active", registeredAt: "15/01/2025", taxCode: "0123456789", staffCount: 25 },
   { id: "DT-002", name: "Green Tech Solutions", type: "business", services: ["scbd", "xaymoi", "caitao"], phone: "0287654321", email: "contact@greentech.vn", address: "200 Lê Văn Sỹ, Q.Tân Bình", rating: 4.6, completedOrders: 89, status: "active", registeredAt: "20/03/2025", taxCode: "9876543210", staffCount: 18 },
   { id: "DT-003", name: "Nguyễn Văn Tùng", type: "individual", services: ["vsld"], phone: "0934567890", email: "tung@email.com", address: "50 Trần Quốc Thảo, Q.3", rating: 4.5, completedOrders: 34, status: "active", registeredAt: "01/06/2025" },
-  { id: "DT-004", name: "Smart Toilet JSC", type: "business", services: ["tuvan", "netzero", "vsld", "scbd"], phone: "0289998877", email: "info@smarttoilet.vn", address: "300 Điện Biên Phủ, Q.Bình Thạnh", rating: 4.9, completedOrders: 210, status: "active", registeredAt: "10/11/2024", taxCode: "1122334455", staffCount: 42 },
+  { id: "DT-004", name: "Smart Toilet JSC", type: "business", services: ["tuvan", "netzero", "vsld", "scbd", "xaymoi"], phone: "0289998877", email: "info@smarttoilet.vn", address: "300 Điện Biên Phủ, Q.Bình Thạnh", rating: 4.9, completedOrders: 210, status: "active", registeredAt: "10/11/2024", taxCode: "1122334455", staffCount: 42 },
   { id: "DT-005", name: "Phạm Minh Tuấn", type: "individual", services: ["scbd"], phone: "0945678901", email: "tuan.pham@email.com", address: "15 Nguyễn Đình Chiểu, Q.1", rating: 0, completedOrders: 0, status: "pending", registeredAt: "14/03/2026" },
-  { id: "DT-006", name: "CleanPro Vietnam", type: "business", services: ["vsld", "tuvan"], phone: "0286665544", email: "info@cleanpro.vn", address: "88 Võ Văn Tần, Q.3", rating: 0, completedOrders: 0, status: "pending", registeredAt: "15/03/2026", taxCode: "5566778899", staffCount: 8 },
-  { id: "DT-007", name: "Lê Hoàng Anh", type: "individual", services: ["vsld"], phone: "0912223344", email: "anh.le@email.com", address: "22 Pasteur, Q.1", rating: 3.2, completedOrders: 5, status: "suspended", registeredAt: "01/12/2025" },
 ];
 
 // Admin sees ALL orders across the system
@@ -331,24 +375,6 @@ export const MOCK_ADMIN_ORDERS: OrderData[] = [
     status: "cho_dieu_phoi",
     timeline: [
       { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "15/03/2026 14:00", actor: "Công ty ABC" },
-    ],
-  },
-  {
-    id: "DH-007",
-    type: "netzero",
-    typeLabel: "Netzero",
-    name: "Đăng ký Netzero - Xanh",
-    customerName: "Trường THPT Y",
-    customerPhone: "0287654321",
-    customerEmail: "thpt@email.com",
-    address: "789 Nguyễn Trãi, Q.5",
-    content: "Đăng ký chứng nhận Xanh cho NVS trường học",
-    toilets: ["NVS Block A - THPT Y", "NVS Block B - THPT Y"],
-    netzeroLevel: "xanh",
-    createdAt: "16/03/2026",
-    status: "cho_dieu_phoi",
-    timeline: [
-      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "16/03/2026 09:30", actor: "Trường THPT Y" },
     ],
   },
 ];
