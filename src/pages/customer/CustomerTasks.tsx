@@ -186,8 +186,9 @@ const CustomerTasks = () => {
       <div className="py-4">
         <SegmentedControl tabs={["Tất cả", "Việc tôi giao", "Việc của tôi"]} active={tab} onChange={setTab} />
 
-        <div className="px-4 mb-4">
-          <div className="relative">
+        {/* Search + Filter button */}
+        <div className="px-4 mb-4 flex gap-2">
+          <div className="relative flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Tìm công việc..."
@@ -196,24 +197,58 @@ const CustomerTasks = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-11 w-11 rounded-xl shrink-0 border-border/40 relative"
+            onClick={() => setShowFilter(true)}
+          >
+            <SlidersHorizontal size={16} />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full gradient-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
         </div>
 
-        <div className="px-4 mb-4 flex gap-2">
-          {[
-            { key: null, label: "Tất cả" },
-            { key: "VSLD", label: "VSLD" },
-            { key: "SCBD", label: "SCBD" },
-          ].map((f) => (
-            <motion.button
-              key={f.label}
-              onClick={() => setFilterType(f.key)}
-              className={`chip ${filterType === f.key ? "chip-active" : "chip-inactive"}`}
-              whileTap={{ scale: 0.93 }}
-            >
-              {f.label}
-            </motion.button>
-          ))}
-        </div>
+        {/* Active filter chips */}
+        {activeFilterCount > 0 && (
+          <div className="px-4 mb-4 flex gap-2 flex-wrap">
+            {filterNvs && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterNvs} <X size={10} className="cursor-pointer" onClick={() => setFilterNvs("")} />
+              </span>
+            )}
+            {filterOrder && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                #{filterOrder} <X size={10} className="cursor-pointer" onClick={() => setFilterOrder("")} />
+              </span>
+            )}
+            {filterStatus && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {statusLabel[filterStatus]} <X size={10} className="cursor-pointer" onClick={() => setFilterStatus("")} />
+              </span>
+            )}
+            {filterAssignee && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterAssignee} <X size={10} className="cursor-pointer" onClick={() => setFilterAssignee("")} />
+              </span>
+            )}
+            {filterType && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {typeLabel[filterType]} <X size={10} className="cursor-pointer" onClick={() => setFilterType("")} />
+              </span>
+            )}
+            {filterTime && (
+              <span className="chip chip-active text-[10px] flex items-center gap-1">
+                {filterTime === "today" ? "Hôm nay" : filterTime === "week" ? "Tuần này" : "Tháng này"}
+                <X size={10} className="cursor-pointer" onClick={() => setFilterTime("")} />
+              </span>
+            )}
+            <button onClick={resetFilters} className="text-[10px] text-destructive font-semibold underline">Xóa tất cả</button>
+          </div>
+        )}
 
         {/* Create task button - only on "Việc tôi giao" tab */}
         {tab === 1 && (
