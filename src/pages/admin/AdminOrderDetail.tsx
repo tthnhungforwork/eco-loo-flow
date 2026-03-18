@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Clock, ChevronDown, ChevronUp,
-  Users, Send, Star, Zap, MapPinned, ArrowRight
+  Users, Send, Star, MapPinned, ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ import {
   SERVICE_TYPE_CONFIG, SERVICE_STEPS, type PartnerInfo
 } from "@/data/orderData";
 
-type SheetType = "dispatch_auto" | "dispatch_manual" | null;
+type SheetType = "dispatch_manual" | null;
 
 const AdminOrderDetail = () => {
   const { orderId } = useParams();
@@ -50,18 +50,6 @@ const AdminOrderDetail = () => {
   const eligiblePartners = MOCK_PARTNERS.filter(
     (p) => p.status === "active" && p.services.includes(order.type)
   );
-
-  const handleAutoDispatch = () => {
-    if (eligiblePartners.length === 0) {
-      toast.error("Không tìm thấy đối tác phù hợp. Đơn hàng được gán về KTX.");
-    } else {
-      const best = [...eligiblePartners].sort((a, b) => b.rating - a.rating)[0];
-      toast.success(`Đã điều phối tự động đến ${best.name}`, {
-        description: `Đánh giá: ${best.rating}⭐ · ${best.completedOrders} đơn hoàn thành`,
-      });
-    }
-    setActiveSheet(null);
-  };
 
   const handleManualDispatch = () => {
     if (!selectedPartner) {
@@ -193,13 +181,6 @@ const AdminOrderDetail = () => {
           <motion.div className="space-y-2.5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
             <Button
               className="w-full h-12 rounded-2xl font-bold gap-2 gradient-primary border-0 shadow-glow text-primary-foreground"
-              onClick={() => setActiveSheet("dispatch_auto")}
-            >
-              <Zap size={16} /> Điều phối tự động
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full h-12 rounded-2xl font-semibold gap-2"
               onClick={() => setActiveSheet("dispatch_manual")}
             >
               <Users size={16} /> Gán thủ công cho đối tác
@@ -207,50 +188,6 @@ const AdminOrderDetail = () => {
           </motion.div>
         )}
       </div>
-
-      {/* Auto dispatch confirmation */}
-      <Sheet open={activeSheet === "dispatch_auto"} onOpenChange={() => setActiveSheet(null)}>
-        <SheetContent side="bottom" className="rounded-t-3xl max-h-[75vh] overflow-y-auto px-5 pb-8">
-          <SheetHeader className="pb-4"><SheetTitle className="text-base text-left">Điều phối tự động</SheetTitle></SheetHeader>
-          <div className="space-y-4">
-            <p className="text-[13px] text-muted-foreground">
-              Hệ thống sẽ tìm đối tác phù hợp nhất dựa trên: loại dịch vụ ({serviceConfig.label}), khoảng cách, đánh giá và số đơn hoàn thành.
-            </p>
-
-            {eligiblePartners.length > 0 ? (
-              <>
-                <p className="text-[12px] font-bold text-foreground">Đối tác phù hợp ({eligiblePartners.length}):</p>
-                <div className="space-y-2">
-                  {[...eligiblePartners].sort((a, b) => b.rating - a.rating).map((p, i) => (
-                    <div key={p.id} className={`rounded-xl p-3 border ${i === 0 ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"}`}>
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${i === 0 ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                          <Building2 size={14} />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[12px] font-semibold text-foreground">{p.name}</p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <Star size={10} className="inline text-amber-500 fill-amber-500" /> {p.rating} · {p.completedOrders} đơn
-                          </p>
-                        </div>
-                        {i === 0 && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Đề xuất</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
-                <p className="text-[12px] text-amber-700 dark:text-amber-400 font-medium">Không tìm thấy đối tác. Đơn sẽ được gán về KTX.</p>
-              </div>
-            )}
-
-            <Button className="w-full h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground gap-1.5" onClick={handleAutoDispatch}>
-              <Zap size={16} /> Xác nhận điều phối tự động
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Manual dispatch */}
       <Sheet open={activeSheet === "dispatch_manual"} onOpenChange={() => setActiveSheet(null)}>
