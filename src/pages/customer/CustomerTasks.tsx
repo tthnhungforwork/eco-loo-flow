@@ -49,6 +49,7 @@ const employeeOptions = [
   { name: "Hoàng Thị E", role: "VSLD" },
 ];
 const deviceOptions = ["Bồn cầu", "Vòi nước", "Lavabo", "Bình nước nóng", "Quạt hút", "Van xả", "Ống thoát nước", "Máy sấy tay"];
+const orderOptions = ["DV-101", "DV-102", "DV-103", "DV-104"];
 
 const allTasks: Task[] = [
   {
