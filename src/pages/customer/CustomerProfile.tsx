@@ -12,7 +12,9 @@ const CustomerProfile = () => {
     ...(isBusinessOwner ? [
       { icon: Building2, label: "Quản lý thông tin doanh nghiệp", desc: "Thông tin DN, mã số thuế", path: "/customer/business" },
       { icon: Users, label: "Quản lý nhân sự", desc: "Thêm, sửa, gán quyền nhân viên", path: "/customer/business" },
-    ] : []),
+    ] : [
+      { icon: Building2, label: "Đăng ký doanh nghiệp", desc: "Trở thành khách hàng doanh nghiệp", path: "/customer/register-business" },
+    ]),
     { icon: ShoppingBag, label: "Quản lý đơn mua", desc: "Giỏ hàng, đơn hàng sản phẩm", path: "/customer/orders" },
     { icon: Heart, label: "Sản phẩm yêu thích", desc: "Danh sách sản phẩm đã lưu", path: "/customer/orders" },
     { icon: MessageSquareWarning, label: "Ticket hỗ trợ", desc: "Ticket đã gửi và trạng thái", path: "/customer/tickets" },
