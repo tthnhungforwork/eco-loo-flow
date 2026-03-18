@@ -17,7 +17,7 @@ import {
   SERVICE_TYPE_CONFIG, SERVICE_STEPS, type PartnerInfo
 } from "@/data/orderData";
 
-type SheetType = "dispatch_auto" | "dispatch_manual" | null;
+type SheetType = "dispatch_manual" | null;
 
 const AdminOrderDetail = () => {
   const { orderId } = useParams();
