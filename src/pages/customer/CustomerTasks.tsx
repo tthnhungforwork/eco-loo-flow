@@ -105,10 +105,18 @@ const typeColor: Record<string, string> = { VSLD: "bg-primary/10 text-primary", 
 const CustomerTasks = () => {
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showComplete, setShowComplete] = useState(false);
   const [completeNote, setCompleteNote] = useState("");
+
+  // Advanced filter state
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterNvs, setFilterNvs] = useState("");
+  const [filterOrder, setFilterOrder] = useState("");
+  const [filterTime, setFilterTime] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterAssignee, setFilterAssignee] = useState("");
+  const [filterType, setFilterType] = useState("");
 
   // Create task state
   const [showCreate, setShowCreate] = useState(false);
@@ -122,6 +130,8 @@ const CustomerTasks = () => {
   const [createDevices, setCreateDevices] = useState<string[]>([]);
   const [createRecurring, setCreateRecurring] = useState("");
 
+  const activeFilterCount = [filterNvs, filterOrder, filterTime, filterStatus, filterAssignee, filterType].filter(Boolean).length;
+
   const filtered = allTasks
     .filter((t) => {
       if (tab === 1) return t.creator === "Tôi";
@@ -129,6 +139,10 @@ const CustomerTasks = () => {
       return true;
     })
     .filter((t) => !filterType || t.type === filterType)
+    .filter((t) => !filterNvs || t.nvs === filterNvs)
+    .filter((t) => !filterOrder || t.orderId === filterOrder)
+    .filter((t) => !filterStatus || t.status === filterStatus)
+    .filter((t) => !filterAssignee || t.assignee === filterAssignee)
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 
   const filteredEmployees = employeeOptions.filter((e) =>
