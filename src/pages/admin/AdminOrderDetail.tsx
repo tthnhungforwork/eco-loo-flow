@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Clock, ChevronDown, ChevronUp,
-  Users, Send, Star, Zap, MapPinned, ArrowRight
+  Users, Send, Star, MapPinned, ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
