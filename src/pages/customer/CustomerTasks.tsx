@@ -6,11 +6,21 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Clock, User, Play, Search, MapPin, FileText, Bath, Calendar,
-  CheckCircle2, ClipboardList, Image as ImageIcon, ChevronRight
+  CheckCircle2, ClipboardList, Image as ImageIcon, ChevronRight,
+  Plus, Trash2, X, Sparkles, Wrench, RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// ── Types ─────────────────────────────────────────────
+
+interface ChecklistItem {
+  item: string;
+  done: boolean;
+  required?: boolean;
+}
 
 interface Task {
   id: number;
@@ -23,8 +33,22 @@ interface Task {
   nvs: string;
   orderId?: string;
   description?: string;
-  checklist?: { item: string; done: boolean }[];
+  checklist?: ChecklistItem[];
+  recurring?: string;
+  devices?: string[];
 }
+
+// ── Mock Data ─────────────────────────────────────────
+
+const nvsOptions = ["NVS Tầng 1", "NVS Tầng 3", "NVS Tầng 5", "NVS Sảnh B", "NVS Eco Park"];
+const employeeOptions = [
+  { name: "Trần Văn A", role: "VSLD" },
+  { name: "Lê Thị B", role: "VSLD" },
+  { name: "Phạm Văn C", role: "SCBD" },
+  { name: "Nguyễn Văn D", role: "SCBD" },
+  { name: "Hoàng Thị E", role: "VSLD" },
+];
+const deviceOptions = ["Bồn cầu", "Vòi nước", "Lavabo", "Bình nước nóng", "Quạt hút", "Van xả", "Ống thoát nước", "Máy sấy tay"];
 
 const allTasks: Task[] = [
   {
@@ -32,9 +56,9 @@ const allTasks: Task[] = [
     deadline: "16/03/2026", status: "processing", nvs: "NVS Tầng 3", orderId: "DV-101",
     description: "Thực hiện vệ sinh tổng thể NVS tầng 3, bao gồm sàn, bồn cầu, lavabo và bổ sung vật tư.",
     checklist: [
-      { item: "Lau sàn nhà vệ sinh", done: true },
-      { item: "Vệ sinh bồn cầu", done: true },
-      { item: "Lau chùi lavabo & gương", done: false },
+      { item: "Lau sàn nhà vệ sinh", done: true, required: true },
+      { item: "Vệ sinh bồn cầu", done: true, required: true },
+      { item: "Lau chùi lavabo & gương", done: false, required: true },
       { item: "Bổ sung giấy & xà phòng", done: false },
       { item: "Khử mùi", done: false },
     ],
@@ -48,13 +72,14 @@ const allTasks: Task[] = [
     id: 3, title: "Bảo trì thiết bị vệ sinh", type: "SCBD", assignee: "Tôi", creator: "Nguyễn Văn A",
     deadline: "15/03/2026", status: "done", nvs: "NVS Tầng 1",
     description: "Bảo trì các thiết bị vệ sinh bao gồm vòi nước, bồn cầu, hệ thống xả.",
+    devices: ["Vòi nước", "Bồn cầu"],
   },
   {
     id: 4, title: "Khử mùi NVS Sảnh B", type: "VSLD", assignee: "Nguyễn Văn A", creator: "Tôi",
     deadline: "18/03/2026", status: "processing", nvs: "NVS Sảnh B", orderId: "DV-102",
     description: "Sử dụng chế phẩm sinh học để khử mùi khu vực NVS Sảnh B.",
     checklist: [
-      { item: "Kiểm tra nguồn gây mùi", done: true },
+      { item: "Kiểm tra nguồn gây mùi", done: true, required: true },
       { item: "Xịt chế phẩm sinh học", done: false },
       { item: "Vệ sinh đường ống thoát", done: false },
     ],
@@ -65,9 +90,10 @@ const allTasks: Task[] = [
     description: "Thay thế bình xà phòng đã hết tại các vị trí lavabo tầng 5.",
   },
   {
-    id: 6, title: "Sửa chữa van nước NVS Eco", type: "SCBD", assignee: "Phạm Văn C", creator: "Admin KTX",
+    id: 6, title: "Sửa chữa van nước NVS Eco", type: "SCBD", assignee: "Phạm Văn C", creator: "Tôi",
     deadline: "20/03/2026", status: "new", nvs: "NVS Eco Park",
     description: "Thay thế van nước bị hỏng tại phòng vệ sinh nam khu Eco Park.",
+    devices: ["Van xả", "Vòi nước"],
   },
 ];
 
@@ -83,6 +109,18 @@ const CustomerTasks = () => {
   const [showComplete, setShowComplete] = useState(false);
   const [completeNote, setCompleteNote] = useState("");
 
+  // Create task state
+  const [showCreate, setShowCreate] = useState(false);
+  const [createType, setCreateType] = useState<"VSLD" | "SCBD">("VSLD");
+  const [createTitle, setCreateTitle] = useState("");
+  const [createAssignee, setCreateAssignee] = useState("");
+  const [createNvs, setCreateNvs] = useState("");
+  const [createDeadline, setCreateDeadline] = useState("");
+  const [createDescription, setCreateDescription] = useState("");
+  const [createChecklist, setCreateChecklist] = useState<string[]>([""]);
+  const [createDevices, setCreateDevices] = useState<string[]>([]);
+  const [createRecurring, setCreateRecurring] = useState("");
+
   const filtered = allTasks
     .filter((t) => {
       if (tab === 1) return t.creator === "Tôi";
@@ -91,6 +129,26 @@ const CustomerTasks = () => {
     })
     .filter((t) => !filterType || t.type === filterType)
     .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
+
+  const filteredEmployees = employeeOptions.filter((e) =>
+    createType === "VSLD" ? e.role === "VSLD" : e.role === "SCBD"
+  );
+
+  const resetCreateForm = () => {
+    setCreateTitle("");
+    setCreateAssignee("");
+    setCreateNvs("");
+    setCreateDeadline("");
+    setCreateDescription("");
+    setCreateChecklist([""]);
+    setCreateDevices([]);
+    setCreateRecurring("");
+  };
+
+  const handleCreate = () => {
+    setShowCreate(false);
+    resetCreateForm();
+  };
 
   const handleComplete = () => {
     setShowComplete(false);
@@ -133,6 +191,21 @@ const CustomerTasks = () => {
           ))}
         </div>
 
+        {/* Create task button - only on "Việc tôi giao" tab */}
+        {tab === 1 && (
+          <div className="px-4 mb-4">
+            <Button
+              className="w-full h-12 font-bold gap-2 rounded-2xl gradient-primary border-0 shadow-glow text-primary-foreground"
+              onClick={() => {
+                resetCreateForm();
+                setShowCreate(true);
+              }}
+            >
+              <Plus size={18} /> Tạo công việc mới
+            </Button>
+          </div>
+        )}
+
         <div className="px-4 space-y-3">
           <AnimatePresence mode="popLayout">
             {filtered.length === 0 && (
@@ -168,6 +241,11 @@ const CustomerTasks = () => {
                           #{t.orderId}
                         </span>
                       )}
+                      {t.recurring && (
+                        <span className="text-[10px] font-semibold text-secondary flex items-center gap-0.5">
+                          <RotateCcw size={9} /> {t.recurring}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <StatusBadge status={t.status} label={statusLabel[t.status]} />
@@ -177,13 +255,37 @@ const CustomerTasks = () => {
                   <span className="flex items-center gap-1"><Clock size={12} />{t.deadline}</span>
                   <span className="flex items-center gap-1"><MapPin size={12} />{t.nvs}</span>
                 </div>
+                {/* Quick action */}
+                {t.assignee === "Tôi" && t.status !== "done" && (
+                  <Button
+                    size="sm"
+                    className="w-full mt-3 h-9 font-bold rounded-xl gradient-primary border-0 text-xs gap-1 shadow-glow text-primary-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTask(t);
+                      setShowComplete(true);
+                    }}
+                  >
+                    <Play size={12} /> Thực hiện
+                  </Button>
+                )}
+                {t.assignee !== "Tôi" && t.creator === "Tôi" && t.status !== "done" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-3 h-9 font-bold rounded-xl text-xs gap-1 border-primary/30 text-primary"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Clock size={12} /> Nhắc nhở
+                  </Button>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
       </div>
 
-      {/* Task Detail Sheet */}
+      {/* ═══ Task Detail Sheet ═══ */}
       <Sheet open={!!selectedTask && !showComplete} onOpenChange={() => setSelectedTask(null)}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-5 pb-8">
           {selectedTask && (
@@ -191,7 +293,7 @@ const CustomerTasks = () => {
               <SheetHeader className="pb-4">
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-primary-foreground shadow-sm ${selectedTask.type === "VSLD" ? "gradient-primary" : "gradient-warm"}`}>
-                    <ClipboardList size={22} />
+                    {selectedTask.type === "VSLD" ? <Sparkles size={22} /> : <Wrench size={22} />}
                   </div>
                   <div>
                     <SheetTitle className="text-base text-left">{selectedTask.title}</SheetTitle>
@@ -211,7 +313,7 @@ const CustomerTasks = () => {
                 </p>
               )}
 
-              <div className="space-y-3 mb-5">
+              <div className="space-y-2.5 mb-5">
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
                   <User size={16} className="text-primary shrink-0" />
                   <div>
@@ -220,7 +322,7 @@ const CustomerTasks = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
-                  <User size={16} className="text-primary shrink-0" />
+                  <User size={16} className="text-secondary shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Người tạo</p>
                     <p className="text-[13px] font-semibold text-foreground">{selectedTask.creator}</p>
@@ -229,7 +331,7 @@ const CustomerTasks = () => {
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-3">
                   <Calendar size={16} className="text-primary shrink-0" />
                   <div>
-                    <p className="text-[10px] text-muted-foreground">Thời hạn</p>
+                    <p className="text-[10px] text-muted-foreground">Thời gian thực hiện</p>
                     <p className="text-[13px] font-semibold text-foreground">{selectedTask.deadline}</p>
                   </div>
                 </div>
@@ -259,36 +361,56 @@ const CustomerTasks = () => {
                     {selectedTask.checklist.map((c, i) => (
                       <div key={i} className="flex items-center gap-2.5 bg-card border border-border/30 rounded-xl p-3">
                         <CheckCircle2 size={16} className={c.done ? "text-primary" : "text-muted-foreground/30"} />
-                        <span className={`text-[12px] ${c.done ? "text-foreground line-through opacity-60" : "text-foreground"}`}>{c.item}</span>
+                        <span className={`text-[12px] flex-1 ${c.done ? "text-foreground line-through opacity-60" : "text-foreground"}`}>{c.item}</span>
+                        {c.required && (
+                          <span className="text-[8px] font-bold text-destructive px-1.5 py-0.5 rounded bg-destructive/10">Bắt buộc</span>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {selectedTask.assignee === "Tôi" && selectedTask.status !== "done" && (
-                <Button
-                  className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
-                  onClick={() => setShowComplete(true)}
-                >
-                  <CheckCircle2 size={18} /> Khai báo hoàn thành
-                </Button>
+              {/* Devices for SCBD */}
+              {selectedTask.devices && selectedTask.devices.length > 0 && (
+                <div className="mb-5">
+                  <p className="text-[12px] font-bold text-foreground mb-2">Thiết bị liên quan</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTask.devices.map((d) => (
+                      <span key={d} className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-eco-orange/10 text-eco-orange">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
-              {selectedTask.assignee !== "Tôi" && selectedTask.creator === "Tôi" && selectedTask.status !== "done" && (
-                <Button
-                  variant="outline"
-                  className="w-full touch-target font-bold rounded-2xl h-14 gap-2 border-primary/30 text-primary"
-                  onClick={() => {/* TODO: send reminder */}}
-                >
-                  <Clock size={18} /> Nhắc nhở
-                </Button>
-              )}
+
+              {/* Action buttons */}
+              <div className="space-y-2.5">
+                {selectedTask.assignee === "Tôi" && selectedTask.status !== "done" && (
+                  <Button
+                    className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
+                    onClick={() => setShowComplete(true)}
+                  >
+                    <CheckCircle2 size={18} /> Khai báo hoàn thành
+                  </Button>
+                )}
+                {selectedTask.assignee !== "Tôi" && selectedTask.creator === "Tôi" && selectedTask.status !== "done" && (
+                  <Button
+                    variant="outline"
+                    className="w-full touch-target font-bold rounded-2xl h-14 gap-2 border-primary/30 text-primary"
+                    onClick={() => {/* TODO: send reminder */}}
+                  >
+                    <Clock size={18} /> Nhắc nhở
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </SheetContent>
       </Sheet>
 
-      {/* Complete Task Sheet */}
+      {/* ═══ Complete Task Sheet ═══ */}
       <Sheet open={showComplete} onOpenChange={setShowComplete}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto px-5 pb-8">
           <SheetHeader className="pb-4">
@@ -348,6 +470,194 @@ const CustomerTasks = () => {
               </Button>
             </div>
           )}
+        </SheetContent>
+      </Sheet>
+
+      {/* ═══ Create Task Sheet ═══ */}
+      <Sheet open={showCreate} onOpenChange={setShowCreate}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="text-base text-left">Tạo công việc mới</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-4">
+            {/* Task type */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-2 block">Loại công việc</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setCreateType("VSLD"); setCreateAssignee(""); }}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    createType === "VSLD" ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Sparkles size={14} /> Vệ sinh lau dọn
+                </button>
+                <button
+                  onClick={() => { setCreateType("SCBD"); setCreateAssignee(""); }}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    createType === "SCBD" ? "gradient-warm text-primary-foreground" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Wrench size={14} /> Sửa chữa BD
+                </button>
+              </div>
+            </div>
+
+            {/* Title */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Tiêu đề công việc</label>
+              <Input
+                placeholder="VD: Vệ sinh NVS Tầng 3..."
+                className="rounded-xl h-11"
+                value={createTitle}
+                onChange={(e) => setCreateTitle(e.target.value)}
+              />
+            </div>
+
+            {/* NVS */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Nhà vệ sinh</label>
+              <Select value={createNvs} onValueChange={setCreateNvs}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Chọn NVS" />
+                </SelectTrigger>
+                <SelectContent>
+                  {nvsOptions.map((n) => (
+                    <SelectItem key={n} value={n}>{n}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Assignee - filtered by role */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">
+                Người thực hiện
+                <span className="text-[10px] text-muted-foreground font-normal ml-1">(vai trò {createType})</span>
+              </label>
+              <Select value={createAssignee} onValueChange={setCreateAssignee}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Chọn nhân viên" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredEmployees.map((e) => (
+                    <SelectItem key={e.name} value={e.name}>{e.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Deadline */}
+            <div>
+              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thời gian thực hiện</label>
+              <Input
+                type="datetime-local"
+                className="rounded-xl h-11"
+                value={createDeadline}
+                onChange={(e) => setCreateDeadline(e.target.value)}
+              />
+            </div>
+
+            {/* Recurring - only for VSLD */}
+            {createType === "VSLD" && (
+              <div>
+                <label className="text-[12px] font-bold text-foreground mb-1.5 block">Định kỳ (tùy chọn)</label>
+                <Select value={createRecurring} onValueChange={setCreateRecurring}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Không định kỳ" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Không định kỳ</SelectItem>
+                    <SelectItem value="daily">Hàng ngày</SelectItem>
+                    <SelectItem value="weekly">Hàng tuần</SelectItem>
+                    <SelectItem value="monthly">Hàng tháng</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* VSLD: Checklist */}
+            {createType === "VSLD" && (
+              <div>
+                <label className="text-[12px] font-bold text-foreground mb-2 block">Checklist thực hiện</label>
+                <div className="space-y-2">
+                  {createChecklist.map((item, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input
+                        placeholder={`Bước ${i + 1}...`}
+                        className="rounded-xl h-10 flex-1"
+                        value={item}
+                        onChange={(e) => {
+                          const updated = [...createChecklist];
+                          updated[i] = e.target.value;
+                          setCreateChecklist(updated);
+                        }}
+                      />
+                      {createChecklist.length > 1 && (
+                        <button
+                          onClick={() => setCreateChecklist(createChecklist.filter((_, j) => j !== i))}
+                          className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center shrink-0"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setCreateChecklist([...createChecklist, ""])}
+                    className="w-full h-10 rounded-xl border border-dashed border-primary/30 text-primary text-xs font-semibold flex items-center justify-center gap-1"
+                  >
+                    <Plus size={14} /> Thêm bước
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SCBD: Description + Devices */}
+            {createType === "SCBD" && (
+              <>
+                <div>
+                  <label className="text-[12px] font-bold text-foreground mb-1.5 block">Mô tả nội dung công việc</label>
+                  <Textarea
+                    placeholder="Mô tả chi tiết nội dung sửa chữa/bảo dưỡng..."
+                    className="rounded-xl min-h-[80px]"
+                    value={createDescription}
+                    onChange={(e) => setCreateDescription(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-[12px] font-bold text-foreground mb-2 block">Chọn thiết bị liên quan</label>
+                  <div className="flex flex-wrap gap-2">
+                    {deviceOptions.map((d) => (
+                      <button
+                        key={d}
+                        onClick={() =>
+                          setCreateDevices((prev) =>
+                            prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+                          )
+                        }
+                        className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all ${
+                          createDevices.includes(d)
+                            ? "gradient-warm text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Button
+              className="w-full touch-target font-bold rounded-2xl gradient-primary border-0 shadow-glow h-14 text-primary-foreground gap-2"
+              onClick={handleCreate}
+            >
+              <Plus size={18} /> Tạo công việc
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
