@@ -193,13 +193,6 @@ const AdminOrderDetail = () => {
           <motion.div className="space-y-2.5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
             <Button
               className="w-full h-12 rounded-2xl font-bold gap-2 gradient-primary border-0 shadow-glow text-primary-foreground"
-              onClick={() => setActiveSheet("dispatch_auto")}
-            >
-              <Zap size={16} /> Điều phối tự động
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full h-12 rounded-2xl font-semibold gap-2"
               onClick={() => setActiveSheet("dispatch_manual")}
             >
               <Users size={16} /> Gán thủ công cho đối tác
