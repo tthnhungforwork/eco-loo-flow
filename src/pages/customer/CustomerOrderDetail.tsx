@@ -723,6 +723,27 @@ const CustomerOrderDetail = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Create Task Sheet */}
+      <CreateTaskSheet
+        open={showCreateTask}
+        onOpenChange={setShowCreateTask}
+        orderId={order.id}
+        nvsOptions={order.toilets.length > 0 ? order.toilets : undefined}
+        onSubmit={(data) => {
+          const newTask = {
+            id: `T-${Date.now()}`,
+            title: data.title,
+            toiletName: data.nvs,
+            assignee: data.assignee,
+            status: "pending" as const,
+            scheduledDate: data.deadline ? new Date(data.deadline).toLocaleDateString("vi-VN") : undefined,
+            notes: data.description || undefined,
+          };
+          const updatedTasks = [...(order.orderTasks || []), newTask];
+          advanceOrder(order.id, order.status, { orderTasks: updatedTasks });
+        }}
+      />
     </div>
   );
 };
