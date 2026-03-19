@@ -75,6 +75,7 @@ const CustomerOrderDetail = () => {
   const [rateContent, setRateContent] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [showCreateTask, setShowCreateTask] = useState(false);
 
   const order = getOrder(orderId || "");
   if (!order) {
