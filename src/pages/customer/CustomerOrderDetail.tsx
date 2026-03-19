@@ -9,8 +9,9 @@ import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Star, Send, Image as ImageIcon,
   Clock, ChevronDown, ChevronUp, XCircle, DollarSign, FileSignature, Eye,
-  AlertCircle, Clipboard, PenTool, Paperclip
+  AlertCircle, Clipboard, PenTool, Paperclip, Plus
 } from "lucide-react";
+import CreateTaskSheet from "@/components/CreateTaskSheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useOrders } from "@/contexts/OrderContext";
@@ -64,7 +65,7 @@ const getTabAccess = (status: string) => {
 const CustomerOrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { getOrder, advanceOrder } = useOrders();
+  const { getOrder, advanceOrder, updateOrder } = useOrders();
   const [activeTab, setActiveTab] = useState("order");
   const [surveyTab, setSurveyTab] = useState("overview");
   const [contractTab, setContractTab] = useState("contract");
@@ -74,6 +75,7 @@ const CustomerOrderDetail = () => {
   const [rateContent, setRateContent] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [showCreateTask, setShowCreateTask] = useState(false);
 
   const order = getOrder(orderId || "");
   if (!order) {
@@ -403,7 +405,16 @@ const CustomerOrderDetail = () => {
 
     return (
       <div className="space-y-4">
-        <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+          <Button
+            size="sm"
+            className="h-8 rounded-xl gap-1.5 text-[11px] font-bold gradient-primary text-primary-foreground border-0"
+            onClick={() => setShowCreateTask(true)}
+          >
+            <Plus size={14} /> Thêm công việc
+          </Button>
+        </div>
 
         {/* Summary */}
         {tasks.length > 0 && (
@@ -712,6 +723,27 @@ const CustomerOrderDetail = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Create Task Sheet */}
+      <CreateTaskSheet
+        open={showCreateTask}
+        onOpenChange={setShowCreateTask}
+        orderId={order.id}
+        nvsOptions={order.toilets.length > 0 ? order.toilets : undefined}
+        onSubmit={(data) => {
+          const newTask = {
+            id: `T-${Date.now()}`,
+            title: data.title,
+            toiletName: data.nvs,
+            assignee: data.assignee,
+            status: "pending" as const,
+            scheduledDate: data.deadline ? new Date(data.deadline).toLocaleDateString("vi-VN") : undefined,
+            notes: data.description || undefined,
+          };
+          const updatedTasks = [...(order.orderTasks || []), newTask];
+          updateOrder(order.id, { orderTasks: updatedTasks });
+        }}
+      />
     </div>
   );
 };
