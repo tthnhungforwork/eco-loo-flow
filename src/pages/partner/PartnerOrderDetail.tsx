@@ -18,7 +18,8 @@ import { useOrders } from "@/contexts/OrderContext";
 import {
   MOCK_PARTNER_STAFF, ORDER_STATUS_CONFIG,
   SERVICE_TYPE_CONFIG, SERVICE_STEPS, QUOTATION_CATEGORIES,
-  type StaffMember, type QuotationItem, type SurveyToiletItem, type SurveyEquipment
+  type StaffMember, type QuotationItem, type SurveyToiletItem, type SurveyEquipment,
+  type OrderTask
 } from "@/data/orderData";
 
 type SheetType = "accept" | "reject" | "staff" | "survey_form" | "equip_form" | "quote_item" | "contract" | "bbnt" | "tlhd" | null;
