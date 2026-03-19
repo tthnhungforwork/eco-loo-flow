@@ -741,7 +741,7 @@ const CustomerOrderDetail = () => {
             notes: data.description || undefined,
           };
           const updatedTasks = [...(order.orderTasks || []), newTask];
-          advanceOrder(order.id, order.status, { orderTasks: updatedTasks });
+          updateOrder(order.id, { orderTasks: updatedTasks });
         }}
       />
     </div>
