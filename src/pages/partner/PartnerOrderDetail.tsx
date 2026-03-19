@@ -41,6 +41,8 @@ const PartnerOrderDetail = () => {
   const [activeTab, setActiveTab] = useState("info");
   const [activeSheet, setActiveSheet] = useState<SheetType>(null);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [surveySubTab, setSurveySubTab] = useState(0);
+  const [selectedToiletIdx, setSelectedToiletIdx] = useState(0);
 
   // Staff selection
   const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
