@@ -18,7 +18,8 @@ import { useOrders } from "@/contexts/OrderContext";
 import {
   MOCK_PARTNER_STAFF, ORDER_STATUS_CONFIG,
   SERVICE_TYPE_CONFIG, SERVICE_STEPS, QUOTATION_CATEGORIES,
-  type StaffMember, type QuotationItem, type SurveyToiletItem, type SurveyEquipment
+  type StaffMember, type QuotationItem, type SurveyToiletItem, type SurveyEquipment,
+  type OrderTask
 } from "@/data/orderData";
 
 type SheetType = "accept" | "reject" | "staff" | "survey_form" | "equip_form" | "quote_item" | "contract" | "bbnt" | "tlhd" | null;
@@ -244,8 +245,32 @@ const PartnerOrderDetail = () => {
   const handleStartExecution = () => {
     if (selectedStaff.length === 0) { toast.error("Chọn nhân viên thực hiện"); return; }
     const staffMembers = MOCK_PARTNER_STAFF.filter(s => selectedStaff.includes(s.id));
+    // Generate tasks from toilets and quotation items
+    const tasks: OrderTask[] = [];
+    const toilets = order.toilets.length > 0 ? order.toilets : (order.surveyItems || []).map(s => s.toiletName);
+    toilets.forEach((toilet, tIdx) => {
+      tasks.push({
+        id: `task-${Date.now()}-${tIdx}`,
+        title: `${order.typeLabel} - ${toilet}`,
+        toiletName: toilet,
+        assignee: staffMembers[tIdx % staffMembers.length]?.name,
+        status: "pending",
+        scheduledDate: new Date(Date.now() + (tIdx + 1) * 86400000).toLocaleDateString("vi-VN"),
+      });
+    });
+    if (tasks.length === 0) {
+      tasks.push({
+        id: `task-${Date.now()}-0`,
+        title: `${order.typeLabel} - ${order.name}`,
+        assignee: staffMembers[0]?.name,
+        status: "pending",
+        scheduledDate: new Date(Date.now() + 86400000).toLocaleDateString("vi-VN"),
+      });
+    }
     assignStaff(orderId || "", staffMembers);
-    advanceOrder(orderId || "", "dang_thuc_hien", `Bắt đầu thực hiện. NV: ${staffMembers.map(s => s.name).join(", ")}`, "Eco Clean Co.");
+    advanceOrder(orderId || "", "dang_thuc_hien", `Bắt đầu thực hiện. NV: ${staffMembers.map(s => s.name).join(", ")}`, "Eco Clean Co.", {
+      orderTasks: tasks,
+    });
     toast.success("Đã bắt đầu thực hiện!");
     setActiveSheet(null);
     setSelectedStaff([]);

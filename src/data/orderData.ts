@@ -86,6 +86,18 @@ export interface SettlementInfo {
   notes: string;
   signedDate?: string;
 }
+export type TaskStatus = "pending" | "in_progress" | "completed";
+
+export interface OrderTask {
+  id: string;
+  title: string;
+  toiletName?: string;
+  assignee?: string;
+  status: TaskStatus;
+  scheduledDate?: string;
+  completedDate?: string;
+  notes?: string;
+}
 
 export interface OrderData {
   id: string;
@@ -127,6 +139,8 @@ export interface OrderData {
   acceptanceReport?: AcceptanceReport;
   // Settlement
   settlement?: SettlementInfo;
+  // Tasks
+  orderTasks?: OrderTask[];
   // Rating
   rating?: number;
   ratingContent?: string;
