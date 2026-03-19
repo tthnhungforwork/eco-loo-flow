@@ -329,7 +329,7 @@ const CustomerOrderDetail = () => {
       <div className="flex border-b border-border/50 mb-1 overflow-x-auto">
         {CONTRACT_TABS.map(t => {
           // Hide design tab if not applicable
-          if (t.key === "design" && order.type !== "xaymoi" && order.type !== "caitao") return null;
+          
           return (
             <button
               key={t.key}
