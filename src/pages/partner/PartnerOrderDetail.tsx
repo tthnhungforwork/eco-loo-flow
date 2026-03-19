@@ -283,100 +283,181 @@ const PartnerOrderDetail = () => {
   };
 
   // ======================== RENDER ========================
-  const renderInfoTab = () => (
-    <div className="space-y-4">
-      {/* Progress */}
-      <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="text-[12px] font-bold text-foreground mb-3">Tiến trình xử lý</p>
-        <div className="flex items-center gap-1 mb-2">
-          {steps.map((s, i) => (
-            <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= currentStepIndex ? "bg-primary" : "bg-muted"}`} />
-          ))}
+  const renderSurveyOverview = (item: SurveyToiletItem) => (
+    <div className="space-y-3 text-[13px]">
+      <p className="text-xs font-bold text-foreground">Thông tin khảo sát</p>
+      {[
+        { label: "Loại hình nhà vệ sinh", value: item.toiletType },
+        { label: "Tình trạng", value: item.condition || "(Select)" },
+        { label: "Độ tuổi", value: item.area || "(Nhập text dạng khoảng)" },
+        { label: "Tần suất sử dụng", value: item.usageFrequency || "(Select: Thường xuyên/ít)" },
+        { label: "Công năng", value: "(Select chọn nhiều)" },
+        { label: "Địa điểm xây dựng", value: "(Select Gần liền tòa nhà)" },
+        { label: "Diện tích", value: item.area || "(Nhập số + m2)" },
+        { label: "Tình trạng", value: item.equipmentCondition || "(Cũ/Mới/Hỏng/Cần cải tạo)" },
+        { label: "Tần suất dọn dẹp", value: "(Select)" },
+      ].map((row, i) => (
+        <div key={i}>
+          <span className="font-semibold text-foreground">{row.label}: </span>
+          <span className="text-muted-foreground">{row.value}</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-[10px] text-muted-foreground">{ORDER_STATUS_CONFIG[steps[0]]?.label}</span>
-          <span className="text-[10px] font-bold text-primary">{currentStepIndex + 1}/{steps.length}</span>
-          <span className="text-[10px] text-muted-foreground">{ORDER_STATUS_CONFIG[steps[steps.length - 1]]?.label}</span>
-        </div>
-      </motion.div>
+      ))}
+    </div>
+  );
 
-      {/* Timeline */}
-      <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <button className="w-full flex items-center justify-between" onClick={() => setShowTimeline(!showTimeline)}>
-          <p className="text-[12px] font-bold text-foreground flex items-center gap-1.5"><Clock size={13} /> Lịch sử ({order.timeline.length})</p>
-          {showTimeline ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
-        </button>
-        <AnimatePresence>
-          {showTimeline && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-              <div className="mt-3">
-                {[...order.timeline].reverse().map((t, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      {i === 0 ? <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" /> : <Circle size={14} className="text-muted-foreground/40 shrink-0 mt-1" />}
-                      {i < order.timeline.length - 1 && <div className="w-px flex-1 bg-border/50 my-1" />}
-                    </div>
-                    <div className="pb-3">
-                      <p className={`text-[12px] font-semibold ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{t.label}</p>
-                      <p className="text-[10px] text-muted-foreground/70 mt-0.5">{t.date} {t.actor && `· ${t.actor}`}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Customer info */}
-      <motion.div className="glass-card rounded-2xl p-4 space-y-2.5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="text-[12px] font-bold text-foreground">Thông tin khách hàng</p>
-        <div className="space-y-2 text-[12px]">
-          <div className="flex items-center gap-2"><User size={13} className="text-muted-foreground" /><span className="text-foreground font-semibold">{order.customerName}</span></div>
-          <div className="flex items-center gap-2"><Phone size={13} className="text-muted-foreground" /><span className="text-foreground">{order.customerPhone}</span></div>
-          <div className="flex items-center gap-2"><Mail size={13} className="text-muted-foreground" /><span className="text-foreground">{order.customerEmail}</span></div>
-          <div className="flex items-start gap-2"><MapPin size={13} className="text-muted-foreground shrink-0 mt-0.5" /><span className="text-foreground">{order.address}</span></div>
-          {order.content && <div className="flex items-start gap-2"><FileText size={13} className="text-muted-foreground shrink-0 mt-0.5" /><span className="text-foreground">{order.content}</span></div>}
-          {order.toilets.length > 0 && (
-            <div className="flex items-start gap-2">
-              <Bath size={13} className="text-muted-foreground shrink-0 mt-0.5" />
-              <div>{order.toilets.map((t, i) => <p key={i}>• {t}</p>)}</div>
+  const renderSurveyEquipmentList = () => (
+    <div className="space-y-2">
+      {(!order.surveyEquipment || order.surveyEquipment.length === 0) ? (
+        <p className="text-xs text-muted-foreground text-center py-6">Chưa có dữ liệu thiết bị</p>
+      ) : (
+        order.surveyEquipment.map((eq, idx) => (
+          <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/30">
+            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-[10px] font-bold text-accent-foreground">{eq.quantity}</div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-foreground">{eq.name}</p>
+              <p className="text-[10px] text-muted-foreground">{eq.condition} {eq.description && `· ${eq.description}`}</p>
             </div>
-          )}
-        </div>
-      </motion.div>
-
-      {/* Assigned staff */}
-      {order.assignedStaff && order.assignedStaff.length > 0 && (
-        <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[12px] font-bold text-foreground mb-2.5">Nhân viên được gán</p>
-          <div className="space-y-2">
-            {order.assignedStaff.map(s => (
-              <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><User size={14} className="text-primary" /></div>
-                <div className="flex-1">
-                  <p className="text-[12px] font-semibold text-foreground">{s.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.role} · {s.phone}</p>
-                </div>
-              </div>
-            ))}
           </div>
-        </motion.div>
-      )}
-
-      {/* Accept/Reject buttons */}
-      {order.status === "cho_tiep_nhan" && (
-        <div className="flex gap-2.5">
-          <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => setActiveSheet("reject")}>
-            <XCircle size={16} /> Từ chối
-          </Button>
-          <Button className="flex-1 h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={() => setActiveSheet("accept")}>
-            <CheckCircle2 size={16} /> Tiếp nhận
-          </Button>
-        </div>
+        ))
       )}
     </div>
   );
+
+  const renderInfoTab = () => {
+    const surveyItems = order.surveyItems || [];
+    const toiletNames = order.toilets.length > 0
+      ? order.toilets
+      : surveyItems.map(s => s.toiletName);
+    const currentToilet = surveyItems[selectedToiletIdx];
+    const showSurvey = hasKhaoSat && steps.indexOf(order.status) >= steps.indexOf("da_tiep_nhan");
+
+    return (
+      <div className="space-y-5">
+        {/* Thông tin đơn hàng */}
+        <div>
+          <p className="text-sm font-bold text-foreground mb-3">Thông tin đơn hàng</p>
+          <div className="space-y-2 text-[13px]">
+            {[
+              { label: "Đơn hàng", value: order.id },
+              { label: "Ngày đăng ký", value: order.createdAt },
+              { label: "Dịch vụ", value: order.typeLabel },
+              { label: "Tên khách hàng", value: order.customerName },
+              { label: "Số điện thoại", value: order.customerPhone },
+              { label: "Địa chỉ", value: order.address },
+              { label: "Mô tả", value: order.content },
+            ].map((row, i) => (
+              <div key={i}>
+                <span className="font-semibold text-foreground">{row.label}: </span>
+                <span className="text-muted-foreground">{row.value || "—"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Thông tin khảo sát */}
+        {showSurvey && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-foreground">Thông tin khảo sát</p>
+              {order.status === "da_tiep_nhan" && (
+                <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 rounded-lg" onClick={() => { setSurveyForm({}); setEditingSurveyIdx(null); setActiveSheet("survey_form"); }}>
+                  <Plus size={12} /> Thêm NVS
+                </Button>
+              )}
+            </div>
+
+            {/* Survey sub-tabs */}
+            <div className="flex gap-4 border-b border-border/50 mb-3">
+              {SURVEY_SUB_TABS.map((t, i) => (
+                <button
+                  key={t}
+                  onClick={() => setSurveySubTab(i)}
+                  className={`pb-2 text-xs font-medium transition-colors relative ${
+                    surveySubTab === i ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  {t}
+                  {surveySubTab === i && (
+                    <motion.div layoutId="surveySubTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Toilet chips */}
+            {toiletNames.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 pb-1">
+                {toiletNames.map((name, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedToiletIdx(i)}
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
+                      selectedToiletIdx === i
+                        ? "gradient-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Sub-tab content */}
+            <AnimatePresence mode="wait">
+              <motion.div key={`${surveySubTab}-${selectedToiletIdx}`} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+                {surveySubTab === 0 && (
+                  currentToilet ? (
+                    <div>
+                      {renderSurveyOverview(currentToilet)}
+                      {order.status === "da_tiep_nhan" && (
+                        <button className="mt-2 text-primary text-xs font-medium flex items-center gap-1" onClick={() => { setSurveyForm(currentToilet); setEditingSurveyIdx(selectedToiletIdx); setActiveSheet("survey_form"); }}>
+                          <Pencil size={12} /> Chỉnh sửa
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-6">Chưa có dữ liệu khảo sát. Nhấn "Thêm NVS" để bắt đầu.</p>
+                  )
+                )}
+                {surveySubTab === 1 && renderSurveyEquipmentList()}
+                {surveySubTab === 2 && (
+                  <div className="text-xs text-muted-foreground text-center py-6">Chưa có dữ liệu chế phẩm sinh học</div>
+                )}
+                {surveySubTab === 3 && (
+                  <div className="text-xs text-muted-foreground text-center py-6">Chưa có đánh giá khảo sát</div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Complete survey */}
+            {order.status === "da_tiep_nhan" && (surveyItems.length > 0) && (
+              <Button className="w-full h-11 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground mt-4" onClick={handleCompleteSurvey}>
+                <CheckCircle2 size={16} /> Hoàn thành khảo sát
+              </Button>
+            )}
+            {order.surveyCompleted && (
+              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-center mt-3">
+                <p className="text-xs font-bold text-primary flex items-center justify-center gap-1.5"><CheckCircle2 size={14} /> Khảo sát đã hoàn tất</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Accept/Reject */}
+        {order.status === "cho_tiep_nhan" && (
+          <div className="flex gap-2.5">
+            <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => setActiveSheet("reject")}>
+              <XCircle size={16} /> Từ chối
+            </Button>
+            <Button className="flex-1 h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={() => setActiveSheet("accept")}>
+              <CheckCircle2 size={16} /> Tiếp nhận
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderSurveyTab = () => (
     <div className="space-y-4">
