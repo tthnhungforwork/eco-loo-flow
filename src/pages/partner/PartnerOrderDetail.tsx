@@ -24,13 +24,14 @@ import {
 type SheetType = "accept" | "reject" | "staff" | "survey_form" | "equip_form" | "quote_item" | "contract" | "bbnt" | "tlhd" | null;
 
 const TABS = [
-  { key: "info", label: "Thông tin" },
-  { key: "survey", label: "Khảo sát" },
-  { key: "quote", label: "Báo giá" },
+  { key: "info", label: "Đơn hàng mới" },
+  { key: "quote", label: "Tư vấn/Báo giá" },
   { key: "contract", label: "Hợp đồng" },
   { key: "execute", label: "Thực hiện" },
-  { key: "settle", label: "Thanh lý" },
+  { key: "settle", label: "Nghiệm thu" },
 ];
+
+const SURVEY_SUB_TABS = ["Tổng quan", "Thiết bị", "CP sinh học", "Đánh giá"];
 
 const PartnerOrderDetail = () => {
   const { orderId } = useParams();
