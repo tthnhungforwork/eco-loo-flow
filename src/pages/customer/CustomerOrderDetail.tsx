@@ -9,8 +9,9 @@ import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Star, Send, Image as ImageIcon,
   Clock, ChevronDown, ChevronUp, XCircle, DollarSign, FileSignature, Eye,
-  AlertCircle, Clipboard, PenTool, Paperclip
+  AlertCircle, Clipboard, PenTool, Paperclip, Plus
 } from "lucide-react";
+import CreateTaskSheet from "@/components/CreateTaskSheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useOrders } from "@/contexts/OrderContext";
