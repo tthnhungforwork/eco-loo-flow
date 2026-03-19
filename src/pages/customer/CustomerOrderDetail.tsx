@@ -65,7 +65,7 @@ const getTabAccess = (status: string) => {
 const CustomerOrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { getOrder, advanceOrder } = useOrders();
+  const { getOrder, advanceOrder, updateOrder } = useOrders();
   const [activeTab, setActiveTab] = useState("order");
   const [surveyTab, setSurveyTab] = useState("overview");
   const [contractTab, setContractTab] = useState("contract");
