@@ -86,8 +86,19 @@ export interface SettlementInfo {
   notes: string;
   signedDate?: string;
 }
+export type TaskStatus = "pending" | "in_progress" | "completed";
 
-export interface OrderData {
+export interface OrderTask {
+  id: string;
+  title: string;
+  toiletName?: string;
+  assignee?: string;
+  status: TaskStatus;
+  scheduledDate?: string;
+  completedDate?: string;
+  notes?: string;
+}
+
   id: string;
   type: ServiceType;
   typeLabel: string;
