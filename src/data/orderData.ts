@@ -261,9 +261,12 @@ export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
     content: "Bảo trì hệ thống nước và thiết bị vệ sinh tầng 1-5",
     toilets: ["NVS Sảnh B - KTX"],
     partnerName: "Green Tech",
+    partnerPhone: "0287654321",
     amount: "5.000.000đ",
     createdAt: "01/03/2026",
     status: "hoan_thanh",
+    assignedStaff: [MOCK_PARTNER_STAFF[2]],
+    orderTasks: [],
     timeline: [
       { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "01/03/2026 08:00", actor: "Nguyễn Văn Khách" },
       { status: "cho_tiep_nhan", label: "Điều phối đến Green Tech", date: "01/03/2026 09:00", actor: "Hệ thống" },
