@@ -261,9 +261,63 @@ export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
     content: "Bảo trì hệ thống nước và thiết bị vệ sinh tầng 1-5",
     toilets: ["NVS Sảnh B - KTX"],
     partnerName: "Green Tech",
+    partnerPhone: "0287654321",
     amount: "5.000.000đ",
     createdAt: "01/03/2026",
     status: "hoan_thanh",
+    assignedStaff: [MOCK_PARTNER_STAFF[2]],
+    orderTasks: [
+      {
+        id: "T-001",
+        title: "Kiểm tra hệ thống xả nước tầng 1",
+        toiletName: "NVS Sảnh B - KTX",
+        assignee: "Nguyễn Hoàng Nam",
+        status: "completed",
+        scheduledDate: "04/03/2026",
+        completedDate: "04/03/2026",
+        notes: "Đã thay van xả nước bị hỏng, hệ thống hoạt động bình thường",
+      },
+      {
+        id: "T-002",
+        title: "Thay thế bộ phận vòi nước lavabo",
+        toiletName: "NVS Sảnh B - KTX",
+        assignee: "Nguyễn Hoàng Nam",
+        status: "completed",
+        scheduledDate: "05/03/2026",
+        completedDate: "05/03/2026",
+        notes: "Thay 3 vòi nước lavabo, kiểm tra áp suất nước OK",
+      },
+      {
+        id: "T-003",
+        title: "Sửa chữa bồn cầu bị rò rỉ",
+        toiletName: "NVS Sảnh B - KTX",
+        assignee: "Nguyễn Hoàng Nam",
+        status: "completed",
+        scheduledDate: "06/03/2026",
+        completedDate: "06/03/2026",
+        notes: "Thay gioăng cao su, bồn cầu không còn rò rỉ",
+      },
+      {
+        id: "T-004",
+        title: "Bảo trì hệ thống thoát nước sàn",
+        toiletName: "NVS Sảnh B - KTX",
+        assignee: "Nguyễn Hoàng Nam",
+        status: "completed",
+        scheduledDate: "07/03/2026",
+        completedDate: "07/03/2026",
+        notes: "Thông tắc và vệ sinh đường ống thoát nước sàn",
+      },
+      {
+        id: "T-005",
+        title: "Kiểm tra và vệ sinh tổng thể",
+        toiletName: "NVS Sảnh B - KTX",
+        assignee: "Nguyễn Hoàng Nam",
+        status: "completed",
+        scheduledDate: "08/03/2026",
+        completedDate: "08/03/2026",
+        notes: "Kiểm tra tổng thể sau sửa chữa, tất cả thiết bị hoạt động tốt",
+      },
+    ],
     timeline: [
       { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "01/03/2026 08:00", actor: "Nguyễn Văn Khách" },
       { status: "cho_tiep_nhan", label: "Điều phối đến Green Tech", date: "01/03/2026 09:00", actor: "Hệ thống" },
@@ -328,6 +382,8 @@ export const MOCK_PARTNER_ORDERS: OrderData[] = [
     assignedStaff: [],
   },
 ];
+
+
 
 // Partner directory for admin dispatch
 export interface PartnerInfo {

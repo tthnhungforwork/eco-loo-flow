@@ -73,6 +73,7 @@ const CustomerOrderDetail = () => {
   const [rating, setRating] = useState(5);
   const [rateContent, setRateContent] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const order = getOrder(orderId || "");
   if (!order) {
@@ -426,45 +427,98 @@ const CustomerOrderDetail = () => {
         {tasks.length > 0 ? (
           <div className="space-y-2">
             <p className="text-[12px] font-semibold text-foreground">Danh sách công việc</p>
-            {tasks.map((task) => (
-              <div key={task.id} className="p-3 rounded-xl border border-border/50 bg-card">
-                <div className="flex items-start gap-2.5">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    task.status === "completed" ? "bg-primary/10" : task.status === "in_progress" ? "bg-amber-500/10" : "bg-muted"
-                  }`}>
-                    {task.status === "completed" ? (
-                      <CheckCircle2 size={13} className="text-primary" />
-                    ) : task.status === "in_progress" ? (
-                      <Clock size={11} className="text-amber-600" />
-                    ) : (
-                      <Circle size={11} className="text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-[12px] font-semibold ${task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground"}`}>{task.title}</p>
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                      {task.toiletName && (
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bath size={10} /> {task.toiletName}</span>
-                      )}
-                      {task.assignee && (
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><User size={10} /> {task.assignee}</span>
-                      )}
-                      {task.scheduledDate && (
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Calendar size={10} /> {task.scheduledDate}</span>
+            {tasks.map((task) => {
+              const isExpanded = expandedTaskId === task.id;
+              return (
+                <div
+                  key={task.id}
+                  className="rounded-xl border border-border/50 bg-card overflow-hidden cursor-pointer"
+                  onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
+                >
+                  {/* Task summary row */}
+                  <div className="p-3 flex items-start gap-2.5">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                      task.status === "completed" ? "bg-primary/10" : task.status === "in_progress" ? "bg-amber-500/10" : "bg-muted"
+                    }`}>
+                      {task.status === "completed" ? (
+                        <CheckCircle2 size={13} className="text-primary" />
+                      ) : task.status === "in_progress" ? (
+                        <Clock size={11} className="text-amber-600" />
+                      ) : (
+                        <Circle size={11} className="text-muted-foreground" />
                       )}
                     </div>
-                    {task.notes && <p className="text-[10px] text-muted-foreground italic mt-1">{task.notes}</p>}
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-[12px] font-semibold ${task.status === "completed" ? "text-muted-foreground" : "text-foreground"}`}>{task.title}</p>
+                      {!isExpanded && (
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                          {task.assignee && (
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><User size={10} /> {task.assignee}</span>
+                          )}
+                          {task.scheduledDate && (
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Calendar size={10} /> {task.scheduledDate}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        task.status === "completed" ? "bg-primary/10 text-primary" :
+                        task.status === "in_progress" ? "bg-amber-500/10 text-amber-600" :
+                        "bg-muted text-muted-foreground"
+                      }`}>
+                        {task.status === "completed" ? "Hoàn thành" : task.status === "in_progress" ? "Đang làm" : "Chờ"}
+                      </span>
+                      {isExpanded ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
+                    </div>
                   </div>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
-                    task.status === "completed" ? "bg-primary/10 text-primary" :
-                    task.status === "in_progress" ? "bg-amber-500/10 text-amber-600" :
-                    "bg-muted text-muted-foreground"
-                  }`}>
-                    {task.status === "completed" ? "Hoàn thành" : task.status === "in_progress" ? "Đang làm" : "Chờ"}
-                  </span>
+
+                  {/* Task detail (expanded) */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-3 pb-3 pt-0 border-t border-border/30">
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                            <div>
+                              <p className="text-[10px] text-muted-foreground">Nhà vệ sinh</p>
+                              <p className="text-[11px] font-medium text-foreground flex items-center gap-1"><Bath size={10} className="text-primary" /> {task.toiletName || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground">Người thực hiện</p>
+                              <p className="text-[11px] font-medium text-foreground flex items-center gap-1"><User size={10} className="text-primary" /> {task.assignee || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground">Ngày dự kiến</p>
+                              <p className="text-[11px] font-medium text-foreground flex items-center gap-1"><Calendar size={10} className="text-primary" /> {task.scheduledDate || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground">Ngày hoàn thành</p>
+                              <p className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                                {task.completedDate ? (
+                                  <><CheckCircle2 size={10} className="text-primary" /> {task.completedDate}</>
+                                ) : "—"}
+                              </p>
+                            </div>
+                          </div>
+                          {task.notes && (
+                            <div className="mt-2.5 p-2.5 rounded-lg bg-muted/50 border border-border/30">
+                              <p className="text-[10px] text-muted-foreground mb-0.5">Ghi chú</p>
+                              <p className="text-[11px] text-foreground">{task.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <EmptyState icon={<Clipboard size={32} />} text="Chưa có công việc" sub="Công việc sẽ được tạo khi hợp đồng bắt đầu thực hiện" />
