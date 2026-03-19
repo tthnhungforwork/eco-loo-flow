@@ -383,59 +383,7 @@ export const MOCK_PARTNER_ORDERS: OrderData[] = [
   },
 ];
 
-// Mock tasks for completed orders
-export const MOCK_ORDER_TASKS_DH003: OrderTask[] = [
-  {
-    id: "T-001",
-    title: "Kiểm tra hệ thống xả nước tầng 1",
-    toiletName: "NVS Sảnh B - KTX",
-    assignee: "Nguyễn Hoàng Nam",
-    status: "completed",
-    scheduledDate: "04/03/2026",
-    completedDate: "04/03/2026",
-    notes: "Đã thay van xả nước bị hỏng, hệ thống hoạt động bình thường",
-  },
-  {
-    id: "T-002",
-    title: "Thay thế bộ phận vòi nước lavabo",
-    toiletName: "NVS Sảnh B - KTX",
-    assignee: "Nguyễn Hoàng Nam",
-    status: "completed",
-    scheduledDate: "05/03/2026",
-    completedDate: "05/03/2026",
-    notes: "Thay 3 vòi nước lavabo, kiểm tra áp suất nước OK",
-  },
-  {
-    id: "T-003",
-    title: "Sửa chữa bồn cầu bị rò rỉ",
-    toiletName: "NVS Sảnh B - KTX",
-    assignee: "Nguyễn Hoàng Nam",
-    status: "completed",
-    scheduledDate: "06/03/2026",
-    completedDate: "06/03/2026",
-    notes: "Thay gioăng cao su, bồn cầu không còn rò rỉ",
-  },
-  {
-    id: "T-004",
-    title: "Bảo trì hệ thống thoát nước sàn",
-    toiletName: "NVS Sảnh B - KTX",
-    assignee: "Nguyễn Hoàng Nam",
-    status: "completed",
-    scheduledDate: "07/03/2026",
-    completedDate: "07/03/2026",
-    notes: "Thông tắc và vệ sinh đường ống thoát nước sàn",
-  },
-  {
-    id: "T-005",
-    title: "Kiểm tra và vệ sinh tổng thể",
-    toiletName: "NVS Sảnh B - KTX",
-    assignee: "Nguyễn Hoàng Nam",
-    status: "completed",
-    scheduledDate: "08/03/2026",
-    completedDate: "08/03/2026",
-    notes: "Kiểm tra tổng thể sau sửa chữa, tất cả thiết bị hoạt động tốt",
-  },
-];
+
 
 // Partner directory for admin dispatch
 export interface PartnerInfo {
