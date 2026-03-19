@@ -96,14 +96,13 @@ const PartnerOrderDetail = () => {
   // Determine which tabs are available based on service type and status
   const getAvailableTabs = () => {
     const statusIdx = steps.indexOf(order.status);
-    const tabs = [TABS[0]]; // Info always visible
+    const tabs = [TABS[0]]; // Đơn hàng mới always visible
 
-    if (hasKhaoSat && statusIdx >= steps.indexOf("da_tiep_nhan")) tabs.push(TABS[1]); // Survey
     const quoteStatusIdx = steps.indexOf("da_bao_gia");
-    if (quoteStatusIdx >= 0 && statusIdx >= steps.indexOf(hasKhaoSat ? "dang_khao_sat" : "da_tiep_nhan")) tabs.push(TABS[2]); // Quote
-    if (steps.includes("da_ky_hop_dong") && statusIdx >= steps.indexOf("da_duyet_bao_gia")) tabs.push(TABS[3]); // Contract
-    if (statusIdx >= steps.indexOf("da_ky_hop_dong")) tabs.push(TABS[4]); // Execute
-    if (steps.includes("cho_thanh_ly") && statusIdx >= steps.indexOf("hoan_thanh")) tabs.push(TABS[5]); // Settle
+    if (quoteStatusIdx >= 0 && statusIdx >= steps.indexOf(hasKhaoSat ? "da_tiep_nhan" : "da_tiep_nhan")) tabs.push(TABS[1]); // Tư vấn/Báo giá
+    if (steps.includes("da_ky_hop_dong") && statusIdx >= steps.indexOf("da_duyet_bao_gia")) tabs.push(TABS[2]); // Hợp đồng
+    if (statusIdx >= steps.indexOf("da_ky_hop_dong")) tabs.push(TABS[3]); // Thực hiện
+    if (statusIdx >= steps.indexOf("hoan_thanh")) tabs.push(TABS[4]); // Nghiệm thu
 
     return tabs;
   };
