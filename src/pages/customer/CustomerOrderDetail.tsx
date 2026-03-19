@@ -405,7 +405,16 @@ const CustomerOrderDetail = () => {
 
     return (
       <div className="space-y-4">
-        <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+          <Button
+            size="sm"
+            className="h-8 rounded-xl gap-1.5 text-[11px] font-bold gradient-primary text-primary-foreground border-0"
+            onClick={() => setShowCreateTask(true)}
+          >
+            <Plus size={14} /> Thêm công việc
+          </Button>
+        </div>
 
         {/* Summary */}
         {tasks.length > 0 && (
