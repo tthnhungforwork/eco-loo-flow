@@ -735,7 +735,6 @@ const PartnerOrderDetail = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "info": return renderInfoTab();
-      case "survey": return renderSurveyTab();
       case "quote": return renderQuoteTab();
       case "contract": return renderContractTab();
       case "execute": return renderExecuteTab();
