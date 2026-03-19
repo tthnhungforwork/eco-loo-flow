@@ -99,6 +99,7 @@ export interface OrderTask {
   notes?: string;
 }
 
+export interface OrderData {
   id: string;
   type: ServiceType;
   typeLabel: string;

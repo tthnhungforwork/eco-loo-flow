@@ -395,54 +395,101 @@ const CustomerOrderDetail = () => {
     </div>
   );
 
-  const renderExecuteTab = () => (
-    <div className="space-y-4">
-      <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+  const renderExecuteTab = () => {
+    const tasks = order.orderTasks || [];
+    const completedCount = tasks.filter(t => t.status === "completed").length;
+    const inProgressCount = tasks.filter(t => t.status === "in_progress").length;
 
-      {/* Staff assigned */}
-      {order.assignedStaff && order.assignedStaff.length > 0 && (
-        <div>
-          <p className="text-[12px] font-semibold text-foreground mb-2">Nhân viên thực hiện</p>
-          {order.assignedStaff.map(s => (
-            <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card mb-1.5">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <User size={14} className="text-primary" />
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold text-foreground">{s.name}</p>
-                <p className="text-[10px] text-muted-foreground">{s.role} · {s.phone}</p>
-              </div>
+    return (
+      <div className="space-y-4">
+        <p className="text-[13px] font-bold text-foreground">Thực hiện hợp đồng</p>
+
+        {/* Summary */}
+        {tasks.length > 0 && (
+          <div className="flex gap-2">
+            <div className="flex-1 p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
+              <p className="text-lg font-extrabold text-primary">{completedCount}/{tasks.length}</p>
+              <p className="text-[10px] text-muted-foreground">Hoàn thành</p>
             </div>
-          ))}
-        </div>
-      )}
+            <div className="flex-1 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-center">
+              <p className="text-lg font-extrabold text-amber-600">{inProgressCount}</p>
+              <p className="text-[10px] text-muted-foreground">Đang thực hiện</p>
+            </div>
+            <div className="flex-1 p-3 rounded-xl bg-muted border border-border/50 text-center">
+              <p className="text-lg font-extrabold text-muted-foreground">{tasks.length - completedCount - inProgressCount}</p>
+              <p className="text-[10px] text-muted-foreground">Chờ thực hiện</p>
+            </div>
+          </div>
+        )}
 
-      {/* Progress timeline during execution */}
-      {["dang_thuc_hien", "cho_nghiem_thu", "hoan_thanh", "cho_thanh_ly", "da_thanh_ly", "da_danh_gia"].includes(order.status) ? (
-        <div>
-          <p className="text-[12px] font-semibold text-foreground mb-2">Tiến trình thực hiện</p>
-          <div className="space-y-0">
-            {order.timeline.filter(t =>
-              ["dang_thuc_hien", "cho_nghiem_thu"].includes(t.status) || t.label.includes("thực hiện")
-            ).map((t, i) => (
-              <div key={i} className="flex gap-3 pb-3">
-                <div className="flex flex-col items-center">
-                  <CheckCircle2 size={14} className="text-primary shrink-0 mt-0.5" />
-                  <div className="w-px flex-1 bg-border/50 my-1" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold text-foreground">{t.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{t.date}</p>
+        {/* Task list */}
+        {tasks.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-[12px] font-semibold text-foreground">Danh sách công việc</p>
+            {tasks.map((task) => (
+              <div key={task.id} className="p-3 rounded-xl border border-border/50 bg-card">
+                <div className="flex items-start gap-2.5">
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                    task.status === "completed" ? "bg-primary/10" : task.status === "in_progress" ? "bg-amber-500/10" : "bg-muted"
+                  }`}>
+                    {task.status === "completed" ? (
+                      <CheckCircle2 size={13} className="text-primary" />
+                    ) : task.status === "in_progress" ? (
+                      <Clock size={11} className="text-amber-600" />
+                    ) : (
+                      <Circle size={11} className="text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[12px] font-semibold ${task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground"}`}>{task.title}</p>
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                      {task.toiletName && (
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bath size={10} /> {task.toiletName}</span>
+                      )}
+                      {task.assignee && (
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><User size={10} /> {task.assignee}</span>
+                      )}
+                      {task.scheduledDate && (
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Calendar size={10} /> {task.scheduledDate}</span>
+                      )}
+                    </div>
+                    {task.notes && <p className="text-[10px] text-muted-foreground italic mt-1">{task.notes}</p>}
+                  </div>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
+                    task.status === "completed" ? "bg-primary/10 text-primary" :
+                    task.status === "in_progress" ? "bg-amber-500/10 text-amber-600" :
+                    "bg-muted text-muted-foreground"
+                  }`}>
+                    {task.status === "completed" ? "Hoàn thành" : task.status === "in_progress" ? "Đang làm" : "Chờ"}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      ) : (
-        <EmptyState icon={<Clock size={32} />} text="Chưa bắt đầu thực hiện" sub="Quá trình thực hiện sẽ được cập nhật tại đây" />
-      )}
-    </div>
-  );
+        ) : (
+          <EmptyState icon={<Clipboard size={32} />} text="Chưa có công việc" sub="Công việc sẽ được tạo khi hợp đồng bắt đầu thực hiện" />
+        )}
+
+        {/* Staff assigned */}
+        {order.assignedStaff && order.assignedStaff.length > 0 && (
+          <div>
+            <p className="text-[12px] font-semibold text-foreground mb-2">Nhân viên thực hiện</p>
+            {order.assignedStaff.map(s => (
+              <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card mb-1.5">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User size={14} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-[12px] font-semibold text-foreground">{s.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{s.role} · {s.phone}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderAcceptTab = () => (
     <div className="space-y-4">
