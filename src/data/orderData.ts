@@ -138,6 +138,8 @@ export interface OrderTask {
   acceptanceReport?: AcceptanceReport;
   // Settlement
   settlement?: SettlementInfo;
+  // Tasks
+  orderTasks?: OrderTask[];
   // Rating
   rating?: number;
   ratingContent?: string;
