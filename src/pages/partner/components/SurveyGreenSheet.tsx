@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, CheckCircle2, Circle, PlusCircle } from "lucide-react";
+import { ArrowLeft, PlusCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 const mockToilets = [
@@ -93,34 +94,24 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
     setter: React.Dispatch<React.SetStateAction<Criteria[]>>,
     checkedCount: number
   ) => (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-bold text-primary">{title}</h3>
-        <span className="text-xs font-semibold text-muted-foreground">
-          {checkedCount}/{items.length}
-        </span>
-      </div>
-      <div className="space-y-2">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => toggleItem(items, setter, item.id)}
-            className="w-full flex items-start gap-3 p-3 rounded-xl bg-card border border-border/50 hover:border-primary/30 transition-all text-left"
-          >
-            {item.checked ? (
-              <CheckCircle2 size={20} className="text-primary shrink-0 mt-0.5" />
-            ) : (
-              <Circle size={20} className="text-muted-foreground/40 shrink-0 mt-0.5" />
-            )}
-            <div className="flex-1 min-w-0">
-              <p className={`text-sm font-semibold ${item.checked ? "text-foreground" : "text-foreground/80"}`}>
-                {item.label}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.desc}</p>
-            </div>
-          </button>
-        ))}
-      </div>
+    <div className="space-y-1">
+      <h3 className="text-base font-bold text-primary mb-3">{title}</h3>
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => toggleItem(items, setter, item.id)}
+          className="w-full flex items-start gap-3 py-2.5 text-left"
+        >
+          <Checkbox
+            checked={item.checked}
+            className="mt-0.5 h-5 w-5 rounded border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground leading-tight">{item.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.desc}</p>
+          </div>
+        </button>
+      ))}
     </div>
   );
 
@@ -130,21 +121,21 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
       animate={{ x: 0 }}
       exit={{ x: "100%" }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="fixed inset-0 z-50 bg-background flex flex-col max-w-lg mx-auto"
+      className="fixed inset-0 z-[60] bg-background flex flex-col max-w-lg mx-auto"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-border/50 bg-background/95 backdrop-blur-xl shrink-0">
-        <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted">
-          <ArrowLeft size={20} className="text-foreground" />
+      <div className="flex items-center gap-3 px-4 h-14 border-b border-border/30 bg-primary shrink-0">
+        <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center">
+          <ArrowLeft size={20} className="text-primary-foreground" />
         </button>
-        <h1 className="text-sm font-bold text-foreground flex-1">
+        <h1 className="text-sm font-bold text-primary-foreground flex-1">
           Đánh giá tiêu chuẩn Sạch - Xanh - Tuần hoàn
         </h1>
       </div>
 
       {/* Progress bar */}
-      <div className="flex gap-1.5 px-4 pt-3">
-        <div className={`h-1 flex-1 rounded-full ${step === "select" || step === "survey" ? "bg-primary" : "bg-muted"}`} />
+      <div className="flex gap-1.5 px-4 pt-3 pb-2">
+        <div className="h-1 flex-1 rounded-full bg-primary" />
         <div className={`h-1 flex-1 rounded-full ${step === "survey" ? "bg-primary" : "bg-muted"}`} />
       </div>
 
@@ -171,16 +162,14 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
               {/* Action buttons */}
               <div className="flex gap-3">
                 <Button
-                  variant="outline"
-                  className="rounded-full border-primary text-primary font-semibold text-xs h-9 px-4"
+                  className="rounded-full bg-primary text-primary-foreground font-semibold text-xs h-9 px-4"
                   onClick={() => setStep("survey")}
                 >
                   <PlusCircle size={14} className="mr-1" />
                   Chọn NVS có sẵn
                 </Button>
                 <Button
-                  variant="outline"
-                  className="rounded-full border-primary text-primary font-semibold text-xs h-9 px-4"
+                  className="rounded-full bg-primary text-primary-foreground font-semibold text-xs h-9 px-4"
                 >
                   <PlusCircle size={14} className="mr-1" />
                   Thêm mới NVS
@@ -228,16 +217,16 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="px-4 py-5 space-y-6"
+              className="px-4 py-4 space-y-5 pb-28"
             >
-              {/* NVS tabs */}
+              {/* NVS chip tabs */}
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 <button
                   onClick={() => setSelectedNvs("all")}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                     selectedNvs === "all"
-                      ? "bg-foreground text-background"
-                      : "bg-muted text-muted-foreground"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-background text-muted-foreground border-border"
                   }`}
                 >
                   Tất cả
@@ -246,10 +235,10 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
                   <button
                     key={nvs.id}
                     onClick={() => setSelectedNvs(nvs.id)}
-                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                       selectedNvs === nvs.id
-                        ? "bg-foreground text-background"
-                        : "bg-muted text-muted-foreground"
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-background text-muted-foreground border-border"
                     }`}
                   >
                     {nvs.id}
@@ -257,34 +246,22 @@ const SurveyGreenSheet = ({ onClose }: Props) => {
                 ))}
               </div>
 
-              {/* Progress summary */}
-              <div className="glass-card rounded-xl p-3 flex items-center justify-between">
-                <span className="text-xs font-semibold text-foreground">Tiến độ khảo sát</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${(totalChecked / totalItems) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-bold text-primary">
-                    {totalChecked}/{totalItems}
-                  </span>
-                </div>
-              </div>
-
               {renderCriteriaSection("Khảo sát Tiêu chí Sạch", sach, setSach, sachCount)}
-              {renderCriteriaSection("Khảo sát Tiêu chí Xanh", xanh, setXanh, xanhCount)}
-              {renderCriteriaSection("Khảo sát Tiêu chí Tuần hoàn", tuanHoan, setTuanHoan, tuanHoanCount)}
 
-              <div className="h-24" />
+              <div className="border-t border-border/50" />
+
+              {renderCriteriaSection("Khảo sát Tiêu chí Xanh", xanh, setXanh, xanhCount)}
+
+              <div className="border-t border-border/50" />
+
+              {renderCriteriaSection("Khảo sát Tiêu chí Tuần hoàn", tuanHoan, setTuanHoan, tuanHoanCount)}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Bottom buttons */}
-      <div className="shrink-0 border-t border-border/50 bg-background p-4 flex gap-3">
+      {/* Bottom buttons - always visible */}
+      <div className="shrink-0 border-t border-border/50 bg-background px-4 py-3 flex gap-3">
         {step === "select" ? (
           <Button variant="outline" className="flex-1 rounded-xl h-11 font-bold" onClick={onClose}>
             Đóng
