@@ -817,7 +817,7 @@ const PartnerOrderDetail = () => {
       const PARTNER_EXEC_SUB_TABS = [
         { key: "stats", label: "Thống kê vận hành", badge: (order.operationalReports || []).filter(r => r.status === "submitted").length },
         { key: "manage", label: "Quản lý công việc" },
-        { key: "addon", label: "Thêm dịch vụ" },
+        { key: "addon", label: "Dịch vụ bổ sung" },
       ];
 
       return (
