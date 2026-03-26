@@ -652,6 +652,87 @@ const CustomerOrderDetail = () => {
           </div>
         )}
 
+        {executeSubTab === "netzero" && (
+          <div className="space-y-4 mt-2">
+            {/* NVS selector */}
+            {order.toilets.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {order.toilets.map((t, i) => (
+                  <button key={i} className="px-3 py-1.5 rounded-full text-[11px] font-medium border border-primary/30 bg-primary/10 text-primary whitespace-nowrap">
+                    {t}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Sạch */}
+            <div className="space-y-2">
+              <h3 className="text-[13px] font-bold text-primary flex items-center gap-1.5">
+                <Sparkles size={14} /> Sạch
+              </h3>
+              {[
+                { id: "s1", label: "Không có côn trùng", desc: "Ruồi nhặng, muỗi, bọ gậy..." },
+                { id: "s2", label: "Thoát nước tốt", desc: "Không bị tắc nghẽn, nước thoát nhanh" },
+                { id: "s3", label: "Thông thoáng", desc: "Không có bụi bẩn, vết ố trên bề mặt nội thất" },
+                { id: "s4", label: "Thẩm mỹ", desc: "Thiết kế hài hoà, không gian sạch đẹp, bắt mắt giúp cải thiện" },
+                { id: "s5", label: "Ánh sáng đầy đủ", desc: "Có đủ áo sáng sinh hoạt và chiếu sáng hoặc tương đương" },
+                { id: "s6", label: "Bồn cầu vệ sinh tay sạch sẽ", desc: "Không có vết ố, vặn bẩn cáu bám trên đường ống" },
+              ].map(item => (
+                <label key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card cursor-pointer hover:border-primary/30 transition-colors">
+                  <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-primary text-primary accent-primary" readOnly />
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{item.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Xanh */}
+            <div className="space-y-2">
+              <h3 className="text-[13px] font-bold text-primary flex items-center gap-1.5">
+                <Leaf size={14} /> Xanh
+              </h3>
+              {[
+                { id: "x1", label: "Không dùng hóa chất", desc: "Không sử dụng hóa chất tẩy rửa hoặc rửa tay" },
+                { id: "x2", label: "Tiết kiệm nước", desc: "Sử dụng thiết bị và phương pháp giúp giảm lượng nước tiêu thụ" },
+                { id: "x3", label: "Tiết kiệm điện", desc: "Sử dụng đèn LED, cảm biến tự động tắt/mở" },
+                { id: "x4", label: "Sử dụng chế phẩm sinh học", desc: "Dùng chế phẩm vi sinh thay thế hóa chất công nghiệp" },
+                { id: "x5", label: "Vật liệu thân thiện", desc: "Sử dụng vật liệu tái chế, thân thiện môi trường" },
+              ].map(item => (
+                <label key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card cursor-pointer hover:border-primary/30 transition-colors">
+                  <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-primary text-primary accent-primary" readOnly />
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{item.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Tuần hoàn */}
+            <div className="space-y-2">
+              <h3 className="text-[13px] font-bold text-primary flex items-center gap-1.5">
+                <Recycle size={14} /> Tuần hoàn
+              </h3>
+              {[
+                { id: "t1", label: "Sử dụng năng lượng tái tạo", desc: "Ưu tiên điện mặt trời, điện gió..." },
+                { id: "t2", label: "Dùng nước tái tạo", desc: "Tái sử dụng nước tại chỗ hoặc từ nguồn tái tạo" },
+                { id: "t3", label: "Xử lý chất thải tuần hoàn", desc: "Chất thải được xử lý và tái sử dụng" },
+                { id: "t4", label: "Giảm phát thải carbon", desc: "Áp dụng công nghệ giảm phát thải khí nhà kính" },
+              ].map(item => (
+                <label key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card cursor-pointer hover:border-primary/30 transition-colors">
+                  <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-primary text-primary accent-primary" readOnly />
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{item.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         {executeSubTab === "manage" && renderExecuteTabContent()}
         {executeSubTab === "addon" && (
           <div className="space-y-3 mt-2">
