@@ -636,15 +636,258 @@ const PartnerOrderDetail = () => {
     </div>
   );
 
-  const renderExecuteTab = () => {
-    // For Netzero orders, show operational reports approval section
-    const isNetzero = order.type === "netzero";
+  // ===== NETZERO PARTNER EXECUTE =====
+  const [partnerExecSubTab, setPartnerExecSubTab] = useState("stats");
+
+  const getPartnerReportStatusBadge = (status: string, isEditable: boolean) => {
+    if (status === "draft" && !isEditable) {
+      return <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Chưa đến hạn</span>;
+    }
+    const map: Record<string, { label: string; cls: string }> = {
+      draft: { label: "Chờ KH nhập", cls: "bg-muted text-muted-foreground" },
+      submitted: { label: "Chờ duyệt", cls: "bg-amber-500/10 text-amber-600" },
+      approved: { label: "Đã duyệt", cls: "bg-primary/10 text-primary" },
+      rejected: { label: "Từ chối", cls: "bg-destructive/10 text-destructive" },
+    };
+    const c = map[status] || map.draft;
+    return <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${c.cls}`}>{c.label}</span>;
+  };
+
+  const isMonthEditablePartner = (month: number, year: number) => {
+    const now = new Date();
+    return year < now.getFullYear() || (year === now.getFullYear() && month <= now.getMonth() + 1);
+  };
+
+  const handleApproveReport = (reportId: string) => {
     const reports = order.operationalReports || [];
-    const pendingReports = reports.filter(r => r.status === "submitted");
+    const updated = reports.map(r =>
+      r.id === reportId ? { ...r, status: "approved" as const, reviewedAt: new Date().toLocaleDateString("vi-VN") } : r
+    );
+    updateOrder(orderId || "", { operationalReports: updated });
+    toast.success("Đã phê duyệt báo cáo");
+  };
+
+  const handleRejectReport = (reportId: string) => {
+    const reason = prompt("Lý do từ chối:");
+    if (reason !== null) {
+      const reports = order.operationalReports || [];
+      const updated = reports.map(r =>
+        r.id === reportId ? { ...r, status: "rejected" as const, rejectedReason: reason, reviewedAt: new Date().toLocaleDateString("vi-VN") } : r
+      );
+      updateOrder(orderId || "", { operationalReports: updated });
+      toast.info("Đã từ chối báo cáo");
+    }
+  };
+
+  const renderNetzeroPartnerStats = () => {
+    const reports = order.operationalReports || [];
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+
+    const currentMonthReport = reports.find(r => r.month === currentMonth && r.year === currentYear);
+    const pastReports = reports.filter(r => r.year < currentYear || (r.year === currentYear && r.month < currentMonth));
+    const futureReports = reports.filter(r => r.year > currentYear || (r.year === currentYear && r.month > currentMonth));
+
+    const submittedCount = reports.filter(r => r.status === "submitted" || r.status === "approved").length;
+    const approvedCount = reports.filter(r => r.status === "approved").length;
+    const overdueCount = reports.filter(r => r.status === "draft" && isMonthEditablePartner(r.month, r.year) && !(r.month === currentMonth && r.year === currentYear)).length;
+
+    const renderPartnerReportCard = (r: OperationalReport) => {
+      const editable = isMonthEditablePartner(r.month, r.year);
+      return (
+        <div key={r.id} className="p-3 rounded-xl border border-border/50 bg-card mb-2 space-y-2">
+          <div className="flex items-start justify-between">
+            <p className="text-[12px] font-semibold text-foreground">
+              Thống kê vận hành Tháng {r.month}/{r.year} của MVS NVS {r.toiletName || order.toilets[0]}
+            </p>
+            {getPartnerReportStatusBadge(r.status, editable)}
+          </div>
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span>Trạng thái thực hiện:</span>
+            {editable && r.status === "draft" && r.month !== currentMonth ? (
+              <span className="text-destructive font-bold px-1.5 py-0.5 rounded bg-destructive/10">Quá hạn</span>
+            ) : (
+              <span>{!editable ? "Chưa đến hạn" : r.status === "draft" ? "Chờ KH nhập" : r.status === "submitted" ? "Đã gửi" : r.status === "approved" ? "Đã phê duyệt" : "Đã từ chối"}</span>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Trạng thái phê duyệt: {r.status === "approved" ? "Đã phê duyệt" : r.status === "rejected" ? "Từ chối" : "Chờ phê duyệt"}
+          </p>
+
+          {/* Show data summary for submitted/approved/rejected */}
+          {(r.status === "submitted" || r.status === "approved" || r.status === "rejected") && (
+            <div className="grid grid-cols-2 gap-2 text-[10px] p-2 rounded-lg bg-muted/30">
+              <span className="text-muted-foreground">Điện: <strong className="text-foreground">{r.electricityUsage} kWh</strong></span>
+              <span className="text-muted-foreground">Nước: <strong className="text-foreground">{r.waterUsage} m³</strong></span>
+              <span className="text-muted-foreground">CP sinh học: <strong className="text-foreground">{r.bioProductUsage} m³</strong></span>
+              <span className="text-muted-foreground">VS lau dọn: <strong className="text-foreground">{r.cleaningCount} lần</strong></span>
+            </div>
+          )}
+
+          {r.notes && <p className="text-[10px] text-muted-foreground italic">{r.notes}</p>}
+          {r.rejectedReason && <p className="text-[10px] text-destructive">Lý do từ chối: {r.rejectedReason}</p>}
+
+          {/* Approve/Reject buttons for submitted reports */}
+          {r.status === "submitted" && (
+            <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 h-9 rounded-xl text-[11px] font-semibold border-destructive/30 text-destructive hover:bg-destructive/10 gap-1"
+                onClick={() => handleRejectReport(r.id)}
+              >
+                <XCircle size={13} /> Từ chối
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1 h-9 rounded-xl text-[11px] font-bold gradient-primary border-0 text-primary-foreground gap-1"
+                onClick={() => handleApproveReport(r.id)}
+              >
+                <CheckCircle2 size={13} /> Phê duyệt
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+    };
 
     return (
       <div className="space-y-4">
-        {/* Contract info */}
+        {/* Summary */}
+        <div className="flex gap-2">
+          <div className="flex-1 p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
+            <p className="text-lg font-extrabold text-primary">{submittedCount}</p>
+            <p className="text-[10px] text-muted-foreground">Đã nộp</p>
+          </div>
+          <div className="flex-1 p-3 rounded-xl bg-muted border border-border/50 text-center">
+            <p className="text-lg font-extrabold text-muted-foreground">{approvedCount}</p>
+            <p className="text-[10px] text-muted-foreground">Đã duyệt</p>
+          </div>
+          <div className="flex-1 p-3 rounded-xl bg-destructive/5 border border-destructive/20 text-center">
+            <p className="text-lg font-extrabold text-destructive">{overdueCount}</p>
+            <p className="text-[10px] text-muted-foreground">Quá hạn</p>
+          </div>
+          <div className="flex-1 p-3 rounded-xl bg-muted border border-border/50 text-center">
+            <p className="text-lg font-extrabold text-muted-foreground">{futureReports.length}</p>
+            <p className="text-[10px] text-muted-foreground">Chưa đến</p>
+          </div>
+        </div>
+
+        {/* Current month */}
+        {currentMonthReport && (
+          <div>
+            <p className="text-[12px] font-bold text-foreground mb-2">Tháng hiện tại</p>
+            {renderPartnerReportCard(currentMonthReport)}
+          </div>
+        )}
+
+        {/* Past */}
+        {pastReports.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[12px] font-bold text-foreground">Các tháng khác</p>
+              <span className="text-[10px] text-muted-foreground">Số lượt tháng: {pastReports.length + futureReports.length}</span>
+            </div>
+            {pastReports.map(renderPartnerReportCard)}
+          </div>
+        )}
+
+        {/* Future */}
+        {futureReports.length > 0 && (
+          <div>
+            {pastReports.length === 0 && (
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[12px] font-bold text-foreground">Các tháng khác</p>
+                <span className="text-[10px] text-muted-foreground">Số lượt tháng: {futureReports.length}</span>
+              </div>
+            )}
+            {futureReports.map(renderPartnerReportCard)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderExecuteTab = () => {
+    const isNetzero = order.type === "netzero";
+
+    if (isNetzero) {
+      const PARTNER_EXEC_SUB_TABS = [
+        { key: "stats", label: "Thống kê vận hành", badge: (order.operationalReports || []).filter(r => r.status === "submitted").length },
+        { key: "manage", label: "Quản lý công việc" },
+        { key: "addon", label: "Thêm dịch vụ" },
+      ];
+
+      return (
+        <div className="space-y-4">
+          {/* Sub-tabs */}
+          <div className="flex border-b border-border/50 overflow-x-auto">
+            {PARTNER_EXEC_SUB_TABS.map(t => (
+              <button
+                key={t.key}
+                onClick={() => setPartnerExecSubTab(t.key)}
+                className={`px-3 py-2 text-[11px] font-semibold whitespace-nowrap border-b-2 transition-colors relative ${
+                  partnerExecSubTab === t.key ? "border-primary text-primary" : "border-transparent text-muted-foreground"
+                }`}
+              >
+                {t.label}
+                {t.badge && t.badge > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center px-1">
+                    {t.badge}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {partnerExecSubTab === "stats" && renderNetzeroPartnerStats()}
+
+          {partnerExecSubTab === "manage" && (
+            <div className="space-y-3">
+              {/* Staff + execution */}
+              {order.contract && (
+                <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <p className="text-[12px] font-bold text-foreground mb-2">Hợp đồng #{order.contract.contractNo}</p>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground">Giá trị: <strong className="text-primary">{order.contract.value}</strong></span>
+                    <span className="text-muted-foreground">Thời hạn: {order.contract.duration}</span>
+                  </div>
+                </motion.div>
+              )}
+              {order.assignedStaff && order.assignedStaff.length > 0 && (
+                <motion.div className="glass-card rounded-2xl p-4 space-y-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <p className="text-[12px] font-bold text-foreground">Nhân viên thực hiện</p>
+                  {order.assignedStaff.map(s => (
+                    <div key={s.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
+                      <User size={12} className="text-primary" />
+                      <span className="text-[11px] text-foreground">{s.name} ({s.role})</span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+              {order.status === "dang_thuc_hien" && (
+                <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={() => setActiveSheet("bbnt")}>
+                  <Send size={16} /> Tạo & Gửi BBNT
+                </Button>
+              )}
+            </div>
+          )}
+
+          {partnerExecSubTab === "addon" && (
+            <div className="text-center py-10">
+              <Plus size={32} className="mx-auto text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground text-[12px]">Thêm dịch vụ bổ sung</p>
+              <p className="text-muted-foreground/60 text-[11px] mt-1">Tính năng đang phát triển</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Non-Netzero default execute tab
+    return (
+      <div className="space-y-4">
         {order.contract && (
           <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-[12px] font-bold text-foreground mb-2">Hợp đồng #{order.contract.contractNo}</p>
@@ -655,88 +898,6 @@ const PartnerOrderDetail = () => {
           </motion.div>
         )}
 
-        {/* Netzero: Operational Reports from Customer */}
-        {isNetzero && reports.length > 0 && (
-          <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-center justify-between">
-              <p className="text-[12px] font-bold text-foreground">Thống kê vận hành từ KH</p>
-              {pendingReports.length > 0 && (
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
-                  {pendingReports.length} chờ duyệt
-                </span>
-              )}
-            </div>
-            {reports.map(r => (
-              <div key={r.id} className="p-3 rounded-xl border border-border/50 bg-card space-y-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[12px] font-semibold text-foreground">
-                      Tháng {r.month}/{r.year} - {r.toiletName}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Gửi: {r.submittedAt || "—"}</p>
-                  </div>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                    r.status === "submitted" ? "bg-amber-500/10 text-amber-600" :
-                    r.status === "approved" ? "bg-primary/10 text-primary" :
-                    r.status === "rejected" ? "bg-destructive/10 text-destructive" :
-                    "bg-muted text-muted-foreground"
-                  }`}>
-                    {r.status === "submitted" ? "Chờ duyệt" : r.status === "approved" ? "Đã duyệt" : r.status === "rejected" ? "Từ chối" : "Nháp"}
-                  </span>
-                </div>
-
-                {/* Report data summary */}
-                <div className="grid grid-cols-2 gap-2 text-[10px]">
-                  <span className="text-muted-foreground">Điện: <strong className="text-foreground">{r.electricityUsage} kWh</strong></span>
-                  <span className="text-muted-foreground">Nước: <strong className="text-foreground">{r.waterUsage} m³</strong></span>
-                  <span className="text-muted-foreground">CP sinh học: <strong className="text-foreground">{r.bioProductUsage} m³</strong></span>
-                  <span className="text-muted-foreground">VS lau dọn: <strong className="text-foreground">{r.cleaningCount} lần</strong></span>
-                </div>
-
-                {r.notes && <p className="text-[10px] text-muted-foreground italic">{r.notes}</p>}
-
-                {/* Approve/Reject buttons */}
-                {r.status === "submitted" && (
-                  <div className="flex gap-2 pt-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 h-9 rounded-xl text-[11px] font-semibold border-destructive/30 text-destructive hover:bg-destructive/10 gap-1"
-                      onClick={() => {
-                        const reason = prompt("Lý do từ chối:");
-                        if (reason !== null) {
-                          const updated = reports.map(rpt =>
-                            rpt.id === r.id ? { ...rpt, status: "rejected" as const, rejectedReason: reason, reviewedAt: new Date().toLocaleDateString("vi-VN") } : rpt
-                          );
-                          updateOrder(orderId || "", { operationalReports: updated });
-                          toast.info("Đã từ chối báo cáo");
-                        }
-                      }}
-                    >
-                      <XCircle size={13} /> Từ chối
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="flex-1 h-9 rounded-xl text-[11px] font-bold gradient-primary border-0 text-primary-foreground gap-1"
-                      onClick={() => {
-                        const updated = reports.map(rpt =>
-                          rpt.id === r.id ? { ...rpt, status: "approved" as const, reviewedAt: new Date().toLocaleDateString("vi-VN") } : rpt
-                        );
-                        updateOrder(orderId || "", { operationalReports: updated });
-                        toast.success("Đã phê duyệt báo cáo");
-                      }}
-                    >
-                      <CheckCircle2 size={13} /> Phê duyệt
-                    </Button>
-                  </div>
-                )}
-                {r.rejectedReason && <p className="text-[10px] text-destructive">Lý do: {r.rejectedReason}</p>}
-              </div>
-            ))}
-          </motion.div>
-        )}
-
-        {/* Staff assignment for execution */}
         {order.status === "da_ky_hop_dong" && (
           <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-[12px] font-bold text-foreground">Gán nhân viên thực hiện</p>
@@ -761,7 +922,6 @@ const PartnerOrderDetail = () => {
           </motion.div>
         )}
 
-        {/* Execution status */}
         {order.status === "dang_thuc_hien" && (
           <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-[12px] font-bold text-foreground">Đang thực hiện dịch vụ</p>
@@ -781,7 +941,6 @@ const PartnerOrderDetail = () => {
           </motion.div>
         )}
 
-        {/* BBNT sent */}
         {order.acceptanceReport && (
           <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-[12px] font-bold text-foreground mb-2">Biên bản nghiệm thu</p>
