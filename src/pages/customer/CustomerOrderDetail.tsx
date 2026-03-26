@@ -652,10 +652,30 @@ const CustomerOrderDetail = () => {
 
         {executeSubTab === "manage" && renderExecuteTabContent()}
         {executeSubTab === "addon" && (
-          <div className="text-center py-10">
-            <Plus size={32} className="mx-auto text-muted-foreground/30 mb-2" />
-            <p className="text-muted-foreground text-[12px]">Dịch vụ bổ sung</p>
-            <p className="text-muted-foreground/60 text-[11px] mt-1">Tính năng đang phát triển</p>
+          <div className="space-y-3 mt-2">
+            <p className="text-[12px] text-muted-foreground">Chọn dịch vụ bổ sung cho đơn hàng:</p>
+            {[
+              { key: "vsld", label: "Vệ sinh lau dọn", icon: Sparkles, desc: "Dịch vụ vệ sinh, lau dọn định kỳ hoặc theo yêu cầu" },
+              { key: "scbd", label: "Sửa chữa bảo dưỡng", icon: Wrench, desc: "Sửa chữa thiết bị, bảo trì hệ thống nước & điện" },
+              { key: "caitao", label: "Cải tạo", icon: Hammer, desc: "Cải tạo, nâng cấp nhà vệ sinh hiện hữu" },
+              { key: "xaymoi", label: "Xây mới", icon: HardHat, desc: "Xây dựng nhà vệ sinh mới hoàn toàn" },
+              { key: "tuvan", label: "Liên hệ Tư vấn", icon: FileText, desc: "Tư vấn giải pháp quản lý & vận hành NVS" },
+            ].map((svc) => (
+              <button
+                key={svc.key}
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all text-left"
+                onClick={() => toast.info(`Đã gửi yêu cầu dịch vụ "${svc.label}". Chúng tôi sẽ liên hệ bạn sớm nhất!`)}
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <svc.icon size={18} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-foreground">{svc.label}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{svc.desc}</p>
+                </div>
+                <ChevronRight size={16} className="text-muted-foreground/40 shrink-0" />
+              </button>
+            ))}
           </div>
         )}
       </div>
