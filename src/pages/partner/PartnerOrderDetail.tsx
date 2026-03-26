@@ -636,82 +636,170 @@ const PartnerOrderDetail = () => {
     </div>
   );
 
-  const renderExecuteTab = () => (
-    <div className="space-y-4">
-      {/* Contract info */}
-      {order.contract && (
-        <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[12px] font-bold text-foreground mb-2">Hợp đồng #{order.contract.contractNo}</p>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground">Giá trị: <strong className="text-primary">{order.contract.value}</strong></span>
-            <span className="text-muted-foreground">Thời hạn: {order.contract.duration}</span>
-          </div>
-        </motion.div>
-      )}
+  const renderExecuteTab = () => {
+    // For Netzero orders, show operational reports approval section
+    const isNetzero = order.type === "netzero";
+    const reports = order.operationalReports || [];
+    const pendingReports = reports.filter(r => r.status === "submitted");
 
-      {/* Staff assignment for execution */}
-      {order.status === "da_ky_hop_dong" && (
-        <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[12px] font-bold text-foreground">Gán nhân viên thực hiện</p>
-          <div className="space-y-2">
-            {MOCK_PARTNER_STAFF.map(s => {
-              const sel = selectedStaff.includes(s.id);
-              return (
-                <button key={s.id} className={`w-full rounded-xl p-3 flex items-center gap-3 text-left border transition-colors ${sel ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"}`} onClick={() => toggleStaff(s.id)}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${sel ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}><User size={14} /></div>
-                  <div className="flex-1">
-                    <p className="text-[12px] font-semibold text-foreground">{s.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.role} · {s.phone}</p>
+    return (
+      <div className="space-y-4">
+        {/* Contract info */}
+        {order.contract && (
+          <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-[12px] font-bold text-foreground mb-2">Hợp đồng #{order.contract.contractNo}</p>
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">Giá trị: <strong className="text-primary">{order.contract.value}</strong></span>
+              <span className="text-muted-foreground">Thời hạn: {order.contract.duration}</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Netzero: Operational Reports from Customer */}
+        {isNetzero && reports.length > 0 && (
+          <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="flex items-center justify-between">
+              <p className="text-[12px] font-bold text-foreground">Thống kê vận hành từ KH</p>
+              {pendingReports.length > 0 && (
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
+                  {pendingReports.length} chờ duyệt
+                </span>
+              )}
+            </div>
+            {reports.map(r => (
+              <div key={r.id} className="p-3 rounded-xl border border-border/50 bg-card space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground">
+                      Tháng {r.month}/{r.year} - {r.toiletName}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Gửi: {r.submittedAt || "—"}</p>
                   </div>
-                  {sel && <CheckCircle2 size={14} className="text-primary" />}
-                </button>
-              );
-            })}
-          </div>
-          <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={handleStartExecution}>
-            <Users size={16} /> Gán & Bắt đầu thực hiện ({selectedStaff.length})
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Execution status */}
-      {order.status === "dang_thuc_hien" && (
-        <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[12px] font-bold text-foreground">Đang thực hiện dịch vụ</p>
-          {order.assignedStaff && order.assignedStaff.length > 0 && (
-            <div className="space-y-1.5">
-              {order.assignedStaff.map(s => (
-                <div key={s.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
-                  <User size={12} className="text-primary" />
-                  <span className="text-[11px] text-foreground">{s.name} ({s.role})</span>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    r.status === "submitted" ? "bg-amber-500/10 text-amber-600" :
+                    r.status === "approved" ? "bg-primary/10 text-primary" :
+                    r.status === "rejected" ? "bg-destructive/10 text-destructive" :
+                    "bg-muted text-muted-foreground"
+                  }`}>
+                    {r.status === "submitted" ? "Chờ duyệt" : r.status === "approved" ? "Đã duyệt" : r.status === "rejected" ? "Từ chối" : "Nháp"}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-          <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={() => setActiveSheet("bbnt")}>
-            <Send size={16} /> Tạo & Gửi BBNT
-          </Button>
-        </motion.div>
-      )}
 
-      {/* BBNT sent */}
-      {order.acceptanceReport && (
-        <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[12px] font-bold text-foreground mb-2">Biên bản nghiệm thu</p>
-          <p className="text-[10px] text-muted-foreground mb-2">Gửi ngày: {order.acceptanceReport.sentDate}</p>
-          {order.acceptanceReport.completedItems.map((item, i) => (
-            <p key={i} className="text-[11px] text-foreground">✓ {item}</p>
-          ))}
-          {order.acceptanceReport.notes && <p className="text-[11px] text-muted-foreground mt-2 italic">{order.acceptanceReport.notes}</p>}
-          {order.status === "cho_nghiem_thu" && (
-            <div className="mt-3 p-2.5 rounded-xl bg-accent/50 text-center">
-              <p className="text-[11px] font-semibold text-accent-foreground">⏳ Chờ khách hàng nghiệm thu</p>
+                {/* Report data summary */}
+                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <span className="text-muted-foreground">Điện: <strong className="text-foreground">{r.electricityUsage} kWh</strong></span>
+                  <span className="text-muted-foreground">Nước: <strong className="text-foreground">{r.waterUsage} m³</strong></span>
+                  <span className="text-muted-foreground">CP sinh học: <strong className="text-foreground">{r.bioProductUsage} m³</strong></span>
+                  <span className="text-muted-foreground">VS lau dọn: <strong className="text-foreground">{r.cleaningCount} lần</strong></span>
+                </div>
+
+                {r.notes && <p className="text-[10px] text-muted-foreground italic">{r.notes}</p>}
+
+                {/* Approve/Reject buttons */}
+                {r.status === "submitted" && (
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 h-9 rounded-xl text-[11px] font-semibold border-destructive/30 text-destructive hover:bg-destructive/10 gap-1"
+                      onClick={() => {
+                        const reason = prompt("Lý do từ chối:");
+                        if (reason !== null) {
+                          const updated = reports.map(rpt =>
+                            rpt.id === r.id ? { ...rpt, status: "rejected" as const, rejectedReason: reason, reviewedAt: new Date().toLocaleDateString("vi-VN") } : rpt
+                          );
+                          updateOrder(orderId || "", { operationalReports: updated });
+                          toast.info("Đã từ chối báo cáo");
+                        }
+                      }}
+                    >
+                      <XCircle size={13} /> Từ chối
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1 h-9 rounded-xl text-[11px] font-bold gradient-primary border-0 text-primary-foreground gap-1"
+                      onClick={() => {
+                        const updated = reports.map(rpt =>
+                          rpt.id === r.id ? { ...rpt, status: "approved" as const, reviewedAt: new Date().toLocaleDateString("vi-VN") } : rpt
+                        );
+                        updateOrder(orderId || "", { operationalReports: updated });
+                        toast.success("Đã phê duyệt báo cáo");
+                      }}
+                    >
+                      <CheckCircle2 size={13} /> Phê duyệt
+                    </Button>
+                  </div>
+                )}
+                {r.rejectedReason && <p className="text-[10px] text-destructive">Lý do: {r.rejectedReason}</p>}
+              </div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Staff assignment for execution */}
+        {order.status === "da_ky_hop_dong" && (
+          <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-[12px] font-bold text-foreground">Gán nhân viên thực hiện</p>
+            <div className="space-y-2">
+              {MOCK_PARTNER_STAFF.map(s => {
+                const sel = selectedStaff.includes(s.id);
+                return (
+                  <button key={s.id} className={`w-full rounded-xl p-3 flex items-center gap-3 text-left border transition-colors ${sel ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"}`} onClick={() => toggleStaff(s.id)}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${sel ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}><User size={14} /></div>
+                    <div className="flex-1">
+                      <p className="text-[12px] font-semibold text-foreground">{s.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{s.role} · {s.phone}</p>
+                    </div>
+                    {sel && <CheckCircle2 size={14} className="text-primary" />}
+                  </button>
+                );
+              })}
             </div>
-          )}
-        </motion.div>
-      )}
-    </div>
-  );
+            <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={handleStartExecution}>
+              <Users size={16} /> Gán & Bắt đầu thực hiện ({selectedStaff.length})
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Execution status */}
+        {order.status === "dang_thuc_hien" && (
+          <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-[12px] font-bold text-foreground">Đang thực hiện dịch vụ</p>
+            {order.assignedStaff && order.assignedStaff.length > 0 && (
+              <div className="space-y-1.5">
+                {order.assignedStaff.map(s => (
+                  <div key={s.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
+                    <User size={12} className="text-primary" />
+                    <span className="text-[11px] text-foreground">{s.name} ({s.role})</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={() => setActiveSheet("bbnt")}>
+              <Send size={16} /> Tạo & Gửi BBNT
+            </Button>
+          </motion.div>
+        )}
+
+        {/* BBNT sent */}
+        {order.acceptanceReport && (
+          <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-[12px] font-bold text-foreground mb-2">Biên bản nghiệm thu</p>
+            <p className="text-[10px] text-muted-foreground mb-2">Gửi ngày: {order.acceptanceReport.sentDate}</p>
+            {order.acceptanceReport.completedItems.map((item, i) => (
+              <p key={i} className="text-[11px] text-foreground">✓ {item}</p>
+            ))}
+            {order.acceptanceReport.notes && <p className="text-[11px] text-muted-foreground mt-2 italic">{order.acceptanceReport.notes}</p>}
+            {order.status === "cho_nghiem_thu" && (
+              <div className="mt-3 p-2.5 rounded-xl bg-accent/50 text-center">
+                <p className="text-[11px] font-semibold text-accent-foreground">⏳ Chờ khách hàng nghiệm thu</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </div>
+    );
+  };
 
   const renderSettleTab = () => (
     <div className="space-y-4">
