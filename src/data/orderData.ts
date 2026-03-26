@@ -372,6 +372,43 @@ export const MOCK_CUSTOMER_ORDERS: OrderData[] = [
       { status: "da_huy", label: "Khách hàng hủy đơn", date: "02/02/2026 10:00", actor: "Nguyễn Văn Khách" },
     ],
   },
+  {
+    id: "DH-007",
+    type: "netzero",
+    typeLabel: "Netzero",
+    name: "Netzero NVS Tòa nhà GreenPark",
+    customerName: "Nguyễn Văn Khách",
+    customerPhone: "0901234567",
+    customerEmail: "khach@email.com",
+    address: "500 Nguyễn Văn Linh, Q.7, TP.HCM",
+    content: "Triển khai giải pháp Netzero cho 2 NVS tòa nhà GreenPark: khảo sát, lắp đặt hệ thống tiết kiệm nước/điện, xử lý tuần hoàn.",
+    toilets: ["NVS Tầng 1 - GreenPark", "NVS Tầng 2 - GreenPark"],
+    partnerName: "Smart Toilet JSC",
+    partnerPhone: "0289998877",
+    amount: "15.000.000đ",
+    createdAt: "01/03/2026",
+    status: "dang_thuc_hien",
+    assignedStaff: [
+      { id: 5, name: "Võ Minh Tuấn", role: "Netzero", phone: "0956789012" },
+    ],
+    timeline: [
+      { status: "cho_dieu_phoi", label: "Đơn hàng được tạo", date: "01/03/2026 08:00", actor: "Nguyễn Văn Khách" },
+      { status: "cho_tiep_nhan", label: "Điều phối đến Smart Toilet JSC", date: "01/03/2026 09:00", actor: "Admin (KTX)" },
+      { status: "da_tiep_nhan", label: "Đối tác đã tiếp nhận", date: "01/03/2026 11:00", actor: "Smart Toilet JSC" },
+      { status: "dang_khao_sat", label: "Bắt đầu khảo sát NVS", date: "02/03/2026 08:00", actor: "Võ Minh Tuấn" },
+      { status: "dang_thuc_hien", label: "Bắt đầu thực hiện Netzero", date: "10/03/2026 08:00", actor: "Smart Toilet JSC" },
+    ],
+    contract: {
+      contractNo: "HĐ-NETZERO-001",
+      partyA: "Nguyễn Văn Khách",
+      partyB: "Smart Toilet JSC",
+      value: "15.000.000đ",
+      terms: "Thanh toán 50% khi ký HĐ, 50% khi hoàn thành",
+      duration: "12 tháng",
+      signedDate: "05/03/2026",
+    },
+    operationalReports: [],
+  },
 ];
 
 // Partner sees same orders but from their perspective
@@ -401,6 +438,10 @@ export const MOCK_PARTNER_ORDERS: OrderData[] = [
       { status: "da_tiep_nhan", label: "Đã tiếp nhận", date: "14/03/2026 11:00", actor: "Eco Clean Co." },
     ],
     assignedStaff: [],
+  },
+  {
+    ...MOCK_CUSTOMER_ORDERS[MOCK_CUSTOMER_ORDERS.length - 1],
+    id: "PDH-007",
   },
 ];
 
