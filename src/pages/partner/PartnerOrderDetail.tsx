@@ -638,7 +638,7 @@ const PartnerOrderDetail = () => {
   );
 
   // ===== NETZERO PARTNER EXECUTE =====
-  const [partnerExecSubTab, setPartnerExecSubTab] = useState("stats");
+  // ===== NETZERO PARTNER EXECUTE =====
 
   const getPartnerReportStatusBadge = (status: string, isEditable: boolean) => {
     if (status === "draft" && !isEditable) {
