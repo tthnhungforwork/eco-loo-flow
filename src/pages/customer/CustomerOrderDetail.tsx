@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   CheckCircle2, Circle, MapPin, Phone, User, Mail, Bath,
   Building2, Calendar, FileText, Star, Send, Image as ImageIcon,
-  Clock, ChevronDown, ChevronUp, XCircle, DollarSign, FileSignature, Eye,
-  AlertCircle, Clipboard, PenTool, Paperclip, Plus, Zap, Droplets, Leaf, SprayCan, BarChart3
+  Clock, ChevronDown, ChevronUp, ChevronRight, XCircle, DollarSign, FileSignature, Eye,
+  AlertCircle, Clipboard, PenTool, Paperclip, Plus, Zap, Droplets, Leaf, SprayCan, BarChart3,
+  Sparkles, Wrench, Hammer, HardHat
 } from "lucide-react";
 import CreateTaskSheet from "@/components/CreateTaskSheet";
 import { motion, AnimatePresence } from "framer-motion";
