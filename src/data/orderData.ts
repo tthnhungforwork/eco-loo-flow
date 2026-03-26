@@ -87,6 +87,25 @@ export interface SettlementInfo {
   signedDate?: string;
 }
 export type TaskStatus = "pending" | "in_progress" | "completed";
+export type ReportStatus = "draft" | "submitted" | "approved" | "rejected";
+
+export interface OperationalReport {
+  id: string;
+  toiletName: string;
+  month: number;
+  year: number;
+  electricityUsage: number; // kWh
+  waterUsage: number; // m³
+  bioProductUsage: number; // m³
+  cleaningCount: number; // lần
+  deadline: string;
+  executionDate?: string;
+  notes?: string;
+  status: ReportStatus;
+  rejectedReason?: string;
+  submittedAt?: string;
+  reviewedAt?: string;
+}
 
 export interface OrderTask {
   id: string;
@@ -141,6 +160,8 @@ export interface OrderData {
   settlement?: SettlementInfo;
   // Tasks
   orderTasks?: OrderTask[];
+  // Operational reports (Netzero)
+  operationalReports?: OperationalReport[];
   // Rating
   rating?: number;
   ratingContent?: string;
