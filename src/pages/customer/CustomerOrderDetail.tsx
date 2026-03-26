@@ -12,7 +12,7 @@ import {
   Building2, Calendar, FileText, Star, Send, Image as ImageIcon,
   Clock, ChevronDown, ChevronUp, ChevronRight, XCircle, DollarSign, FileSignature, Eye,
   AlertCircle, Clipboard, PenTool, Paperclip, Plus, Zap, Droplets, Leaf, SprayCan, BarChart3,
-  Sparkles, Wrench, Hammer, HardHat
+  Sparkles, Wrench, Hammer, HardHat, Recycle
 } from "lucide-react";
 import CreateTaskSheet from "@/components/CreateTaskSheet";
 import { motion, AnimatePresence } from "framer-motion";
