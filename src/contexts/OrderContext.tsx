@@ -13,6 +13,7 @@ export const TEST_ORDERS = {
   SCBD: { customer: "DH-TEST-SCBD", partner: "PDH-TEST-SCBD" },
   XM: { customer: "DH-TEST-XM", partner: "PDH-TEST-XM" },
   CT: { customer: "DH-TEST-CT", partner: "PDH-TEST-CT" },
+  NETZERO: { customer: "DH-TEST-NETZERO", partner: "PDH-TEST-NETZERO" },
 };
 
 // Keep backward compat
@@ -21,7 +22,7 @@ export const TEST_ORDER_PARTNER_ID = "PDH-TEST-VSLD";
 
 const createTestOrder = (
   id: string,
-  type: "vsld" | "scbd" | "xaymoi" | "caitao",
+  type: "vsld" | "scbd" | "xaymoi" | "caitao" | "netzero",
   typeLabel: string,
   name: string,
   toilets: string[],
@@ -68,6 +69,12 @@ const TEST_ORDER_DEFS: OrderData[] = [
     "Cải tạo NVS Tầng 5 - VP Sunrise",
     ["NVS Tầng 5 - VP Sunrise"],
     "Cải tạo toàn bộ NVS tầng 5 văn phòng Sunrise, thay mới thiết bị và ốp lát."
+  ),
+  createTestOrder(
+    TEST_ORDERS.NETZERO.customer, "netzero", "Netzero",
+    "Netzero NVS Tòa nhà GreenPark",
+    ["NVS Tầng 1 - GreenPark", "NVS Tầng 2 - GreenPark"],
+    "Đánh giá và triển khai giải pháp Netzero cho 2 NVS tòa nhà GreenPark. Bao gồm khảo sát hiện trạng, lắp đặt hệ thống tiết kiệm nước/điện và xử lý tuần hoàn."
   ),
 ];
 
