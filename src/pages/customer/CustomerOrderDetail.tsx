@@ -941,6 +941,108 @@ const CustomerOrderDetail = () => {
           updateOrder(order.id, { orderTasks: updatedTasks });
         }}
       />
+
+      {/* Operational Report Sheet */}
+      <Sheet open={showReportSheet} onOpenChange={(open) => { setShowReportSheet(open); if (!open) setEditingReport(null); }}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto px-5 pb-8">
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-base text-left flex items-center gap-2">
+              <BarChart3 size={18} className="text-primary" />
+              Thống kê vận hành
+            </SheetTitle>
+          </SheetHeader>
+          <p className="text-[11px] text-muted-foreground mb-4">Báo cáo thống kê vận hành nhiều nhà vệ sinh</p>
+          <p className="text-[10px] text-muted-foreground mb-4 italic">Vui lòng điền đầy đủ số liệu nhà vệ sinh tiêu thụ trong tháng</p>
+
+          <div className="space-y-4">
+            {/* Toilet + Period selector */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Bath size={12} className="text-primary" /> Nhà vệ sinh</label>
+                <Select value={reportForm.toiletName} onValueChange={v => setReportForm(f => ({ ...f, toiletName: v }))}>
+                  <SelectTrigger className="rounded-xl text-[12px] h-10"><SelectValue placeholder="Chọn NVS" /></SelectTrigger>
+                  <SelectContent>
+                    {order.toilets.map(t => <SelectItem key={t} value={t} className="text-[12px]">{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-foreground mb-1 block">Thống kê vận hành</label>
+                <Select value={`${reportForm.month}/${reportForm.year}`} onValueChange={v => {
+                  const [m, y] = v.split("/").map(Number);
+                  setReportForm(f => ({ ...f, month: m, year: y }));
+                }}>
+                  <SelectTrigger className="rounded-xl text-[12px] h-10"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const m = i + 1;
+                      return <SelectItem key={m} value={`${m}/${reportForm.year}`} className="text-[12px]">Tháng {m}/{reportForm.year}</SelectItem>;
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Data fields */}
+            <div>
+              <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Zap size={12} className="text-amber-500" /> Điện năng tiêu thụ</label>
+              <div className="flex items-center gap-2">
+                <Input type="number" className="rounded-xl text-[12px] h-10 flex-1" value={reportForm.electricityUsage || ""} onChange={e => setReportForm(f => ({ ...f, electricityUsage: Number(e.target.value) }))} placeholder="0" />
+                <span className="text-[11px] text-muted-foreground w-10">kWh</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Droplets size={12} className="text-blue-500" /> Nước sử dụng</label>
+              <div className="flex items-center gap-2">
+                <Input type="number" className="rounded-xl text-[12px] h-10 flex-1" value={reportForm.waterUsage || ""} onChange={e => setReportForm(f => ({ ...f, waterUsage: Number(e.target.value) }))} placeholder="0" />
+                <span className="text-[11px] text-muted-foreground w-10">m³</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Leaf size={12} className="text-primary" /> Chế phẩm sinh học</label>
+              <div className="flex items-center gap-2">
+                <Input type="number" className="rounded-xl text-[12px] h-10 flex-1" value={reportForm.bioProductUsage || ""} onChange={e => setReportForm(f => ({ ...f, bioProductUsage: Number(e.target.value) }))} placeholder="0" />
+                <span className="text-[11px] text-muted-foreground w-10">m³</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><SprayCan size={12} className="text-secondary" /> Số lần vệ sinh lau dọn</label>
+              <div className="flex items-center gap-2">
+                <Input type="number" className="rounded-xl text-[12px] h-10 flex-1" value={reportForm.cleaningCount || ""} onChange={e => setReportForm(f => ({ ...f, cleaningCount: Number(e.target.value) }))} placeholder="0" />
+                <span className="text-[11px] text-muted-foreground w-10">lần</span>
+              </div>
+            </div>
+
+            {/* Dates */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Calendar size={12} className="text-primary" /> Thời hạn thực hiện</label>
+                <Input type="date" className="rounded-xl text-[12px] h-10" value={reportForm.deadline} onChange={e => setReportForm(f => ({ ...f, deadline: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-foreground mb-1 flex items-center gap-1"><Calendar size={12} className="text-primary" /> Ngày thực hiện</label>
+                <Input type="date" className="rounded-xl text-[12px] h-10" value={reportForm.executionDate} onChange={e => setReportForm(f => ({ ...f, executionDate: e.target.value }))} />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="text-[11px] font-semibold text-foreground mb-1 block">Ghi chú</label>
+              <Textarea className="rounded-xl min-h-[60px] text-[12px]" placeholder="Ghi chú thêm..." value={reportForm.notes} onChange={e => setReportForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold text-[12px]" onClick={() => handleSaveReport(true)}>
+                Lưu nháp
+              </Button>
+              <Button className="flex-1 h-12 rounded-2xl font-bold gradient-primary border-0 shadow-glow text-primary-foreground text-[12px]" onClick={() => handleSaveReport(false)}>
+                Hoàn thành
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
