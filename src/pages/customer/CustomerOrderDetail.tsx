@@ -414,6 +414,7 @@ const CustomerOrderDetail = () => {
   // ===== NETZERO EXECUTE TAB =====
   const EXECUTE_SUB_TABS_NETZERO = [
     { key: "stats", label: "Thống kê vận hành", badge: order.operationalReports?.filter(r => r.status === "submitted").length },
+    { key: "netzero", label: "Netzero" },
     { key: "manage", label: "Quản lý công việc" },
     { key: "addon", label: "Dịch vụ bổ sung" },
   ];
