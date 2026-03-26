@@ -414,8 +414,44 @@ const CustomerOrderDetail = () => {
   const EXECUTE_SUB_TABS_NETZERO = [
     { key: "manage", label: "Quản lý công việc" },
     { key: "stats", label: "Thống kê vận hành", badge: order.operationalReports?.filter(r => r.status === "submitted").length },
-    { key: "accept_report", label: "Nghiệm thu" },
   ];
+
+  // Generate 12 monthly reports if not yet created
+  const ensureReports = (): OperationalReport[] => {
+    if (order.operationalReports && order.operationalReports.length === 12) return order.operationalReports;
+    // Determine start month from contract or order creation
+    const startParts = order.contract?.signedDate?.split("/") || order.createdAt.split("/");
+    const startMonth = parseInt(startParts[1]);
+    const startYear = parseInt(startParts[2]);
+    const reports: OperationalReport[] = [];
+    for (let i = 0; i < 12; i++) {
+      const m = ((startMonth - 1 + i) % 12) + 1;
+      const y = startYear + Math.floor((startMonth - 1 + i) / 12);
+      const lastDay = new Date(y, m, 0).getDate();
+      const existing = order.operationalReports?.find(r => r.month === m && r.year === y);
+      if (existing) {
+        reports.push(existing);
+      } else {
+        reports.push({
+          id: `RPT-${order.id}-${m}-${y}`,
+          toiletName: order.toilets[0] || "",
+          month: m,
+          year: y,
+          electricityUsage: 0,
+          waterUsage: 0,
+          bioProductUsage: 0,
+          cleaningCount: 0,
+          deadline: `${y}-${String(m).padStart(2, "0")}-${lastDay}`,
+          status: "draft",
+        });
+      }
+    }
+    // Persist the generated reports
+    if (!order.operationalReports || order.operationalReports.length !== 12) {
+      updateOrder(order.id, { operationalReports: reports });
+    }
+    return reports;
+  };
 
   const resetReportForm = () => {
     setReportForm({
@@ -453,10 +489,13 @@ const CustomerOrderDetail = () => {
     toast.success(asDraft ? "Đã lưu nháp" : "Đã gửi thống kê vận hành");
   };
 
-  const getReportStatusBadge = (status: OperationalReport["status"]) => {
+  const getReportStatusBadge = (status: OperationalReport["status"], isEditable: boolean) => {
+    if (status === "draft" && !isEditable) {
+      return <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Chưa đến hạn</span>;
+    }
     const map = {
-      draft: { label: "Nháp", cls: "bg-muted text-muted-foreground" },
-      submitted: { label: "Đã gửi", cls: "bg-amber-500/10 text-amber-600" },
+      draft: { label: "Chờ nhập liệu", cls: "bg-amber-500/10 text-amber-600" },
+      submitted: { label: "Đã gửi", cls: "bg-blue-500/10 text-blue-600" },
       approved: { label: "Phê duyệt", cls: "bg-primary/10 text-primary" },
       rejected: { label: "Từ chối", cls: "bg-destructive/10 text-destructive" },
     };
@@ -464,21 +503,73 @@ const CustomerOrderDetail = () => {
     return <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${c.cls}`}>{c.label}</span>;
   };
 
-  const renderNetzeroExecuteTab = () => {
-    const reports = order.operationalReports || [];
-    const currentMonthReports = reports.filter(r => {
-      const now = new Date();
-      return r.month === now.getMonth() + 1 && r.year === now.getFullYear();
-    });
-    const otherReports = reports.filter(r => {
-      const now = new Date();
-      return !(r.month === now.getMonth() + 1 && r.year === now.getFullYear());
-    });
+  const isMonthEditable = (month: number, year: number) => {
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    // Allow current month and past months
+    return year < currentYear || (year === currentYear && month <= currentMonth);
+  };
 
-    const totalMonths = 12;
-    const submittedCount = reports.filter(r => r.status !== "draft").length;
+  const renderNetzeroExecuteTab = () => {
+    const reports = ensureReports();
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+
+    // Split into current month, past, and future
+    const currentMonthReport = reports.find(r => r.month === currentMonth && r.year === currentYear);
+    const pastReports = reports.filter(r => (r.year < currentYear || (r.year === currentYear && r.month < currentMonth)));
+    const futureReports = reports.filter(r => (r.year > currentYear || (r.year === currentYear && r.month > currentMonth)));
+
+    const submittedCount = reports.filter(r => r.status === "submitted" || r.status === "approved").length;
     const approvedCount = reports.filter(r => r.status === "approved").length;
-    const overdueCount = reports.filter(r => r.status === "draft" && r.deadline && new Date(r.deadline) < new Date()).length;
+    const overdueCount = reports.filter(r => r.status === "draft" && isMonthEditable(r.month, r.year) && !(r.month === currentMonth && r.year === currentYear)).length;
+
+    const openReport = (r: OperationalReport) => {
+      if (!isMonthEditable(r.month, r.year)) return;
+      if (r.status === "approved") return;
+      setEditingReport(r);
+      setReportForm({
+        toiletName: r.toiletName || order.toilets[0] || "",
+        month: r.month, year: r.year,
+        electricityUsage: r.electricityUsage, waterUsage: r.waterUsage,
+        bioProductUsage: r.bioProductUsage, cleaningCount: r.cleaningCount,
+        deadline: r.deadline, executionDate: r.executionDate || "", notes: r.notes || "",
+      });
+      setShowReportSheet(true);
+    };
+
+    const renderReportCard = (r: OperationalReport) => {
+      const editable = isMonthEditable(r.month, r.year);
+      const canOpen = editable && r.status !== "approved";
+      return (
+        <div
+          key={r.id}
+          className={`p-3 rounded-xl border bg-card mb-2 ${canOpen ? "cursor-pointer border-border/50 hover:border-primary/30 transition-colors" : "border-border/30 opacity-70"}`}
+          onClick={() => canOpen && openReport(r)}
+        >
+          <div className="flex items-start justify-between mb-1">
+            <p className="text-[12px] font-semibold text-foreground">
+              Thống kê vận hành Tháng {r.month}/{r.year} của MVS NVS {r.toiletName || order.toilets[0]}
+            </p>
+            {getReportStatusBadge(r.status, editable)}
+          </div>
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span>Trạng thái thực hiện:</span>
+            {editable && r.status === "draft" && r.month !== currentMonth ? (
+              <span className="text-destructive font-bold px-1.5 py-0.5 rounded bg-destructive/10">Quá hạn</span>
+            ) : (
+              <span>{!editable ? "Chưa đến hạn" : r.status === "draft" ? "Chờ nhập liệu" : r.status === "submitted" ? "Đã gửi" : r.status === "approved" ? "Đã phê duyệt" : "Cần sửa lại"}</span>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Trạng thái phê duyệt: {r.status === "approved" ? "Đã phê duyệt" : r.status === "rejected" ? "Từ chối" : "Chờ phê duyệt"}
+          </p>
+          {r.rejectedReason && <p className="text-[10px] text-destructive mt-1">Lý do từ chối: {r.rejectedReason}</p>}
+        </div>
+      );
+    };
 
     return (
       <div className="space-y-4">
@@ -508,120 +599,57 @@ const CustomerOrderDetail = () => {
             <div className="flex gap-2">
               <div className="flex-1 p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
                 <p className="text-lg font-extrabold text-primary">{submittedCount}</p>
-                <p className="text-[10px] text-muted-foreground">Đã nộp/tháng</p>
+                <p className="text-[10px] text-muted-foreground">Đã nộp</p>
               </div>
               <div className="flex-1 p-3 rounded-xl bg-muted border border-border/50 text-center">
                 <p className="text-lg font-extrabold text-muted-foreground">{approvedCount}</p>
                 <p className="text-[10px] text-muted-foreground">Đã duyệt</p>
               </div>
-              <div className="flex-1 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-center">
-                <p className="text-lg font-extrabold text-amber-600">{totalMonths - submittedCount}</p>
-                <p className="text-[10px] text-muted-foreground">Chờ thực hiện</p>
-              </div>
               <div className="flex-1 p-3 rounded-xl bg-destructive/5 border border-destructive/20 text-center">
                 <p className="text-lg font-extrabold text-destructive">{overdueCount}</p>
                 <p className="text-[10px] text-muted-foreground">Quá hạn</p>
               </div>
+              <div className="flex-1 p-3 rounded-xl bg-muted border border-border/50 text-center">
+                <p className="text-lg font-extrabold text-muted-foreground">{futureReports.length}</p>
+                <p className="text-[10px] text-muted-foreground">Chưa đến</p>
+              </div>
             </div>
 
             {/* Current month */}
-            <div>
-              <p className="text-[12px] font-bold text-foreground mb-2">Tháng hiện tại</p>
-              {currentMonthReports.length > 0 ? currentMonthReports.map(r => (
-                <div
-                  key={r.id}
-                  className="p-3 rounded-xl border border-border/50 bg-card mb-2 cursor-pointer"
-                  onClick={() => {
-                    if (r.status === "draft" || r.status === "rejected") {
-                      setEditingReport(r);
-                      setReportForm({
-                        toiletName: r.toiletName, month: r.month, year: r.year,
-                        electricityUsage: r.electricityUsage, waterUsage: r.waterUsage,
-                        bioProductUsage: r.bioProductUsage, cleaningCount: r.cleaningCount,
-                        deadline: r.deadline, executionDate: r.executionDate || "", notes: r.notes || "",
-                      });
-                      setShowReportSheet(true);
-                    }
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-1">
-                    <p className="text-[12px] font-semibold text-foreground">
-                      Thống kê vận hành Tháng {r.month}/{r.year} của {r.toiletName}
-                    </p>
-                    {getReportStatusBadge(r.status)}
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <span>Trạng thái thực hiện:</span>
-                    {r.deadline && new Date(r.deadline) < new Date() && r.status === "draft" ? (
-                      <span className="text-destructive font-bold px-1.5 py-0.5 rounded bg-destructive/10">Quá hạn</span>
-                    ) : (
-                      <span>{r.status === "draft" ? "Chưa hoàn thành" : r.status === "submitted" ? "Đã gửi" : r.status === "approved" ? "Đã phê duyệt" : "Cần sửa lại"}</span>
-                    )}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Trạng thái phê duyệt: {r.status === "approved" ? "Đã phê duyệt" : r.status === "rejected" ? "Từ chối" : "Chờ phê duyệt"}</p>
-                  {r.rejectedReason && <p className="text-[10px] text-destructive mt-1">Lý do từ chối: {r.rejectedReason}</p>}
-                </div>
-              )) : (
-                <p className="text-[11px] text-muted-foreground italic py-2">Chưa có bản ghi tháng này</p>
-              )}
-            </div>
-
-            {/* Other months */}
-            {otherReports.length > 0 && (
+            {currentMonthReport && (
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[12px] font-bold text-foreground">Các tháng khác</p>
-                  <span className="text-[10px] text-muted-foreground">Số lượt tháng: {otherReports.length}</span>
-                </div>
-                {otherReports.map(r => (
-                  <div
-                    key={r.id}
-                    className="p-3 rounded-xl border border-border/50 bg-card mb-2 cursor-pointer"
-                    onClick={() => {
-                      if (r.status === "draft" || r.status === "rejected") {
-                        setEditingReport(r);
-                        setReportForm({
-                          toiletName: r.toiletName, month: r.month, year: r.year,
-                          electricityUsage: r.electricityUsage, waterUsage: r.waterUsage,
-                          bioProductUsage: r.bioProductUsage, cleaningCount: r.cleaningCount,
-                          deadline: r.deadline, executionDate: r.executionDate || "", notes: r.notes || "",
-                        });
-                        setShowReportSheet(true);
-                      }
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-1">
-                      <p className="text-[12px] font-semibold text-foreground">
-                        Thống kê vận hành Tháng {r.month}/{r.year} của {r.toiletName}
-                      </p>
-                      {getReportStatusBadge(r.status)}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground">
-                      Trạng thái thực hiện: {r.status === "draft" ? "Chưa hoàn thành" : "Đã gửi"}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Trạng thái phê duyệt: {r.status === "approved" ? "Đã phê duyệt" : r.status === "rejected" ? "Từ chối" : "Chờ phê duyệt"}
-                    </p>
-                  </div>
-                ))}
+                <p className="text-[12px] font-bold text-foreground mb-2">Tháng hiện tại</p>
+                {renderReportCard(currentMonthReport)}
               </div>
             )}
 
-            {/* Add new report */}
-            <Button
-              className="w-full h-12 rounded-2xl font-bold gap-2 gradient-primary border-0 shadow-glow text-primary-foreground"
-              onClick={() => {
-                resetReportForm();
-                setShowReportSheet(true);
-              }}
-            >
-              <Plus size={16} /> Thêm thống kê vận hành
-            </Button>
+            {/* Past months (overdue or completed) */}
+            {pastReports.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[12px] font-bold text-foreground">Các tháng khác</p>
+                  <span className="text-[10px] text-muted-foreground">Số lượt tháng: {pastReports.length + futureReports.length}</span>
+                </div>
+                {pastReports.map(renderReportCard)}
+              </div>
+            )}
+
+            {/* Future months */}
+            {futureReports.length > 0 && (
+              <div>
+                {pastReports.length === 0 && (
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[12px] font-bold text-foreground">Các tháng khác</p>
+                    <span className="text-[10px] text-muted-foreground">Số lượt tháng: {futureReports.length}</span>
+                  </div>
+                )}
+                {futureReports.map(renderReportCard)}
+              </div>
+            )}
           </div>
         )}
 
         {executeSubTab === "manage" && renderExecuteTabContent()}
-        {executeSubTab === "accept_report" && renderAcceptTab()}
       </div>
     );
   };
