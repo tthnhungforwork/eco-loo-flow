@@ -412,8 +412,9 @@ const CustomerOrderDetail = () => {
 
   // ===== NETZERO EXECUTE TAB =====
   const EXECUTE_SUB_TABS_NETZERO = [
-    { key: "manage", label: "Quản lý công việc" },
     { key: "stats", label: "Thống kê vận hành", badge: order.operationalReports?.filter(r => r.status === "submitted").length },
+    { key: "manage", label: "Quản lý công việc" },
+    { key: "addon", label: "Dịch vụ bổ sung" },
   ];
 
   // Generate 12 monthly reports if not yet created
@@ -650,6 +651,13 @@ const CustomerOrderDetail = () => {
         )}
 
         {executeSubTab === "manage" && renderExecuteTabContent()}
+        {executeSubTab === "addon" && (
+          <div className="text-center py-10">
+            <Plus size={32} className="mx-auto text-muted-foreground/30 mb-2" />
+            <p className="text-muted-foreground text-[12px]">Dịch vụ bổ sung</p>
+            <p className="text-muted-foreground/60 text-[11px] mt-1">Tính năng đang phát triển</p>
+          </div>
+        )}
       </div>
     );
   };
