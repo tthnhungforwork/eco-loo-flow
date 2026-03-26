@@ -78,6 +78,16 @@ const CustomerOrderDetail = () => {
   const [rejectReason, setRejectReason] = useState("");
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [executeSubTab, setExecuteSubTab] = useState("manage");
+  const [showReportSheet, setShowReportSheet] = useState(false);
+  const [editingReport, setEditingReport] = useState<OperationalReport | null>(null);
+  const [reportForm, setReportForm] = useState({
+    toiletName: "",
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    electricityUsage: 0, waterUsage: 0, bioProductUsage: 0, cleaningCount: 0,
+    deadline: "", executionDate: "", notes: "",
+  });
 
   const order = getOrder(orderId || "");
   if (!order) {
