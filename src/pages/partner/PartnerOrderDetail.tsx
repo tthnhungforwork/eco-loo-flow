@@ -45,6 +45,10 @@ const PartnerOrderDetail = () => {
   const [surveySubTab, setSurveySubTab] = useState(0);
   const [selectedToiletIdx, setSelectedToiletIdx] = useState(0);
   const [partnerExecSubTab, setPartnerExecSubTab] = useState("stats");
+  const [quoteSubTab, setQuoteSubTab] = useState<"tuvan" | "taodv">("tuvan");
+  const [consultNote, setConsultNote] = useState("");
+  const [consultCompleted, setConsultCompleted] = useState(false);
+  const [createdServices, setCreatedServices] = useState<Array<{ id: string; types: string[]; handler: string }>>([]);
 
   // Staff selection
   const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
