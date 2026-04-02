@@ -510,7 +510,7 @@ const PartnerOrderDetail = () => {
     { key: "netzero", label: "Netzero" },
   ];
 
-  const [selectedAddonServices, setSelectedAddonServices] = useState<string[]>([]);
+  // selectedAddonServices moved to top-level state
 
   const renderQuoteTab = () => {
     const grouped = (order.quotationItems || []).reduce((acc, item) => {
