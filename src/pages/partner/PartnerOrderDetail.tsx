@@ -45,6 +45,11 @@ const PartnerOrderDetail = () => {
   const [surveySubTab, setSurveySubTab] = useState(0);
   const [selectedToiletIdx, setSelectedToiletIdx] = useState(0);
   const [partnerExecSubTab, setPartnerExecSubTab] = useState("stats");
+  const [quoteSubTab, setQuoteSubTab] = useState<"tuvan" | "taodv">("tuvan");
+  const [consultNote, setConsultNote] = useState("");
+  const [consultCompleted, setConsultCompleted] = useState(false);
+  const [createdServices, setCreatedServices] = useState<Array<{ id: string; types: string[]; handler: string }>>([]);
+  const [selectedAddonServices, setSelectedAddonServices] = useState<string[]>([]);
 
   // Staff selection
   const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
@@ -487,6 +492,27 @@ const PartnerOrderDetail = () => {
 
   // Survey content is now embedded in renderInfoTab
 
+  const handleCompleteConsult = () => {
+    setConsultCompleted(true);
+    toast.success("Đã hoàn thành tư vấn!");
+  };
+
+  const handleCreateService = (types: string[]) => {
+    const id = `ORD-${Date.now()}-${String(createdServices.length + 1).padStart(4, "0")}`;
+    setCreatedServices(prev => [...prev, { id, types, handler: order.partnerName || "Eco Clean Co." }]);
+    toast.success("Đã tạo đơn dịch vụ bổ sung!");
+  };
+
+  const ADDON_SERVICES = [
+    { key: "vsld", label: "Vệ sinh lau dọn" },
+    { key: "scbd", label: "Sửa chữa bảo dưỡng" },
+    { key: "xaymoi", label: "Xây mới" },
+    { key: "caitao", label: "Cải tạo" },
+    { key: "netzero", label: "Netzero" },
+  ];
+
+  // selectedAddonServices moved to top-level state
+
   const renderQuoteTab = () => {
     const grouped = (order.quotationItems || []).reduce((acc, item) => {
       if (!acc[item.category]) acc[item.category] = [];
@@ -494,80 +520,230 @@ const PartnerOrderDetail = () => {
       return acc;
     }, {} as Record<string, QuotationItem[]>);
 
+    const now = new Date();
+    const dateStr = `${now.getDate().toString().padStart(2, "0")}/${(now.getMonth() + 1).toString().padStart(2, "0")}/${now.getFullYear()}`;
+
     return (
       <div className="space-y-4">
-        <motion.div className="glass-card rounded-2xl p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[12px] font-bold text-foreground">Hạng mục báo giá</p>
-            {(order.status === "dang_khao_sat" || (order.status === "da_tiep_nhan" && !hasKhaoSat)) && (
-              <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 rounded-lg" onClick={() => { setQuoteItem({ category: "thiet_bi", categoryLabel: "Thiết bị" }); setActiveSheet("quote_item"); }}>
-                <Plus size={12} /> Thêm
-              </Button>
-            )}
-          </div>
+        {/* Sub-tabs: Tư vấn | Tạo dịch vụ */}
+        <div className="flex rounded-xl bg-muted/50 p-1 gap-1">
+          {[
+            { key: "tuvan" as const, label: "Tư vấn" },
+            { key: "taodv" as const, label: "Tạo dịch vụ" },
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setQuoteSubTab(t.key)}
+              className={`flex-1 py-2 rounded-lg text-[12px] font-semibold transition-all ${
+                quoteSubTab === t.key
+                  ? "bg-card text-primary shadow-sm"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-          {Object.keys(grouped).length === 0 ? (
-            <p className="text-[11px] text-muted-foreground text-center py-6">Chưa có hạng mục. Nhấn "Thêm" để bắt đầu báo giá.</p>
+        <AnimatePresence mode="wait">
+          {quoteSubTab === "tuvan" ? (
+            <motion.div key="tuvan" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+              {/* Thông tin tư vấn */}
+              <div className="glass-card rounded-2xl p-4 space-y-3">
+                <p className="text-[13px] font-bold text-foreground">Thông tin tư vấn</p>
+                <div className="space-y-2.5 text-[12px]">
+                  <div className="flex">
+                    <span className="text-muted-foreground w-28 shrink-0">Trạng thái</span>
+                    <span className="font-semibold text-foreground">
+                      {consultCompleted ? (
+                        <span className="text-primary flex items-center gap-1"><CheckCircle2 size={13} /> Đã hoàn thành</span>
+                      ) : "Đang tư vấn"}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="text-muted-foreground w-28 shrink-0">Ghi chú tư vấn</span>
+                    <span className="text-foreground">{consultNote || "—"}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="text-muted-foreground w-28 shrink-0">Ngày tư vấn</span>
+                    <span className="text-foreground">{dateStr}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="text-muted-foreground w-28 shrink-0">Người tư vấn</span>
+                    <span className="text-foreground">{order.partnerName || "Eco Clean Co."} {order.assignedStaff?.[0] ? `- ${order.assignedStaff[0].name}` : ""}</span>
+                  </div>
+                </div>
+
+                {/* Ghi chú input */}
+                {!consultCompleted && (
+                  <div className="pt-2 space-y-3">
+                    <div>
+                      <label className="text-[11px] font-semibold text-foreground mb-1 block">Ghi chú tư vấn</label>
+                      <Textarea
+                        className="rounded-xl min-h-[60px] text-[12px]"
+                        placeholder="Nhập ghi chú tư vấn cho khách hàng..."
+                        value={consultNote}
+                        onChange={e => setConsultNote(e.target.value)}
+                      />
+                    </div>
+                    <Button variant="outline" className="w-full rounded-xl gap-2 font-semibold border-dashed text-[12px]">
+                      <Upload size={14} /> Đính kèm file
+                    </Button>
+                  </div>
+                )}
+
+                {/* File đính kèm placeholder */}
+                <div className="pt-1">
+                  <p className="text-[11px] text-muted-foreground mb-2">File đính kèm</p>
+                  <div className="p-6 rounded-xl bg-muted/30 flex items-center justify-center">
+                    <p className="text-[11px] text-muted-foreground">Chưa có file đính kèm</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Báo giá section */}
+              {consultCompleted && (
+                <motion.div className="glass-card rounded-2xl p-4 mt-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[12px] font-bold text-foreground">Hạng mục báo giá</p>
+                    {(order.status === "dang_khao_sat" || (order.status === "da_tiep_nhan" && !hasKhaoSat)) && (
+                      <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 rounded-lg" onClick={() => { setQuoteItem({ category: "thiet_bi", categoryLabel: "Thiết bị" }); setActiveSheet("quote_item"); }}>
+                        <Plus size={12} /> Thêm
+                      </Button>
+                    )}
+                  </div>
+
+                  {Object.keys(grouped).length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground text-center py-6">Chưa có hạng mục. Nhấn "Thêm" để bắt đầu báo giá.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {QUOTATION_CATEGORIES.map(cat => {
+                        const items = grouped[cat.key];
+                        if (!items) return null;
+                        return (
+                          <div key={cat.key}>
+                            <p className="text-[11px] font-bold text-primary mb-1.5">{cat.label}</p>
+                            {items.map((item) => (
+                              <div key={item.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 mb-1">
+                                <div className="flex-1">
+                                  <p className="text-[11px] font-semibold text-foreground">{item.name}</p>
+                                  <p className="text-[10px] text-muted-foreground">{item.quantity} {item.unit} × {item.unitPrice.toLocaleString("vi-VN")}đ</p>
+                                </div>
+                                <p className="text-[11px] font-bold text-foreground">{item.total.toLocaleString("vi-VN")}đ</p>
+                                {order.status === "dang_khao_sat" && (
+                                  <button className="text-destructive" onClick={() => handleRemoveQuoteItem((order.quotationItems || []).indexOf(item))}>
+                                    <Trash2 size={13} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                      <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                        <p className="text-[12px] font-bold text-foreground">Tổng cộng</p>
+                        <p className="text-[14px] font-extrabold text-primary">{(order.quotationTotal || 0).toLocaleString("vi-VN")}đ</p>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Payment terms & send */}
+              {consultCompleted && (order.status === "dang_khao_sat" || (order.status === "da_tiep_nhan" && !hasKhaoSat)) && (order.quotationItems?.length || 0) > 0 && (
+                <motion.div className="glass-card rounded-2xl p-4 space-y-3 mt-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <div>
+                    <label className="text-[12px] font-bold text-foreground mb-1.5 block">Điều khoản thanh toán</label>
+                    <Textarea placeholder="VD: Thanh toán 50% khi ký HĐ, 50% khi nghiệm thu..." className="rounded-xl min-h-[60px] text-[12px]" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thông tin thanh toán</label>
+                    <Input className="rounded-xl text-[12px]" value={bankInfo} onChange={e => setBankInfo(e.target.value)} />
+                  </div>
+                  <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={handleSendQuotation}>
+                    <Send size={16} /> Gửi báo giá
+                  </Button>
+                </motion.div>
+              )}
+
+              {order.status === "da_bao_gia" && (
+                <div className="p-3 rounded-xl bg-accent/50 border border-primary/20 text-center mt-4">
+                  <p className="text-[12px] font-semibold text-accent-foreground">⏳ Đang chờ khách hàng duyệt báo giá</p>
+                </div>
+              )}
+              {order.quotationApproved && (
+                <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-center mt-4">
+                  <p className="text-[12px] font-bold text-primary flex items-center justify-center gap-1.5"><CheckCircle2 size={14} /> Khách hàng đã duyệt báo giá</p>
+                </div>
+              )}
+
+              {/* Hoàn thành tư vấn button */}
+              {!consultCompleted && (
+                <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground mt-4" onClick={handleCompleteConsult}>
+                  <CheckCircle2 size={16} /> Hoàn thành
+                </Button>
+              )}
+            </motion.div>
           ) : (
-            <div className="space-y-3">
-              {QUOTATION_CATEGORIES.map(cat => {
-                const items = grouped[cat.key];
-                if (!items) return null;
-                return (
-                  <div key={cat.key}>
-                    <p className="text-[11px] font-bold text-primary mb-1.5">{cat.label}</p>
-                    {items.map((item, idx) => (
-                      <div key={item.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 mb-1">
-                        <div className="flex-1">
-                          <p className="text-[11px] font-semibold text-foreground">{item.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{item.quantity} {item.unit} × {item.unitPrice.toLocaleString("vi-VN")}đ</p>
-                        </div>
-                        <p className="text-[11px] font-bold text-foreground">{item.total.toLocaleString("vi-VN")}đ</p>
-                        {order.status === "dang_khao_sat" && (
-                          <button className="text-destructive" onClick={() => handleRemoveQuoteItem((order.quotationItems || []).indexOf(item))}>
-                            <Trash2 size={13} />
-                          </button>
-                        )}
+            <motion.div key="taodv" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+              <div className="glass-card rounded-2xl p-4 space-y-4">
+                {/* Created services list */}
+                {createdServices.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-[13px] font-bold text-foreground">Đơn dịch vụ đã tạo</p>
+                    {createdServices.map(svc => (
+                      <div key={svc.id} className="p-3 rounded-xl bg-muted/30 space-y-1">
+                        <p className="text-[12px] font-bold text-foreground">{svc.id}</p>
+                        <p className="text-[11px] text-muted-foreground">Loại: {svc.types.join(", ")}</p>
+                        <p className="text-[11px] text-muted-foreground">Đơn vị xử lý: {svc.handler}</p>
                       </div>
                     ))}
                   </div>
-                );
-              })}
-              <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                <p className="text-[12px] font-bold text-foreground">Tổng cộng</p>
-                <p className="text-[14px] font-extrabold text-primary">{(order.quotationTotal || 0).toLocaleString("vi-VN")}đ</p>
+                )}
+
+                {/* Create new service */}
+                <div className="space-y-3">
+                  <p className="text-[13px] font-bold text-foreground">Đăng ký dịch vụ bổ sung</p>
+                  <p className="text-[11px] text-muted-foreground">Chọn dịch vụ muốn đăng ký cho khách hàng:</p>
+                  <div className="space-y-2">
+                    {ADDON_SERVICES.map(svc => {
+                      const checked = selectedAddonServices.includes(svc.key);
+                      return (
+                        <button
+                          key={svc.key}
+                          onClick={() => setSelectedAddonServices(prev =>
+                            checked ? prev.filter(k => k !== svc.key) : [...prev, svc.key]
+                          )}
+                          className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                            checked ? "bg-primary/5 border-primary/30" : "bg-card border-border/30"
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                            checked ? "bg-primary border-primary" : "border-muted-foreground/40"
+                          }`}>
+                            {checked && <CheckCircle2 size={13} className="text-primary-foreground" />}
+                          </div>
+                          <span className="text-[12px] font-semibold text-foreground">{svc.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <Button
+                    className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground"
+                    disabled={selectedAddonServices.length === 0}
+                    onClick={() => {
+                      const labels = ADDON_SERVICES.filter(s => selectedAddonServices.includes(s.key)).map(s => s.label);
+                      handleCreateService(labels);
+                      setSelectedAddonServices([]);
+                    }}
+                  >
+                    <Plus size={16} /> Tạo đơn dịch vụ ({selectedAddonServices.length})
+                  </Button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           )}
-        </motion.div>
-
-        {/* Payment terms */}
-        {(order.status === "dang_khao_sat" || (order.status === "da_tiep_nhan" && !hasKhaoSat)) && (order.quotationItems?.length || 0) > 0 && (
-          <motion.div className="glass-card rounded-2xl p-4 space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Điều khoản thanh toán</label>
-              <Textarea placeholder="VD: Thanh toán 50% khi ký HĐ, 50% khi nghiệm thu..." className="rounded-xl min-h-[60px] text-[12px]" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} />
-            </div>
-            <div>
-              <label className="text-[12px] font-bold text-foreground mb-1.5 block">Thông tin thanh toán</label>
-              <Input className="rounded-xl text-[12px]" value={bankInfo} onChange={e => setBankInfo(e.target.value)} />
-            </div>
-            <Button className="w-full h-12 rounded-2xl font-bold gap-1.5 gradient-primary border-0 shadow-glow text-primary-foreground" onClick={handleSendQuotation}>
-              <Send size={16} /> Gửi báo giá
-            </Button>
-          </motion.div>
-        )}
-
-        {order.status === "da_bao_gia" && (
-          <div className="p-3 rounded-xl bg-accent/50 border border-primary/20 text-center">
-            <p className="text-[12px] font-semibold text-accent-foreground">⏳ Đang chờ khách hàng duyệt báo giá</p>
-          </div>
-        )}
-        {order.quotationApproved && (
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
-            <p className="text-[12px] font-bold text-primary flex items-center justify-center gap-1.5"><CheckCircle2 size={14} /> Khách hàng đã duyệt báo giá</p>
-          </div>
-        )}
+        </AnimatePresence>
       </div>
     );
   };
