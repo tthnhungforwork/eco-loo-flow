@@ -49,6 +49,7 @@ const PartnerOrderDetail = () => {
   const [consultNote, setConsultNote] = useState("");
   const [consultCompleted, setConsultCompleted] = useState(false);
   const [createdServices, setCreatedServices] = useState<Array<{ id: string; types: string[]; handler: string }>>([]);
+  const [selectedAddonServices, setSelectedAddonServices] = useState<string[]>([]);
 
   // Staff selection
   const [selectedStaff, setSelectedStaff] = useState<number[]>([]);
