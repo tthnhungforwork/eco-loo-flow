@@ -36,6 +36,7 @@ import PartnerToilets from "./pages/partner/PartnerToilets";
 import PartnerSurveys from "./pages/partner/PartnerSurveys";
 import PartnerGeneral from "./pages/partner/PartnerGeneral";
 import PartnerOrderDetail from "./pages/partner/PartnerOrderDetail";
+import PartnerReports from "./pages/partner/PartnerReports";
 
 import AdminLayout from "./layouts/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="tasks" element={<PartnerTasks />} />
               <Route path="toilets" element={<PartnerToilets />} />
               <Route path="surveys" element={<PartnerSurveys />} />
+              <Route path="reports" element={<PartnerReports />} />
               <Route path="general" element={<PartnerGeneral />} />
             </Route>
 
