@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import EquipmentBioSection, { type EquipmentItem, type BioItem } from "./components/EquipmentBioSection";
 
 interface Task {
   id: number;
