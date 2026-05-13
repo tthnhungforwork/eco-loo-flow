@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import EquipmentBioSection, { type EquipmentItem, type BioItem } from "./components/EquipmentBioSection";
 
 interface Task {
   id: number;
@@ -120,6 +121,8 @@ const CustomerToilets = () => {
   const [formData, setFormData] = useState({
     name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] as string[],
   });
+  const [equipments, setEquipments] = useState<EquipmentItem[]>([]);
+  const [bios, setBios] = useState<BioItem[]>([]);
 
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -142,6 +145,8 @@ const CustomerToilets = () => {
     toast.success("Thêm nhà vệ sinh thành công!");
     setShowAddForm(false);
     setFormData({ name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] });
+    setEquipments([]);
+    setBios([]);
   };
   const selected = toilets.find((t) => t.id === selectedId);
   const filtered = toilets.filter((t) =>
@@ -505,6 +510,13 @@ const CustomerToilets = () => {
                 ))}
               </div>
             </div>
+
+            <EquipmentBioSection
+              equipments={equipments}
+              bios={bios}
+              onChangeEquipments={setEquipments}
+              onChangeBios={setBios}
+            />
 
             <div className="flex gap-3 pt-2">
               <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={() => setShowAddForm(false)}>
