@@ -121,6 +121,8 @@ const CustomerToilets = () => {
   const [formData, setFormData] = useState({
     name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] as string[],
   });
+  const [equipments, setEquipments] = useState<EquipmentItem[]>([]);
+  const [bios, setBios] = useState<BioItem[]>([]);
 
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -143,6 +145,8 @@ const CustomerToilets = () => {
     toast.success("Thêm nhà vệ sinh thành công!");
     setShowAddForm(false);
     setFormData({ name: "", address: "", area: "", category: "", phone: "", owner: "", description: "", certificates: [] });
+    setEquipments([]);
+    setBios([]);
   };
   const selected = toilets.find((t) => t.id === selectedId);
   const filtered = toilets.filter((t) =>
