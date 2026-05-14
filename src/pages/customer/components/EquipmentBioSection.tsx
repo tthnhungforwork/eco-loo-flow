@@ -260,6 +260,23 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                   </Select>
                   {eqErrors.name && <p className="text-[10px] text-destructive mt-1">{eqErrors.name}</p>}
                 </div>
+                <div>
+                  <Label className="text-[11px] text-muted-foreground mb-1 block">Hình ảnh</Label>
+                  <input ref={eqFileRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const f = e.target.files?.[0]; if (!f) return;
+                    const url = await readFile(f); setEqForm((s) => ({ ...s, image: url })); e.target.value = "";
+                  }} />
+                  {eqForm.image ? (
+                    <div className="relative inline-block">
+                      <img src={eqForm.image} alt="thiết bị" className="w-20 h-20 rounded-lg object-cover border border-border/50" />
+                      <button type="button" onClick={() => setEqForm((s) => ({ ...s, image: "" }))} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow"><X size={10} /></button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => eqFileRef.current?.click()} className="flex flex-col items-center justify-center w-20 h-20 rounded-lg border border-dashed border-primary/40 bg-background hover:bg-primary/5 text-primary gap-1">
+                      <ImagePlus size={16} /><span className="text-[10px] font-medium">Tải ảnh</span>
+                    </button>
+                  )}
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <Label className="text-[11px] text-muted-foreground mb-1 block">Số lượng <span className="text-destructive">*</span></Label>
