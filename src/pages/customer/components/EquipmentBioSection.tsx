@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Wrench, FlaskConical, Copy, X, Check, PackageOpen } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Pencil, Trash2, Wrench, FlaskConical, Copy, X, Check, PackageOpen, ImagePlus, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ export interface EquipmentItem {
   quantity: number;
   unit: string;
   condition: string;
+  image?: string;
 }
 
 export interface BioItem {
@@ -21,6 +22,7 @@ export interface BioItem {
   quantity: number;
   unit: string;
   cycle: string;
+  image?: string;
 }
 
 const EQUIPMENT_MASTER = ["Bồn cầu", "Lavabo", "Vòi nước", "Gương soi", "Máy sấy tay", "Bình xịt", "Quạt thông gió"];
@@ -50,22 +52,32 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
   // Equipment form
   const [eqEditingId, setEqEditingId] = useState<string | null>(null);
   const [eqOpen, setEqOpen] = useState(false);
-  const [eqForm, setEqForm] = useState<Omit<EquipmentItem, "id">>({ name: "", quantity: 1, unit: "cái", condition: "Mới" });
+  const [eqForm, setEqForm] = useState<Omit<EquipmentItem, "id">>({ name: "", quantity: 1, unit: "cái", condition: "Mới", image: "" });
   const [eqErrors, setEqErrors] = useState<Record<string, string>>({});
+  const eqFileRef = useRef<HTMLInputElement>(null);
 
   // Bio form
   const [bioEditingId, setBioEditingId] = useState<string | null>(null);
   const [bioOpen, setBioOpen] = useState(false);
-  const [bioForm, setBioForm] = useState<Omit<BioItem, "id">>({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần" });
+  const [bioForm, setBioForm] = useState<Omit<BioItem, "id">>({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần", image: "" });
   const [bioErrors, setBioErrors] = useState<Record<string, string>>({});
+  const bioFileRef = useRef<HTMLInputElement>(null);
+
+  const readFile = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
 
   const resetEqForm = () => {
-    setEqForm({ name: "", quantity: 1, unit: "cái", condition: "Mới" });
+    setEqForm({ name: "", quantity: 1, unit: "cái", condition: "Mới", image: "" });
     setEqErrors({});
     setEqEditingId(null);
   };
   const resetBioForm = () => {
-    setBioForm({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần" });
+    setBioForm({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần", image: "" });
     setBioErrors({});
     setBioEditingId(null);
   };
@@ -113,7 +125,7 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
 
   const editEq = (it: EquipmentItem) => {
     setEqEditingId(it.id);
-    setEqForm({ name: it.name, quantity: it.quantity, unit: it.unit, condition: it.condition });
+    setEqForm({ name: it.name, quantity: it.quantity, unit: it.unit, condition: it.condition, image: it.image || "" });
     setEqOpen(true);
   };
   const dupEq = (it: EquipmentItem) => {
@@ -127,7 +139,7 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
 
   const editBio = (it: BioItem) => {
     setBioEditingId(it.id);
-    setBioForm({ name: it.name, quantity: it.quantity, unit: it.unit, cycle: it.cycle });
+    setBioForm({ name: it.name, quantity: it.quantity, unit: it.unit, cycle: it.cycle, image: it.image || "" });
     setBioOpen(true);
   };
   const dupBio = (it: BioItem) => {
@@ -202,7 +214,14 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                     exit={{ opacity: 0, height: 0 }}
                     className="grid grid-cols-12 gap-1 px-3 py-2.5 border-t border-border/40 items-center text-xs"
                   >
-                    <div className="col-span-4 font-semibold text-foreground truncate">{it.name}</div>
+                    <div className="col-span-4 flex items-center gap-2 min-w-0">
+                      {it.image ? (
+                        <img src={it.image} alt={it.name} className="w-7 h-7 rounded-md object-cover border border-border/40 shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-md bg-muted/60 flex items-center justify-center shrink-0"><ImageIcon size={12} className="text-muted-foreground" /></div>
+                      )}
+                      <span className="font-semibold text-foreground truncate">{it.name}</span>
+                    </div>
                     <div className="col-span-2 text-center font-mono">{it.quantity}</div>
                     <div className="col-span-2 text-center text-muted-foreground">{it.unit}</div>
                     <div className="col-span-2 text-center">
@@ -240,6 +259,23 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                     <SelectContent>{EQUIPMENT_MASTER.map((n) => (<SelectItem key={n} value={n}>{n}</SelectItem>))}</SelectContent>
                   </Select>
                   {eqErrors.name && <p className="text-[10px] text-destructive mt-1">{eqErrors.name}</p>}
+                </div>
+                <div>
+                  <Label className="text-[11px] text-muted-foreground mb-1 block">Hình ảnh</Label>
+                  <input ref={eqFileRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const f = e.target.files?.[0]; if (!f) return;
+                    const url = await readFile(f); setEqForm((s) => ({ ...s, image: url })); e.target.value = "";
+                  }} />
+                  {eqForm.image ? (
+                    <div className="relative inline-block">
+                      <img src={eqForm.image} alt="thiết bị" className="w-20 h-20 rounded-lg object-cover border border-border/50" />
+                      <button type="button" onClick={() => setEqForm((s) => ({ ...s, image: "" }))} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow"><X size={10} /></button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => eqFileRef.current?.click()} className="flex flex-col items-center justify-center w-20 h-20 rounded-lg border border-dashed border-primary/40 bg-background hover:bg-primary/5 text-primary gap-1">
+                      <ImagePlus size={16} /><span className="text-[10px] font-medium">Tải ảnh</span>
+                    </button>
+                  )}
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
@@ -307,7 +343,14 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                     exit={{ opacity: 0, height: 0 }}
                     className="grid grid-cols-12 gap-1 px-3 py-2.5 border-t border-border/40 items-center text-xs"
                   >
-                    <div className="col-span-4 font-semibold text-foreground truncate">{it.name}</div>
+                    <div className="col-span-4 flex items-center gap-2 min-w-0">
+                      {it.image ? (
+                        <img src={it.image} alt={it.name} className="w-7 h-7 rounded-md object-cover border border-border/40 shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-md bg-muted/60 flex items-center justify-center shrink-0"><ImageIcon size={12} className="text-muted-foreground" /></div>
+                      )}
+                      <span className="font-semibold text-foreground truncate">{it.name}</span>
+                    </div>
                     <div className="col-span-2 text-center font-mono">{it.quantity}</div>
                     <div className="col-span-2 text-center text-muted-foreground">{it.unit}</div>
                     <div className="col-span-2 text-center text-[10px] text-foreground truncate">{it.cycle}</div>
@@ -341,6 +384,23 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                     <SelectContent>{BIO_MASTER.map((n) => (<SelectItem key={n} value={n}>{n}</SelectItem>))}</SelectContent>
                   </Select>
                   {bioErrors.name && <p className="text-[10px] text-destructive mt-1">{bioErrors.name}</p>}
+                </div>
+                <div>
+                  <Label className="text-[11px] text-muted-foreground mb-1 block">Hình ảnh</Label>
+                  <input ref={bioFileRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const f = e.target.files?.[0]; if (!f) return;
+                    const url = await readFile(f); setBioForm((s) => ({ ...s, image: url })); e.target.value = "";
+                  }} />
+                  {bioForm.image ? (
+                    <div className="relative inline-block">
+                      <img src={bioForm.image} alt="chế phẩm" className="w-20 h-20 rounded-lg object-cover border border-border/50" />
+                      <button type="button" onClick={() => setBioForm((s) => ({ ...s, image: "" }))} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow"><X size={10} /></button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => bioFileRef.current?.click()} className="flex flex-col items-center justify-center w-20 h-20 rounded-lg border border-dashed border-eco-teal/40 bg-background hover:bg-eco-teal/5 text-eco-teal gap-1">
+                      <ImagePlus size={16} /><span className="text-[10px] font-medium">Tải ảnh</span>
+                    </button>
+                  )}
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
