@@ -139,7 +139,7 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
 
   const editBio = (it: BioItem) => {
     setBioEditingId(it.id);
-    setBioForm({ name: it.name, quantity: it.quantity, unit: it.unit, cycle: it.cycle });
+    setBioForm({ name: it.name, quantity: it.quantity, unit: it.unit, cycle: it.cycle, image: it.image || "" });
     setBioOpen(true);
   };
   const dupBio = (it: BioItem) => {
