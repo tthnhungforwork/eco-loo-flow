@@ -52,22 +52,32 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
   // Equipment form
   const [eqEditingId, setEqEditingId] = useState<string | null>(null);
   const [eqOpen, setEqOpen] = useState(false);
-  const [eqForm, setEqForm] = useState<Omit<EquipmentItem, "id">>({ name: "", quantity: 1, unit: "cái", condition: "Mới" });
+  const [eqForm, setEqForm] = useState<Omit<EquipmentItem, "id">>({ name: "", quantity: 1, unit: "cái", condition: "Mới", image: "" });
   const [eqErrors, setEqErrors] = useState<Record<string, string>>({});
+  const eqFileRef = useRef<HTMLInputElement>(null);
 
   // Bio form
   const [bioEditingId, setBioEditingId] = useState<string | null>(null);
   const [bioOpen, setBioOpen] = useState(false);
-  const [bioForm, setBioForm] = useState<Omit<BioItem, "id">>({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần" });
+  const [bioForm, setBioForm] = useState<Omit<BioItem, "id">>({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần", image: "" });
   const [bioErrors, setBioErrors] = useState<Record<string, string>>({});
+  const bioFileRef = useRef<HTMLInputElement>(null);
+
+  const readFile = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
 
   const resetEqForm = () => {
-    setEqForm({ name: "", quantity: 1, unit: "cái", condition: "Mới" });
+    setEqForm({ name: "", quantity: 1, unit: "cái", condition: "Mới", image: "" });
     setEqErrors({});
     setEqEditingId(null);
   };
   const resetBioForm = () => {
-    setBioForm({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần" });
+    setBioForm({ name: "", quantity: 1, unit: "chai", cycle: "Hằng tuần", image: "" });
     setBioErrors({});
     setBioEditingId(null);
   };
