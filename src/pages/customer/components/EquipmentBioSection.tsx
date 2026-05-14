@@ -13,6 +13,7 @@ export interface EquipmentItem {
   quantity: number;
   unit: string;
   condition: string;
+  image?: string;
 }
 
 export interface BioItem {
@@ -21,6 +22,7 @@ export interface BioItem {
   quantity: number;
   unit: string;
   cycle: string;
+  image?: string;
 }
 
 const EQUIPMENT_MASTER = ["Bồn cầu", "Lavabo", "Vòi nước", "Gương soi", "Máy sấy tay", "Bình xịt", "Quạt thông gió"];
