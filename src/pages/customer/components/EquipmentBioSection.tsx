@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Wrench, FlaskConical, Copy, X, Check, PackageOpen } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Pencil, Trash2, Wrench, FlaskConical, Copy, X, Check, PackageOpen, ImagePlus, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
