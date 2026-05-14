@@ -125,7 +125,7 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
 
   const editEq = (it: EquipmentItem) => {
     setEqEditingId(it.id);
-    setEqForm({ name: it.name, quantity: it.quantity, unit: it.unit, condition: it.condition });
+    setEqForm({ name: it.name, quantity: it.quantity, unit: it.unit, condition: it.condition, image: it.image || "" });
     setEqOpen(true);
   };
   const dupEq = (it: EquipmentItem) => {
