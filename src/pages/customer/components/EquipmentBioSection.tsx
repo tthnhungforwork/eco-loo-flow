@@ -326,7 +326,14 @@ const EquipmentBioSection = ({ equipments, bios, onChangeEquipments, onChangeBio
                     exit={{ opacity: 0, height: 0 }}
                     className="grid grid-cols-12 gap-1 px-3 py-2.5 border-t border-border/40 items-center text-xs"
                   >
-                    <div className="col-span-4 font-semibold text-foreground truncate">{it.name}</div>
+                    <div className="col-span-4 flex items-center gap-2 min-w-0">
+                      {it.image ? (
+                        <img src={it.image} alt={it.name} className="w-7 h-7 rounded-md object-cover border border-border/40 shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-md bg-muted/60 flex items-center justify-center shrink-0"><ImageIcon size={12} className="text-muted-foreground" /></div>
+                      )}
+                      <span className="font-semibold text-foreground truncate">{it.name}</span>
+                    </div>
                     <div className="col-span-2 text-center font-mono">{it.quantity}</div>
                     <div className="col-span-2 text-center text-muted-foreground">{it.unit}</div>
                     <div className="col-span-2 text-center text-[10px] text-foreground truncate">{it.cycle}</div>
